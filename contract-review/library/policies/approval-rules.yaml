@@ -1,0 +1,47 @@
+# Approval Rules — Defines auto-approval conditions and per-asset-type rules
+# Users can toggle auto-approval on/off as a key setting.
+
+auto_approval:
+  enabled: false  # Set to true to enable automatic approval for qualifying assets
+  conditions:
+    # ALL conditions must be met for auto-approval
+    - classification_confidence: high
+    - soft_fail_count: 0
+    - schema_validation: passed
+    - hard_fail_count: 0
+
+per_asset_type:
+  template:
+    auto_approvable: true
+    requires_human_fields: []
+    default_authority_level: preferred
+    default_external_safe: false
+
+  precedent:
+    auto_approvable: true
+    requires_human_fields: []
+    default_authority_level: acceptable
+    default_external_safe: false
+
+  playbook:
+    auto_approvable: false  # Playbooks always require human review
+    requires_human_fields: [preferred, acceptable]
+    default_authority_level: null
+    default_external_safe: false
+
+  comment_bank:
+    auto_approvable: false  # Comment banks always require human review
+    requires_human_fields: [text]
+    default_authority_level: null
+    default_external_safe: false  # external entries must be explicitly marked
+
+approval_decisions:
+  valid_values:
+    - approve         # Accept and publish to approved/
+    - reference_only  # Publish to approved/precedents/reference-only/
+    - reject          # Move to quarantine/
+    - archive         # Move to archive/
+
+staging_retention:
+  max_days: 30  # Assets in staging for > 30 days trigger a reminder
+  reminder_enabled: true

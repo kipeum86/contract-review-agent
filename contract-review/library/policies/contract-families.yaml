@@ -1,0 +1,82 @@
+# Contract Families — Classification taxonomy for document types
+# Users may freely add, rename, or remove entries to reflect their contracting universe.
+# Each family defines the broad category; subtypes provide further specificity.
+
+families:
+  - id: nda
+    name: Non-Disclosure Agreement
+    aliases: ["NDA", "Confidentiality Agreement", "CDA", "비밀유지계약", "비밀유지계약서"]
+    subtypes:
+      - mutual_nda
+      - one_way_nda
+      - employee_nda
+
+  - id: msa
+    name: Master Service Agreement
+    aliases: ["MSA", "기본계약", "기본계약서", "마스터계약"]
+    subtypes:
+      - general_msa
+      - it_services_msa
+      - consulting_msa
+
+  - id: saas
+    name: SaaS Subscription Agreement
+    aliases: ["SaaS Agreement", "Software Subscription", "SaaS 이용약관", "소프트웨어 구독계약"]
+    subtypes:
+      - saas_subscription
+      - saas_enterprise
+      - saas_reseller
+
+  - id: dpa
+    name: Data Processing Agreement
+    aliases: ["DPA", "Data Protection Agreement", "개인정보처리위탁계약"]
+    subtypes:
+      - gdpr_dpa
+      - ccpa_dpa
+      - general_dpa
+
+  - id: sow
+    name: Statement of Work
+    aliases: ["SOW", "Work Order", "과업지시서", "작업명세서"]
+    subtypes:
+      - fixed_price_sow
+      - time_and_materials_sow
+
+  - id: license
+    name: License Agreement
+    aliases: ["License", "Software License", "라이선스계약", "사용권계약"]
+    subtypes:
+      - software_license
+      - ip_license
+      - patent_license
+
+  - id: employment
+    name: Employment Agreement
+    aliases: ["Employment Contract", "근로계약", "고용계약"]
+    subtypes:
+      - full_time
+      - part_time
+      - contractor
+
+  - id: lease
+    name: Lease Agreement
+    aliases: ["Lease", "Rental Agreement", "임대차계약"]
+    subtypes:
+      - commercial_lease
+      - equipment_lease
+
+  - id: partnership
+    name: Partnership / Joint Venture Agreement
+    aliases: ["JV Agreement", "합작투자계약", "파트너십계약"]
+    subtypes:
+      - joint_venture
+      - strategic_partnership
+
+  - id: other
+    name: Other / Unclassified
+    aliases: ["기타"]
+    subtypes:
+      - general
+      - amendment
+      - side_letter
+      - memorandum_of_understanding

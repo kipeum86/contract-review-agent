@@ -1,0 +1,58 @@
+# Retrieval Priority — Controls how library candidates are ranked and filtered
+# during the review pipeline (Workflow 2, Step 5)
+
+priority_order:
+  # Higher priority items are preferred when multiple matches exist
+  # Priority is applied after deterministic filtering
+  1: preferred_template      # Template with authority_level = preferred
+  2: acceptable_template     # Template with authority_level = acceptable
+  3: fallback_template       # Template with authority_level = fallback
+  4: approved_precedent      # Precedent with approval_state = approved
+  5: reference_only          # Precedent in reference-only (lowest weight)
+
+filter_rules:
+  # Stage 1 — Deterministic filter (applied in order)
+  stage_1:
+    - filter: contract_family
+      match: exact
+      required: true
+    - filter: jurisdiction
+      match: exact_or_null    # null jurisdiction matches any
+      required: false
+    - filter: governing_law
+      match: exact_or_null
+      required: false
+    - filter: approval_state
+      match: exact
+      value: approved
+      required: true
+    - filter: status
+      match: exact
+      value: active
+      required: true
+
+  # Stage 1.5 — Narrowing filter (when Stage 1 > 50 candidates)
+  stage_1_5:
+    trigger_threshold: 50
+    filter: clause_type
+    match: exact
+    description: >
+      Narrow by clause_type match against target clause's assigned clause_type.
+      Applied per-clause to reduce candidate set.
+
+  # Stage 2 — Exclusion rules
+  stage_2:
+    exclude:
+      - status: archived
+      - status: superseded
+        condition: active_successor_exists
+      - approval_state: quarantined
+    external_context:
+      exclude_when_external: true
+      field: external_safe
+      required_value: true
+
+freshness_rules:
+  stale_threshold_days: 365  # Assets older than this without refresh are flagged
+  stale_handling: downrank   # downrank | exclude | warn_only
+  freshness_field: last_legal_refresh_date
