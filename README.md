@@ -51,7 +51,7 @@ Claude Code will rewrite all six policy files (contract families, clause taxonom
 >
 > ```text
 > ingest된 계약서 유형에 맞게 policies파일 수정해줘.
-> Rewrite policies to match the contract types already in my library.
+> Rewrite policies to match the contra2ct types already in my library.
 > ```
 >
 > This is often easier than writing policy specs from scratch — let your actual contracts drive the configuration.
@@ -69,7 +69,7 @@ Drop your house templates and reference contracts into [`contract-review/library
 | Volume | **50 documents or fewer** for initial setup. Add more anytime. |
 | Formats | DOCX, PDF, Markdown |
 | Structure | One agreement per file |
-| Privacy | All uploaded files are **gitignored** — they never leave your machine |
+| Privacy | All uploaded files stay on your local PC only — they are never uploaded or shared anywhere |
 
 Templates and precedents are **auto-approved** by default. Playbooks and comment banks still require human confirmation. See [`approval-rules.yaml`](./contract-review/library/policies/approval-rules.yaml).
 
@@ -83,7 +83,7 @@ Drop the contract you want reviewed into the [`input/`](./input/) folder at the 
 
 Results (redlined DOCX, analysis report, etc.) are saved to the [`output/`](./output/) folder.
 
-Both `input/` and `output/` are **gitignored**.
+Both `input/` and `output/` are excluded from version control — your contract files never leave your local PC.
 
 Natural language also works:
 
