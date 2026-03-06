@@ -51,14 +51,15 @@ Route user commands to the appropriate workflow. Accept both natural language an
 
 | Folder | Read | Write | Notes |
 |--------|------|-------|-------|
-| `contract-review/library/inbox/` | Yes | No (user drops files) | Agent reads, never writes |
+| `input/` | Yes | No (user drops files) | Review target contracts |
+| `output/` | Yes | Yes | Final deliverables (redlined DOCX, reports) |
+| `contract-review/library/inbox/` | Yes | No (user drops files) | Library source templates |
 | `contract-review/library/staging/` | Yes | Yes | Ingestion intermediate storage |
 | `contract-review/library/quarantine/` | Yes | Yes | Failed/rejected assets |
 | `contract-review/library/approved/` | Yes | Yes (publish only) | Only via publish step |
 | `contract-review/library/indexes/` | Yes | Yes | Index build/rebuild |
 | `contract-review/library/policies/` | Yes | No | User-managed config |
 | `contract-review/matters/` | Yes | Yes | Matter working directories |
-| `contract-review/output/` | Yes | Yes | Final deliverables |
 | `contract-review/library/runs/` | Yes | Yes | Execution logs |
 
 ## Error Handling
