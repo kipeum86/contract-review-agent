@@ -66,11 +66,17 @@ Templates and precedents are **auto-approved** by default. Playbooks and comment
 
 ### 4. Review a Contract
 
+Drop the contract you want reviewed into the [`input/`](./input/) folder at the project root, then run:
+
 ```text
 /review
 ```
 
-Or use natural language:
+Results (redlined DOCX, analysis report, etc.) are saved to the [`output/`](./output/) folder.
+
+Both `input/` and `output/` are **gitignored**.
+
+Natural language also works:
 
 ```text
 이 SaaS 계약서 moderate 모드로 검토해줘.
@@ -150,21 +156,24 @@ Fully auditable. Every match is traceable.
 
 ```
 .
+├── input/                       # ⬅ Drop contracts to review here (gitignored)
+├── output/                      # ⬅ Review results appear here (gitignored)
+│
 ├── .claude/
 │   ├── agents/                  # Sub-agents: ingestion, review, drafting
 │   ├── skills/                  # Skills: parsing, indexing, validation, redlining, etc.
 │   └── settings.json
 │
 ├── contract-review/
-│   ├── uploads/                 # Drop contracts to review here (gitignored)
-│   └── library/
-│       ├── inbox/raw/           # Drop source templates here (gitignored)
-│       ├── inbox/sidecars/      # Auxiliary metadata (gitignored)
-│       ├── staging/             # Validated, awaiting approval (gitignored)
-│       ├── approved/            # Published assets (gitignored)
-│       ├── quarantine/          # Failed / rejected (gitignored)
-│       ├── indexes/             # JSON indexes (auto-managed)
-│       └── policies/            # YAML config files (user-managed)
+│   ├── library/
+│   │   ├── inbox/raw/           # Drop source templates here (gitignored)
+│   │   ├── inbox/sidecars/      # Auxiliary metadata (gitignored)
+│   │   ├── staging/             # Validated, awaiting approval (gitignored)
+│   │   ├── approved/            # Published assets (gitignored)
+│   │   ├── quarantine/          # Failed / rejected (gitignored)
+│   │   ├── indexes/             # JSON indexes (auto-managed)
+│   │   └── policies/            # YAML config files (user-managed)
+│   └── matters/                 # Per-deal working directories (gitignored)
 │
 ├── docs/
 ├── CLAUDE.md                    # Orchestrator routing rules

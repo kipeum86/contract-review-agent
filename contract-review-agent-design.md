@@ -834,8 +834,17 @@ When the counterparty returns a marked-up version of the drafted contract, the u
 │       └── /drafting-agent
 │           └── AGENT.md                         # Contract drafting pipeline specialist
 │
+├── /input                                       # ⬅ Drop contracts to review here (gitignored)
+├── /output                                      # ⬅ Review results and deliverables (gitignored)
+│   └── /reports
+│       ├── {matter_id}_round_{N}_redlined.docx        # Redlined contract (internal — all comments)
+│       ├── {matter_id}_round_{N}_redlined_clean.docx   # Redlined contract (external-clean — [INTERNAL] stripped)
+│       ├── {matter_id}_round_{N}_report.docx           # Analysis report (review)
+│       ├── {matter_id}_round_{N}_delta.docx            # Delta report (re-reviews)
+│       ├── {matter_id}_round_{N}_draft.docx            # Generated contract (drafting)
+│       └── {matter_id}_round_{N}_review.json           # Machine-readable results
+│
 ├── /contract-review
-│   ├── /uploads                               # Contracts to review — drop zone (gitignored)
 │   ├── /library
 │   │   ├── /inbox/raw                           # Source file drop zone
 │   │   ├── /inbox/sidecars                      # Auxiliary metadata files
@@ -852,28 +861,19 @@ When the counterparty returns a marked-up version of the drafted contract, the u
 │   │       ├── retrieval-priority.yaml
 │   │       └── review-mode.yaml                 # strict / moderate / loose settings
 │   │
-│   ├── /matters
-│   │   └── /{matter_id}
-│   │       ├── matter-context.yaml              # Deal context (party, leverage, priorities)
-│   │       ├── /round_1
-│   │       │   ├── pipeline-state.json          # Resume state for this round
-│   │       │   ├── /working/...                 # Intermediate artifacts
-│   │       │   └── /source/                     # Original contract file for this round
-│   │       ├── /round_2
-│   │       │   ├── pipeline-state.json
-│   │       │   ├── round-meta.json              # Link to prior round
-│   │       │   ├── /working/...
-│   │       │   └── /source/
-│   │       └── /round_N/...
-│   │
-│   └── /output
-│       └── /reports
-│           ├── {matter_id}_round_{N}_redlined.docx        # Redlined contract (internal — all comments)
-│           ├── {matter_id}_round_{N}_redlined_clean.docx   # Redlined contract (external-clean — [INTERNAL] stripped)
-│           ├── {matter_id}_round_{N}_report.docx           # Analysis report (review)
-│           ├── {matter_id}_round_{N}_delta.docx            # Delta report (re-reviews)
-│           ├── {matter_id}_round_{N}_draft.docx            # Generated contract (drafting)
-│           └── {matter_id}_round_{N}_review.json           # Machine-readable results
+│   └── /matters
+│       └── /{matter_id}
+│           ├── matter-context.yaml              # Deal context (party, leverage, priorities)
+│           ├── /round_1
+│           │   ├── pipeline-state.json          # Resume state for this round
+│           │   ├── /working/...                 # Intermediate artifacts
+│           │   └── /source/                     # Original contract file for this round
+│           ├── /round_2
+│           │   ├── pipeline-state.json
+│           │   ├── round-meta.json              # Link to prior round
+│           │   ├── /working/...
+│           │   └── /source/
+│           └── /round_N/...
 │
 └── /docs
     └── implementation-notes.md                  # Implementation notes (optional)
@@ -1360,9 +1360,9 @@ After cloning the repository, a new user should:
 
 1. **Customize policies** — Ask Claude Code to rewrite the six policy YAML files based on the user's practice areas. Alternatively, edit the files in `contract-review/library/policies/` manually.
 2. **Seed the library** — Place house templates and reference contracts (50 or fewer recommended) into `contract-review/library/inbox/raw/` and run `/ingest`. Auto-approval is enabled by default for templates and precedents.
-3. **Start reviewing** — Run `/review` with a counterparty contract.
+3. **Start reviewing** — Drop a counterparty contract into `input/` and run `/review`. Results appear in `output/`.
 
-All uploaded files (inbox, staging, approved, quarantine, uploads) are gitignored and never pushed to the remote repository.
+All user data (input, output, inbox, staging, approved, quarantine, matters) is gitignored and never pushed to the remote repository.
 
 ### v1α Setup (Developer / Maintainer)
 
