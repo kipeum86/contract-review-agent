@@ -1,0 +1,34 @@
+doc_id: 2-1-1-mid-investment-common-integrated
+title: '[중기] 투자계약서 — 보통주식 (통합형)'
+title_en: '[Mid-stage] Investment Agreement — Common Stock (통합형)'
+doc_class: template
+contract_family: ssa
+subtype: common_share_subscription
+paper_role: neutral
+jurisdiction: KR
+governing_law: 대한민국 법률 (Korean law)
+language: ko
+approval_state: approved
+status: active
+sha256: 6f95428c792ace41895dadf48ca7405ccb631d883461ea039290cec3cd9350ac
+source_file: 2-1-1. [중기]_투자계약서_보통주식(통합형)_2309개정.docx
+created_at: '2026-03-06T17:09:47.744621+00:00'
+updated_at: '2026-03-06T17:09:47.744621+00:00'
+classification_confidence: high
+authority_level: preferred
+external_safe: false
+freshness_sensitive: false
+tags:
+- KVCA-standard
+- 2023-09-revision
+- 중소벤처기업부
+- 벤처투자
+notes: 한국벤처캐피탈협회(KVCA)/중소벤처기업부 표준투자계약서 (2023.9 개정)
+industry: venture-capital
+stats:
+  total_clauses: 38
+  unmapped_clauses: 0
+  unmapped_ratio: 0.0
+  defined_terms: 0
+  sections: 36
+  exhibits: 2

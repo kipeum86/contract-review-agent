@@ -1,0 +1,34 @@
+doc_id: 1-1-2-early-investment-convertible-preferred-integrated
+title: '[초기] 투자계약서 — 전환우선주식 (통합형)'
+title_en: '[Early-stage] Investment Agreement — Convertible Preferred (통합형)'
+doc_class: template
+contract_family: ssa
+subtype: preferred_share_subscription
+paper_role: neutral
+jurisdiction: KR
+governing_law: 대한민국 법률 (Korean law)
+language: ko
+approval_state: approved
+status: active
+sha256: dcd58e4174263598ec6e2358856eab26d2801d513a77e2ea62eaed21dd17ca35
+source_file: 1-1-2. [초기]_투자계약서_전환우선주식(통합형)_2309개정.docx
+created_at: '2026-03-06T17:09:47.744621+00:00'
+updated_at: '2026-03-06T17:09:47.744621+00:00'
+classification_confidence: high
+authority_level: preferred
+external_safe: false
+freshness_sensitive: false
+tags:
+- KVCA-standard
+- 2023-09-revision
+- 중소벤처기업부
+- 벤처투자
+notes: 한국벤처캐피탈협회(KVCA)/중소벤처기업부 표준투자계약서 (2023.9 개정)
+industry: venture-capital
+stats:
+  total_clauses: 37
+  unmapped_clauses: 0
+  unmapped_ratio: 0.0
+  defined_terms: 0
+  sections: 35
+  exhibits: 2

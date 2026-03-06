@@ -1,0 +1,8 @@
+{
+  "clause_id": "clause-006",
+  "header": "(거래완결일 전 해제)",
+  "start_line": 90,
+  "end_line": 96,
+  "clause_type": "conditions_precedent",
+  "char_count": 381
+}

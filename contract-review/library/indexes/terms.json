@@ -1,5 +1,146 @@
 {
   "version": 1,
-  "updated_at": "2026-03-06T14:36:41.051254+00:00",
-  "terms": []
+  "updated_at": "2026-03-06T17:09:47.744621+00:00",
+  "terms": [
+    {
+      "doc_id": "0-safe-conditional-equity",
+      "term": "기발행주식수",
+      "first_line": 251
+    },
+    {
+      "doc_id": "0-safe-conditional-equity",
+      "term": "시가",
+      "first_line": 251
+    },
+    {
+      "doc_id": "0-safe-conditional-equity",
+      "term": "회사",
+      "first_line": 251
+    },
+    {
+      "doc_id": "0-safe-conditional-equity",
+      "term": "전환가격",
+      "first_line": 251
+    },
+    {
+      "doc_id": "1-3-1-early-investment-convertible-bond",
+      "term": "기발행주식수",
+      "first_line": 363
+    },
+    {
+      "doc_id": "1-3-1-early-investment-convertible-bond",
+      "term": "시가",
+      "first_line": 363
+    },
+    {
+      "doc_id": "1-3-1-early-investment-convertible-bond",
+      "term": "회사",
+      "first_line": 363
+    },
+    {
+      "doc_id": "1-3-1-early-investment-convertible-bond",
+      "term": "전환가격",
+      "first_line": 363
+    },
+    {
+      "doc_id": "1-3-2-early-investment-bond-with-warrants",
+      "term": "기발행주식수",
+      "first_line": 366
+    },
+    {
+      "doc_id": "1-3-2-early-investment-bond-with-warrants",
+      "term": "시가",
+      "first_line": 366
+    },
+    {
+      "doc_id": "1-3-2-early-investment-bond-with-warrants",
+      "term": "회사",
+      "first_line": 366
+    },
+    {
+      "doc_id": "1-3-2-early-investment-bond-with-warrants",
+      "term": "행사가격",
+      "first_line": 366
+    },
+    {
+      "doc_id": "2-3-1-mid-investment-convertible-bond",
+      "term": "기발행주식수",
+      "first_line": 377
+    },
+    {
+      "doc_id": "2-3-1-mid-investment-convertible-bond",
+      "term": "시가",
+      "first_line": 377
+    },
+    {
+      "doc_id": "2-3-1-mid-investment-convertible-bond",
+      "term": "회사",
+      "first_line": 377
+    },
+    {
+      "doc_id": "2-3-1-mid-investment-convertible-bond",
+      "term": "전환가격",
+      "first_line": 377
+    },
+    {
+      "doc_id": "2-3-2-mid-investment-bond-with-warrants",
+      "term": "기발행주식수",
+      "first_line": 379
+    },
+    {
+      "doc_id": "2-3-2-mid-investment-bond-with-warrants",
+      "term": "시가",
+      "first_line": 379
+    },
+    {
+      "doc_id": "2-3-2-mid-investment-bond-with-warrants",
+      "term": "회사",
+      "first_line": 379
+    },
+    {
+      "doc_id": "2-3-2-mid-investment-bond-with-warrants",
+      "term": "행사가격",
+      "first_line": 379
+    },
+    {
+      "doc_id": "3-3-1-late-investment-convertible-bond",
+      "term": "기발행주식수",
+      "first_line": 389
+    },
+    {
+      "doc_id": "3-3-1-late-investment-convertible-bond",
+      "term": "시가",
+      "first_line": 389
+    },
+    {
+      "doc_id": "3-3-1-late-investment-convertible-bond",
+      "term": "회사",
+      "first_line": 389
+    },
+    {
+      "doc_id": "3-3-1-late-investment-convertible-bond",
+      "term": "전환가격",
+      "first_line": 389
+    },
+    {
+      "doc_id": "3-3-2-late-investment-bond-with-warrants",
+      "term": "기발행주식수",
+      "first_line": 391
+    },
+    {
+      "doc_id": "3-3-2-late-investment-bond-with-warrants",
+      "term": "시가",
+      "first_line": 391
+    },
+    {
+      "doc_id": "3-3-2-late-investment-bond-with-warrants",
+      "term": "회사",
+      "first_line": 391
+    },
+    {
+      "doc_id": "3-3-2-late-investment-bond-with-warrants",
+      "term": "행사가격",
+      "first_line": 391
+    }
+  ]
 }

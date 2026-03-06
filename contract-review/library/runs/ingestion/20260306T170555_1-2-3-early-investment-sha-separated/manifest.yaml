@@ -1,0 +1,34 @@
+doc_id: 1-2-3-early-investment-sha-separated
+title: '[초기] 주주간계약서 (분리형)'
+title_en: '[Early-stage] Shareholders Agreement (Separated)'
+doc_class: template
+contract_family: sha
+subtype: investor_sha
+paper_role: neutral
+jurisdiction: KR
+governing_law: 대한민국 법률 (Korean law)
+language: ko
+approval_state: approved
+status: active
+sha256: 25025bb53698af551a7b47fdc35872aa6581f284c100814ae0ac4571aec6125e
+source_file: 1-2-3. [초기]_투자계약서_주주간계약서(분리형)_2309개정.docx
+created_at: '2026-03-06T17:09:47.744621+00:00'
+updated_at: '2026-03-06T17:09:47.744621+00:00'
+classification_confidence: high
+authority_level: preferred
+external_safe: false
+freshness_sensitive: false
+tags:
+- KVCA-standard
+- 2023-09-revision
+- 중소벤처기업부
+- 벤처투자
+notes: 한국벤처캐피탈협회(KVCA)/중소벤처기업부 표준투자계약서 (2023.9 개정)
+industry: venture-capital
+stats:
+  total_clauses: 32
+  unmapped_clauses: 1
+  unmapped_ratio: 0.031
+  defined_terms: 0
+  sections: 32
+  exhibits: 0

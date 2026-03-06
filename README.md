@@ -47,6 +47,15 @@ Contract types I handle:
 
 Claude Code will rewrite all six policy files (contract families, clause taxonomy, review modes, retrieval rules, etc.) in one pass. You can also [edit the YAML files manually](#policy-files).
 
+> **Tip — Not sure how to configure policies yet?** Skip to Step 3 first. Ingest your house templates, then come back and ask Claude Code to customize the policies based on the ingested contracts:
+>
+> ```text
+> ingest된 계약서 유형에 맞게 policies파일 수정해줘.
+> Rewrite policies to match the contract types already in my library.
+> ```
+>
+> This is often easier than writing policy specs from scratch — let your actual contracts drive the configuration.
+
 ### 3. Seed Your Library
 
 Drop your house templates and reference contracts into [`contract-review/library/inbox/raw/`](./contract-review/library/inbox/raw/), then run:

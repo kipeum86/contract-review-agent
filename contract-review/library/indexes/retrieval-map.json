@@ -1,5 +1,223 @@
 {
   "version": 1,
-  "updated_at": "2026-03-06T14:36:41.051256+00:00",
-  "mappings": []
+  "updated_at": "2026-03-06T17:09:47.744621+00:00",
+  "entries": [
+    {
+      "doc_id": "0-safe-conditional-equity",
+      "contract_family": "safe",
+      "subtype": "safe_standard",
+      "authority_level": "preferred",
+      "path": "approved/templates/safe/0-safe-conditional-equity/"
+    },
+    {
+      "doc_id": "1-1-1-early-investment-common-integrated",
+      "contract_family": "ssa",
+      "subtype": "common_share_subscription",
+      "authority_level": "preferred",
+      "path": "approved/templates/ssa/1-1-1-early-investment-common-integrated/"
+    },
+    {
+      "doc_id": "1-1-2-early-investment-convertible-preferred-integrated",
+      "contract_family": "ssa",
+      "subtype": "preferred_share_subscription",
+      "authority_level": "preferred",
+      "path": "approved/templates/ssa/1-1-2-early-investment-convertible-preferred-integrated/"
+    },
+    {
+      "doc_id": "1-2-1-early-investment-common-separated",
+      "contract_family": "ssa",
+      "subtype": "common_share_subscription",
+      "authority_level": "preferred",
+      "path": "approved/templates/ssa/1-2-1-early-investment-common-separated/"
+    },
+    {
+      "doc_id": "1-2-2-early-investment-convertible-preferred-separated",
+      "contract_family": "ssa",
+      "subtype": "preferred_share_subscription",
+      "authority_level": "preferred",
+      "path": "approved/templates/ssa/1-2-2-early-investment-convertible-preferred-separated/"
+    },
+    {
+      "doc_id": "1-2-2-early-investment-sha-separated",
+      "contract_family": "sha",
+      "subtype": "investor_sha",
+      "authority_level": "preferred",
+      "path": "approved/templates/sha/1-2-2-early-investment-sha-separated/"
+    },
+    {
+      "doc_id": "1-2-3-early-investment-sha-separated",
+      "contract_family": "sha",
+      "subtype": "investor_sha",
+      "authority_level": "preferred",
+      "path": "approved/templates/sha/1-2-3-early-investment-sha-separated/"
+    },
+    {
+      "doc_id": "1-3-1-early-investment-convertible-bond",
+      "contract_family": "ssa",
+      "subtype": "convertible_note",
+      "authority_level": "preferred",
+      "path": "approved/templates/ssa/1-3-1-early-investment-convertible-bond/"
+    },
+    {
+      "doc_id": "1-3-2-early-investment-bond-with-warrants",
+      "contract_family": "ssa",
+      "subtype": "convertible_note",
+      "authority_level": "preferred",
+      "path": "approved/templates/ssa/1-3-2-early-investment-bond-with-warrants/"
+    },
+    {
+      "doc_id": "2-1-1-mid-investment-common-integrated",
+      "contract_family": "ssa",
+      "subtype": "common_share_subscription",
+      "authority_level": "preferred",
+      "path": "approved/templates/ssa/2-1-1-mid-investment-common-integrated/"
+    },
+    {
+      "doc_id": "2-1-2-mid-investment-convertible-preferred-integrated",
+      "contract_family": "ssa",
+      "subtype": "preferred_share_subscription",
+      "authority_level": "preferred",
+      "path": "approved/templates/ssa/2-1-2-mid-investment-convertible-preferred-integrated/"
+    },
+    {
+      "doc_id": "2-1-3-mid-investment-rcps-integrated",
+      "contract_family": "ssa",
+      "subtype": "preferred_share_subscription",
+      "authority_level": "preferred",
+      "path": "approved/templates/ssa/2-1-3-mid-investment-rcps-integrated/"
+    },
+    {
+      "doc_id": "2-2-1-mid-investment-common-separated",
+      "contract_family": "ssa",
+      "subtype": "common_share_subscription",
+      "authority_level": "preferred",
+      "path": "approved/templates/ssa/2-2-1-mid-investment-common-separated/"
+    },
+    {
+      "doc_id": "2-2-2-mid-investment-convertible-preferred-separated",
+      "contract_family": "ssa",
+      "subtype": "preferred_share_subscription",
+      "authority_level": "preferred",
+      "path": "approved/templates/ssa/2-2-2-mid-investment-convertible-preferred-separated/"
+    },
+    {
+      "doc_id": "2-2-2-mid-investment-sha-separated",
+      "contract_family": "sha",
+      "subtype": "investor_sha",
+      "authority_level": "preferred",
+      "path": "approved/templates/sha/2-2-2-mid-investment-sha-separated/"
+    },
+    {
+      "doc_id": "2-2-3-mid-investment-rcps-separated",
+      "contract_family": "ssa",
+      "subtype": "preferred_share_subscription",
+      "authority_level": "preferred",
+      "path": "approved/templates/ssa/2-2-3-mid-investment-rcps-separated/"
+    },
+    {
+      "doc_id": "2-2-3-mid-investment-sha-separated",
+      "contract_family": "sha",
+      "subtype": "investor_sha",
+      "authority_level": "preferred",
+      "path": "approved/templates/sha/2-2-3-mid-investment-sha-separated/"
+    },
+    {
+      "doc_id": "2-2-4-mid-investment-sha-separated",
+      "contract_family": "sha",
+      "subtype": "investor_sha",
+      "authority_level": "preferred",
+      "path": "approved/templates/sha/2-2-4-mid-investment-sha-separated/"
+    },
+    {
+      "doc_id": "2-3-1-mid-investment-convertible-bond",
+      "contract_family": "ssa",
+      "subtype": "convertible_note",
+      "authority_level": "preferred",
+      "path": "approved/templates/ssa/2-3-1-mid-investment-convertible-bond/"
+    },
+    {
+      "doc_id": "2-3-2-mid-investment-bond-with-warrants",
+      "contract_family": "ssa",
+      "subtype": "convertible_note",
+      "authority_level": "preferred",
+      "path": "approved/templates/ssa/2-3-2-mid-investment-bond-with-warrants/"
+    },
+    {
+      "doc_id": "3-1-1-late-investment-common-integrated",
+      "contract_family": "ssa",
+      "subtype": "common_share_subscription",
+      "authority_level": "preferred",
+      "path": "approved/templates/ssa/3-1-1-late-investment-common-integrated/"
+    },
+    {
+      "doc_id": "3-1-2-late-investment-convertible-preferred-integrated",
+      "contract_family": "ssa",
+      "subtype": "preferred_share_subscription",
+      "authority_level": "preferred",
+      "path": "approved/templates/ssa/3-1-2-late-investment-convertible-preferred-integrated/"
+    },
+    {
+      "doc_id": "3-1-3-late-investment-rcps-integrated",
+      "contract_family": "ssa",
+      "subtype": "preferred_share_subscription",
+      "authority_level": "preferred",
+      "path": "approved/templates/ssa/3-1-3-late-investment-rcps-integrated/"
+    },
+    {
+      "doc_id": "3-2-1-late-investment-common-separated",
+      "contract_family": "ssa",
+      "subtype": "common_share_subscription",
+      "authority_level": "preferred",
+      "path": "approved/templates/ssa/3-2-1-late-investment-common-separated/"
+    },
+    {
+      "doc_id": "3-2-2-late-investment-convertible-preferred-separated",
+      "contract_family": "ssa",
+      "subtype": "preferred_share_subscription",
+      "authority_level": "preferred",
+      "path": "approved/templates/ssa/3-2-2-late-investment-convertible-preferred-separated/"
+    },
+    {
+      "doc_id": "3-2-2-late-investment-sha-separated",
+      "contract_family": "sha",
+      "subtype": "investor_sha",
+      "authority_level": "preferred",
+      "path": "approved/templates/sha/3-2-2-late-investment-sha-separated/"
+    },
+    {
+      "doc_id": "3-2-3-late-investment-rcps-separated",
+      "contract_family": "ssa",
+      "subtype": "preferred_share_subscription",
+      "authority_level": "preferred",
+      "path": "approved/templates/ssa/3-2-3-late-investment-rcps-separated/"
+    },
+    {
+      "doc_id": "3-2-3-late-investment-sha-separated",
+      "contract_family": "sha",
+      "subtype": "investor_sha",
+      "authority_level": "preferred",
+      "path": "approved/templates/sha/3-2-3-late-investment-sha-separated/"
+    },
+    {
+      "doc_id": "3-2-4-late-investment-sha-separated",
+      "contract_family": "sha",
+      "subtype": "investor_sha",
+      "authority_level": "preferred",
+      "path": "approved/templates/sha/3-2-4-late-investment-sha-separated/"
+    },
+    {
+      "doc_id": "3-3-1-late-investment-convertible-bond",
+      "contract_family": "ssa",
+      "subtype": "convertible_note",
+      "authority_level": "preferred",
+      "path": "approved/templates/ssa/3-3-1-late-investment-convertible-bond/"
+    },
+    {
+      "doc_id": "3-3-2-late-investment-bond-with-warrants",
+      "contract_family": "ssa",
+      "subtype": "convertible_note",
+      "authority_level": "preferred",
+      "path": "approved/templates/ssa/3-3-2-late-investment-bond-with-warrants/"
+    }
+  ]
 }
