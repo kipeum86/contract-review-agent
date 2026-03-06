@@ -3,7 +3,7 @@
 > **Document purpose**: Target architecture and implementation roadmap for building a Contract Review Agent in Claude Code  
 > **Status**: Draft v3.0  
 > **Date**: 2026-03-06  
-> **Related document**: `/.claude/skills/contract-review/references/domain-policy.md` (Folder Schema & Ingestion Policy Reference)
+> **Related document**: `/.claude/skills/review-domain-knowledge/references/domain-policy.md` (Folder Schema & Ingestion Policy Reference)
 >
 > **Changelog (v3.0)**: Phased implementation (v1α → v1β → v2). External-clean DOCX auto-generation promoted to v1β (safety-critical). CLAUDE.md slimmed — detailed rules moved to AGENT.md/SKILL.md. Hooks integration added (§3.17). Explicit slash-command entry points added (§3.16). DOCX redline scoped to body paragraphs in v1β (table cell-level → v2). Validation philosophy clarified (deterministic-first, LLM-secondary).
 >
