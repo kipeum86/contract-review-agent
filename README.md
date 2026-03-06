@@ -39,10 +39,10 @@ The policy files in [`contract-review/library/policies/`](./contract-review/libr
 Ask Claude Code directly:
 
 ```text
-Policies를 내가 평소 많이 검토하는 계약서 유형에 맞게 수정해줘.
+Rewrite the policy files to match the contract types I work with.
 
-내가 주로 다루는 계약서 유형:
-- NDA, 라이선스, IP양도, 콘텐츠유통, 게임개발, ...
+Contract types I handle:
+- NDA, license, IP assignment, content distribution, game development, ...
 ```
 
 Claude Code will rewrite all six policy files (contract families, clause taxonomy, review modes, retrieval rules, etc.) in one pass. You can also [edit the YAML files manually](#policy-files).
