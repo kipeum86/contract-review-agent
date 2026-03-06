@@ -62,7 +62,7 @@ This agent automates the bulk of that process while preserving a **human-in-the-
 | DOCX redline via XML manipulation | Tracked changes and comments are applied by unpacking DOCX, editing raw XML, and repacking. Not via python-docx's high-level API (which does not support tracked changes). |
 | Final authority rests with the human | The agent recommends; the human approves and dispatches |
 | No multi-tenancy | Single user, single library, local filesystem |
-| Natural language + slash commands | User issues commands via natural language or explicit slash commands (`/ingest`, `/review`, etc.); slash commands provide stable entry points, natural language routing operates on top |
+| Natural language + slash commands | User issues commands via natural language or explicit slash commands (`/ingest`, `/contract-review`, etc.); slash commands provide stable entry points, natural language routing operates on top |
 | Pipeline resumability | All pipeline state is persisted to disk; interrupted pipelines can resume from the last completed step |
 
 ### 1.5 Glossary
@@ -888,7 +888,7 @@ CLAUDE.md includes only the following sections:
 | Section | Role |
 |---------|------|
 | **Identity** | One-paragraph identity statement (contract review assistant; final authority rests with the human) |
-| **Workflow routing** | Rules for routing user commands to one of the five workflows; slash-command mapping (`/ingest`, `/review`, `/rereview`, `/draft`, `/library`) |
+| **Workflow routing** | Rules for routing user commands to one of the five workflows; slash-command mapping (`/ingest`, `/contract-review`, `/rereview`, `/draft`, `/library`) |
 | **Sub-agent dispatch** | Conditions for calling each sub-agent; data handoff conventions (file path passing) |
 | **Core safety rules** | Audience firewall, approved-only retrieval, no-auto-promotion — the non-negotiable guardrails |
 | **Folder access rules** | Read/write permissions summary for each folder |
@@ -1190,7 +1190,7 @@ The system supports two modes of invocation: **natural language** and **explicit
 | Slash Command | Workflow | Description |
 |---------------|----------|-------------|
 | `/ingest` | WF1 | Ingest a document into the library |
-| `/review` | WF2 | Review a counterparty contract |
+| `/contract-review` | WF2 | Review a counterparty contract |
 | `/rereview` | WF4 | Re-review a revised contract against a prior round |
 | `/draft` | WF5 | Draft a new contract (v2) |
 | `/library` | WF3 | Library management commands (list, show, search, deprecate, archive) |
@@ -1255,7 +1255,7 @@ First deployable unit. Validates the ingestion → library → review pipeline e
 - Review mode settings (strict / moderate / loose)
 - Natural language matter context parsing
 - Cross-reference map generation for large document handling
-- Explicit slash-command entry points (`/ingest`, `/review`, `/library`) alongside natural language routing
+- Explicit slash-command entry points (`/ingest`, `/contract-review`, `/library`) alongside natural language routing
 - Hooks integration (see §3.19)
 
 #### Phase v1β — DOCX Output & Negotiation Lifecycle
@@ -1360,7 +1360,7 @@ After cloning the repository, a new user should:
 
 1. **Customize policies** — Ask Claude Code to rewrite the six policy YAML files based on the user's practice areas. Alternatively, edit the files in `contract-review/library/policies/` manually.
 2. **Seed the library** — Place house templates and reference contracts (50 or fewer recommended) into `contract-review/library/inbox/raw/` and run `/ingest`. Auto-approval is enabled by default for templates and precedents.
-3. **Start reviewing** — Drop a counterparty contract into `input/` and run `/review`. Results appear in `output/`.
+3. **Start reviewing** — Drop a counterparty contract into `input/` and run `/contract-review`. Results appear in `output/`.
 
 All user data (input, output, inbox, staging, approved, quarantine, matters) is gitignored and never pushed to the remote repository.
 
@@ -1370,7 +1370,7 @@ All user data (input, output, inbox, staging, approved, quarantine, matters) is 
 2. **Generate default policy files** — Author the six policy YAML files with versatile default values (including `review-mode.yaml`)
 3. **Configure hooks** — Set up `.claude/settings.json` with the hooks defined in Section 3.17
 4. **Implement scripts** — Build the scripts within doc-parser, index-manager, metadata-validator, and pipeline-state
-5. **Author skill files** — Write each SKILL.md with LLM guidelines and behavioral instructions; create slash-command skills (`/ingest`, `/review`, `/library`)
+5. **Author skill files** — Write each SKILL.md with LLM guidelines and behavioral instructions; create slash-command skills (`/ingest`, `/contract-review`, `/library`)
 6. **Author sub-agent files** — Write AGENT.md for ingestion-agent and review-agent
 7. **Author CLAUDE.md** — Write the orchestrator instructions (**keep concise** — see Section 3.2 for scope)
 8. **Run the first ingestion test** — Process a single NDA template through the full pipeline to verify end-to-end operation
