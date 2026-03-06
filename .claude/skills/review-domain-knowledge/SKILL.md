@@ -1,4 +1,4 @@
-# contract-review Skill
+# review-domain-knowledge Skill
 
 Domain knowledge for contract review: classification, analysis, and comment generation.
 
