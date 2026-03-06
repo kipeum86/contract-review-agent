@@ -21,7 +21,7 @@ Route user commands to the appropriate workflow. Accept both natural language an
 | Slash Command | Workflow | Trigger Patterns |
 |---------------|----------|------------------|
 | `/ingest` | WF1 — Library Ingestion | "ingest", "등록", "추가", file placed in inbox/raw |
-| `/review` | WF2 — Contract Review | "review", "검토", "분석", "이 계약서 검토해줘" |
+| `/contract-review` | WF2 — Contract Review | "review", "검토", "분석", "이 계약서 검토해줘" |
 | `/library` | WF3 — Library Management | "library", "라이브러리", "list", "search", "목록", "검색" |
 | `/rereview` | WF4 — Contract Re-review | "re-review", "재검토", "revised version", "수정본" |
 | `/draft` | WF5 — Contract Drafting | "draft", "작성", "create a contract", "계약서 만들어줘" |

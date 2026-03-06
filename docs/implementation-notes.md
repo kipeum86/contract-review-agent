@@ -56,7 +56,7 @@
 ### How to Test
 
 1. **Ingestion test**: Place a DOCX/MD contract in `contract-review/library/inbox/raw/` and run `/ingest`
-2. **Review test**: Place a contract to review and run `/review`
+2. **Review test**: Place a contract to review and run `/contract-review`
 3. **Library test**: Run `/library list` or `/library search`
 
 ### Known Limitations (v1α)

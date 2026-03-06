@@ -69,7 +69,7 @@ Templates and precedents are **auto-approved** by default. Playbooks and comment
 Drop the contract you want reviewed into the [`input/`](./input/) folder at the project root, then run:
 
 ```text
-/review
+/contract-review
 ```
 
 Results (redlined DOCX, analysis report, etc.) are saved to the [`output/`](./output/) folder.
@@ -90,7 +90,7 @@ Review this NDA strictly.
 | Command | What it does |
 |---------|-------------|
 | `/ingest` | Ingest documents into the library |
-| `/review` | Review a counterparty contract |
+| `/contract-review` | Review a counterparty contract |
 | `/rereview` | Re-review a revised draft against a prior round |
 | `/library` | Search, list, show, deprecate, or archive library assets |
 | `/export-clean` | Strip `[INTERNAL]` comments from a redlined DOCX |
