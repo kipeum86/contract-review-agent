@@ -1,0 +1,174 @@
+# Metadata Schema — Required and optional fields for manifest.yaml
+# Used by validate-manifest.py for schema validation
+
+manifest_schema:
+  required_fields:
+    - field: doc_id
+      type: string
+      pattern: "^[a-z0-9\\-]+$"
+      description: Unique document identifier
+
+    - field: title
+      type: string
+      description: Document title
+
+    - field: doc_class
+      type: enum
+      values: [template, precedent, playbook, comment_bank, review_target]
+      description: Document classification
+
+    - field: contract_family
+      type: string
+      description: Contract family ID from contract-families.yaml
+
+    - field: paper_role
+      type: enum
+      values: [house, counterparty, neutral, internal]
+      description: Role of the paper in the contracting relationship
+
+    - field: approval_state
+      type: enum
+      values: [pending, staging, approved, quarantined, archived]
+      description: Current approval state
+
+    - field: status
+      type: enum
+      values: [active, deprecated, superseded, archived]
+      description: Current lifecycle status
+
+    - field: sha256
+      type: string
+      pattern: "^[a-f0-9]{64}$"
+      description: SHA-256 hash of the source file
+
+    - field: source_file
+      type: string
+      description: Original filename
+
+    - field: created_at
+      type: datetime
+      description: ISO 8601 timestamp of creation
+
+  optional_fields:
+    - field: subtype
+      type: string
+      description: Contract subtype from contract-families.yaml
+
+    - field: jurisdiction
+      type: string
+      description: Primary jurisdiction
+
+    - field: governing_law
+      type: string
+      description: Governing law
+
+    - field: language
+      type: string
+      description: Primary document language (ISO 639-1)
+
+    - field: authority_level
+      type: enum
+      values: [preferred, acceptable, fallback, reference_only]
+      description: Authority level for retrieval priority
+
+    - field: external_safe
+      type: boolean
+      default: false
+      description: Whether content may appear in counterparty-facing output
+
+    - field: freshness_sensitive
+      type: boolean
+      default: false
+      description: Whether this document contains time-sensitive legal provisions
+
+    - field: last_legal_refresh_date
+      type: date
+      description: Date of last legal validity review
+
+    - field: supersedes
+      type: string
+      description: doc_id of the document this supersedes
+
+    - field: superseded_by
+      type: string
+      description: doc_id of the document that supersedes this one
+
+    - field: related_playbook
+      type: string
+      description: doc_id of the linked playbook
+
+    - field: related_comment_bank
+      type: string
+      description: doc_id of the linked comment bank
+
+    - field: tags
+      type: list
+      description: Free-form tags for search
+
+    - field: notes
+      type: string
+      description: Human-readable notes
+
+    - field: classification_confidence
+      type: enum
+      values: [high, medium, low]
+      description: Confidence level of the classification result
+
+    - field: updated_at
+      type: datetime
+      description: ISO 8601 timestamp of last update
+
+# Playbook schema
+playbook_schema:
+  required_fields:
+    - field: clause_type
+      type: string
+      description: Clause type ID from clause-taxonomy.yaml
+
+    - field: contract_family
+      type: string
+      description: Contract family ID
+
+    - field: preferred
+      type: object
+      description: Preferred position text and rationale
+
+  optional_fields:
+    - field: acceptable
+      type: object
+      description: Acceptable alternative position
+
+    - field: fallback
+      type: object
+      description: Fallback position (maximum concession)
+
+    - field: prohibited
+      type: object
+      description: Positions that must never be accepted
+
+    - field: escalation_trigger
+      type: string
+      description: Condition that triggers escalation to human review
+
+    - field: negotiation_notes
+      type: string
+      description: Internal strategy notes for negotiation
+
+# Comment bank entry schema
+comment_bank_schema:
+  required_fields:
+    - field: clause_type
+      type: string
+    - field: audience
+      type: enum
+      values: [external, internal]
+    - field: text
+      type: string
+  optional_fields:
+    - field: risk_level
+      type: enum
+      values: [critical, high, medium, low]
+    - field: contract_family
+      type: string
+    - field: tags
+      type: list

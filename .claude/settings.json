@@ -1,0 +1,15 @@
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 -c \"\nimport sys, os, json\n\n# Read the tool input from environment\ntool_input = os.environ.get('TOOL_INPUT', '{}')\ntry:\n    data = json.loads(tool_input)\nexcept:\n    sys.exit(0)\n\nfile_path = data.get('file_path', '')\nif not file_path:\n    sys.exit(0)\n\n# Allowed write directories\nproject_root = os.environ.get('PROJECT_DIR', os.getcwd())\nallowed_prefixes = [\n    os.path.join(project_root, 'contract-review'),\n    os.path.join(project_root, '.claude'),\n    os.path.join(project_root, 'docs'),\n    os.path.join(project_root, 'CLAUDE.md'),\n    os.path.join(project_root, 'package.json'),\n    os.path.join(project_root, 'package-lock.json'),\n    os.path.join(project_root, 'node_modules')\n]\n\nabs_path = os.path.abspath(file_path)\nif not any(abs_path.startswith(p) for p in allowed_prefixes):\n    print(f'BLOCKED: Write to {abs_path} is outside allowed directories', file=sys.stderr)\n    sys.exit(1)\n\""
+          }
+        ]
+      }
+    ]
+  }
+}

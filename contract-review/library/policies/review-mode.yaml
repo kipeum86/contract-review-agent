@@ -1,0 +1,78 @@
+# Review Mode — Controls analysis aggressiveness and redline generation scope
+# Users can set a global default and override per-review via natural language.
+
+default_mode: moderate
+
+modes:
+  strict:
+    description: >
+      Flag all deviations from template. Only the 'preferred' playbook tier
+      is considered acceptable. Generates comments for all risk levels.
+      Best for high-value deals or when you have strong leverage.
+    redline_scope:
+      - critical
+      - high
+      - medium
+      - low
+    acceptable_playbook_tiers:
+      - preferred
+    comment_generation:
+      - critical
+      - high
+      - medium
+      - low
+    risk_tolerance: minimal
+
+  moderate:
+    description: >
+      Flag Critical and High risk items. Both 'preferred' and 'acceptable'
+      playbook tiers are tolerated. Comments generated for Critical, High,
+      and Medium items. Balanced approach for most standard deals.
+    redline_scope:
+      - critical
+      - high
+    acceptable_playbook_tiers:
+      - preferred
+      - acceptable
+    comment_generation:
+      - critical
+      - high
+      - medium
+    risk_tolerance: moderate
+
+  loose:
+    description: >
+      Flag Critical items only. 'Preferred', 'acceptable', and 'fallback'
+      playbook tiers are all tolerated. Comments only for Critical and High
+      items. Use when you have low leverage or need a quick assessment.
+    redline_scope:
+      - critical
+    acceptable_playbook_tiers:
+      - preferred
+      - acceptable
+      - fallback
+    comment_generation:
+      - critical
+      - high
+    risk_tolerance: high
+
+# Natural language triggers for mode override
+mode_triggers:
+  strict:
+    - "strict"
+    - "strictly"
+    - "엄격하게"
+    - "꼼꼼하게"
+    - "철저하게"
+  moderate:
+    - "moderate"
+    - "balanced"
+    - "보통"
+    - "일반적으로"
+  loose:
+    - "loose"
+    - "loosely"
+    - "quick"
+    - "간단하게"
+    - "빠르게"
+    - "대략적으로"

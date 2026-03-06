@@ -1,0 +1,187 @@
+# Clause Taxonomy — Hierarchical classification of contract clause types
+# Users may extend with domain-specific types.
+# Each clause_type has a unique ID, display name, and optional description.
+
+categories:
+  - id: preamble
+    name: Preamble & Recitals
+    clause_types:
+      - id: recitals
+        name: Recitals / Whereas Clauses
+      - id: definitions
+        name: Definitions
+      - id: interpretation
+        name: Interpretation Rules
+
+  - id: scope
+    name: Scope & Obligations
+    clause_types:
+      - id: scope_of_services
+        name: Scope of Services / Work
+      - id: deliverables
+        name: Deliverables
+      - id: service_levels
+        name: Service Levels / SLA
+      - id: acceptance
+        name: Acceptance Criteria
+      - id: obligations_general
+        name: General Obligations
+      - id: performance_standards
+        name: Performance Standards
+      - id: exclusivity
+        name: Exclusivity
+      - id: subcontracting
+        name: Subcontracting
+
+  - id: commercial
+    name: Commercial Terms
+    clause_types:
+      - id: fees_payment
+        name: Fees & Payment
+      - id: price_adjustment
+        name: Price Adjustment / Escalation
+      - id: expenses
+        name: Expenses & Reimbursement
+      - id: taxes
+        name: Taxes
+      - id: audit_rights
+        name: Audit Rights
+
+  - id: term_termination
+    name: Term & Termination
+    clause_types:
+      - id: term_duration
+        name: Term / Duration
+      - id: renewal
+        name: Renewal
+      - id: termination_for_convenience
+        name: Termination for Convenience
+      - id: termination_for_cause
+        name: Termination for Cause / Breach
+      - id: effects_of_termination
+        name: Effects of Termination
+      - id: survival
+        name: Survival
+
+  - id: ip_confidentiality
+    name: IP & Confidentiality
+    clause_types:
+      - id: confidentiality
+        name: Confidentiality
+      - id: ip_ownership
+        name: IP Ownership
+      - id: ip_license_grant
+        name: IP License Grant
+      - id: non_compete
+        name: Non-Compete
+      - id: non_solicitation
+        name: Non-Solicitation
+      - id: publicity
+        name: Publicity / Use of Name
+
+  - id: data_privacy
+    name: Data & Privacy
+    clause_types:
+      - id: data_protection
+        name: Data Protection
+      - id: data_processing
+        name: Data Processing
+      - id: data_security
+        name: Data Security
+      - id: data_breach_notification
+        name: Data Breach Notification
+      - id: cross_border_transfer
+        name: Cross-Border Data Transfer
+      - id: data_retention
+        name: Data Retention & Deletion
+
+  - id: liability_indemnity
+    name: Liability & Indemnity
+    clause_types:
+      - id: limitation_of_liability
+        name: Limitation of Liability
+      - id: liability_cap
+        name: Liability Cap
+      - id: exclusion_of_damages
+        name: Exclusion of Consequential Damages
+      - id: indemnification
+        name: Indemnification
+      - id: insurance
+        name: Insurance
+
+  - id: representations
+    name: Representations & Warranties
+    clause_types:
+      - id: representations_warranties
+        name: Representations & Warranties
+      - id: warranty_disclaimer
+        name: Warranty Disclaimer
+      - id: warranty_period
+        name: Warranty Period
+
+  - id: compliance_regulatory
+    name: Compliance & Regulatory
+    clause_types:
+      - id: compliance_with_laws
+        name: Compliance with Laws
+      - id: anti_corruption
+        name: Anti-Corruption / Anti-Bribery
+      - id: export_control
+        name: Export Control
+      - id: sanctions
+        name: Sanctions
+      - id: regulatory_approvals
+        name: Regulatory Approvals
+
+  - id: dispute_resolution
+    name: Dispute Resolution
+    clause_types:
+      - id: governing_law
+        name: Governing Law
+      - id: jurisdiction
+        name: Jurisdiction
+      - id: arbitration
+        name: Arbitration
+      - id: mediation
+        name: Mediation
+      - id: dispute_escalation
+        name: Dispute Escalation Procedure
+
+  - id: boilerplate
+    name: Boilerplate / General
+    clause_types:
+      - id: entire_agreement
+        name: Entire Agreement
+      - id: amendment
+        name: Amendment / Modification
+      - id: assignment
+        name: Assignment
+      - id: notices
+        name: Notices
+      - id: severability
+        name: Severability
+      - id: waiver
+        name: Waiver
+      - id: force_majeure
+        name: Force Majeure
+      - id: counterparts
+        name: Counterparts
+      - id: third_party_rights
+        name: Third Party Rights
+      - id: relationship_of_parties
+        name: Relationship of Parties
+
+  - id: execution
+    name: Execution
+    clause_types:
+      - id: signature_block
+        name: Signature Block
+      - id: exhibits_schedules
+        name: Exhibits / Schedules / Annexes
+
+  - id: unmapped
+    name: Unmapped
+    clause_types:
+      - id: unmapped
+        name: Unmapped Clause
+        description: Clause that could not be confidently mapped to any taxonomy entry
