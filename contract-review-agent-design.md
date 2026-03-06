@@ -835,6 +835,7 @@ When the counterparty returns a marked-up version of the drafted contract, the u
 │           └── AGENT.md                         # Contract drafting pipeline specialist
 │
 ├── /contract-review
+│   ├── /uploads                               # Contracts to review — drop zone (gitignored)
 │   ├── /library
 │   │   ├── /inbox/raw                           # Source file drop zone
 │   │   ├── /inbox/sidecars                      # Auxiliary metadata files
@@ -1053,7 +1054,7 @@ CLAUDE.md includes only the following sections:
 
 **Versatility strategy:**
 
-1. `contract-families.yaml` and `clause-taxonomy.yaml` are the user-facing customization surfaces. The system ships with broadly applicable defaults (NDA, MSA, SaaS, DPA, and a generic "Other" family), but users may add, rename, or remove entries to reflect their own contracting universe.
+1. `contract-families.yaml` and `clause-taxonomy.yaml` are the user-facing customization surfaces. The system ships with 27 contract families covering commercial, M&A, IP/content, and regulatory agreements (NDA, SPA, SSA, SHA, SAFE, license, IP transfer, publishing, content distribution, game development, joint venture, services, SaaS, marketing, independent contractor, lease, MOU, LOI, ToS, EULA, privacy policy, DPA, and more). Users may add, rename, or remove entries to reflect their own contracting universe. The easiest customization path is to ask Claude Code directly to rewrite the policy files based on a list of contract types the user handles.
 2. Playbooks and comment banks are either authored directly by the user in YAML or auto-suggested by the agent during template ingestion.
 3. No industry-specific logic exists in agent code or skill files. All domain specialization is confined to policy files and library assets. This ensures that the same codebase serves a technology company, a law firm, a game studio, or a manufacturing enterprise equally well.
 
@@ -1068,7 +1069,9 @@ The `review-mode.yaml` policy file defines three modes that control the aggressi
 | **loose** | Critical only | `preferred` + `acceptable` + `fallback` | Critical + High |
 
 - The user can set a **global default** mode in `review-mode.yaml`.
-- The mode can be **overridden per review** via natural language (e.g., "review this strictly" or "do a loose review").
+- The mode can be **overridden per review** via natural language (e.g., "review this strictly", "엄격하게 검토해줘", or "do a loose review").
+- Each mode includes a `recommended_for` list mapping modes to contract families (e.g., `strict` for M&A transactions, `loose` for NDA/MOU/LOI). The agent uses this as a suggestion when no explicit mode is specified.
+- `output_language` defaults to `match_input` (output language matches contract language) and can be overridden per review.
 - When a playbook is absent for a given clause type, the matched template clause text is used as the house position baseline regardless of mode, and a `playbook_missing` flag is set in the analysis output.
 
 ### 3.10 DOCX Redline Implementation Strategy
@@ -1221,6 +1224,8 @@ v1 does not use vector databases or embedding models. Instead, retrieval operate
 
 4. **Priority ranking**: The ordering defined in `retrieval-priority.yaml` (preferred template > acceptable template > approved precedent > reference-only precedent) is provided to the LLM as additional context during matching.
 
+5. **Affinity group fallback**: When exact `contract_family` matching yields fewer than 3 candidates, `retrieval-priority.yaml` defines affinity groups of related families (e.g., `[spa, ssa, sha, safe, apa, merger]` or `[license, ip_transfer, content_distribution]`). Candidates from related families are included with a ranking penalty.
+
 **Trade-offs of this approach:**
 - **Strengths**: Zero external dependencies. Simple to implement. Fully auditable — the reason for each match is traceable.
 - **Weaknesses**: As the library grows, the candidate set passed to the LLM may become large enough to degrade performance.
@@ -1349,7 +1354,17 @@ Adds the signing-ready deliverables and negotiation round support.
 
 When implementing, proceed in phases. **v1α** is the first deployable unit:
 
-### v1α Setup
+### User Onboarding (Post-Clone)
+
+After cloning the repository, a new user should:
+
+1. **Customize policies** — Ask Claude Code to rewrite the six policy YAML files based on the user's practice areas. Alternatively, edit the files in `contract-review/library/policies/` manually.
+2. **Seed the library** — Place house templates and reference contracts (50 or fewer recommended) into `contract-review/library/inbox/raw/` and run `/ingest`. Auto-approval is enabled by default for templates and precedents.
+3. **Start reviewing** — Run `/review` with a counterparty contract.
+
+All uploaded files (inbox, staging, approved, quarantine, uploads) are gitignored and never pushed to the remote repository.
+
+### v1α Setup (Developer / Maintainer)
 
 1. **Generate folder structure** — Run a setup script to create the entire directory tree defined in Section 3.1
 2. **Generate default policy files** — Author the six policy YAML files with versatile default values (including `review-mode.yaml`)
