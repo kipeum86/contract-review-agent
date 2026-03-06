@@ -1,191 +1,42 @@
 # Contract Review Agent
 
-Contract Review Agent is a Claude Code-native contract operations project for ingesting legal know-how, reviewing counterparty paper, supporting negotiation re-reviews, and eventually drafting contracts. The design centers on a simple principle: the agent does the repetitive analysis and document preparation work, but final legal judgment remains with the human reviewer.
+> AI-powered contract review pipeline built on Claude Code.
+> The agent handles the repetitive analysis — clause segmentation, risk grading, redline drafting, comment generation.
+> Final legal judgment stays with the human.
 
-This repository should be read as both:
+---
 
-- a working Claude Code project scaffold with skills, agents, policies, and helper scripts
-- a design-first implementation of the target architecture described in [`contract-review-agent-design.md`](./contract-review-agent-design.md)
+## Overview
 
-## What This Project Is For
+Contract Review Agent is a **Claude Code-native** project for legal contract operations:
 
-The system is designed to help a single legal operator or team lead:
+| Capability | Description |
+|------------|-------------|
+| **Ingest** | Build a searchable library from your house templates, precedents, and playbooks |
+| **Review** | Clause-by-clause analysis of counterparty paper against your house positions |
+| **Re-review** | Delta analysis when a revised draft comes back from negotiation |
+| **Draft** | Interview-driven contract generation with self-review *(roadmap)* |
 
-- ingest reusable contracting assets into a local house library
-- review third-party drafts clause by clause against approved internal positions
-- generate redline suggestions, internal notes, and external-safe comments
-- preserve negotiation history across rounds
-- keep all processing local to the filesystem and Claude Code workflow
+All processing runs **locally on your filesystem** — no external servers, no vector databases, no data leaves your machine.
 
-## Design Principles
+---
 
-- Human in the loop: the agent proposes, the human approves.
-- Local and auditable: data lives on disk; artifacts and indexes are inspectable.
-- No vector database by default: retrieval uses deterministic filtering plus LLM judgment.
-- Approved-only authority: only approved, active library assets should be treated as house position.
-- Audience firewall: internal strategy must never leak into external-facing output.
-- Resume-friendly pipelines: long workflows persist state and can be resumed after interruption.
+## Quick Start
 
-## Repository Status
-
-This repository already contains the core project skeleton and a substantial portion of the helper logic:
-
-- `CLAUDE.md` routing rules for the overall orchestrator
-- `.claude/agents/` sub-agents for ingestion, review, and drafting
-- `.claude/skills/` skills for parsing, segmentation, indexing, validation, reporting, DOCX redlining, pipeline state, and contract-review guidance
-- Python helper scripts for parsing, indexing, validation, resume state, and DOCX XML manipulation
-- Node.js report compilers for DOCX report generation
-- seed policy YAML files and empty JSON indexes under `contract-review/library/`
-
-What this repository is not yet:
-
-- a packaged standalone CLI application
-- a conventional Node.js app with runnable `npm` scripts for the full pipeline
-- a fully productionized distribution with sample datasets, test coverage, and end-user installers
-
-In other words, the repo already implements important building blocks, but the design document still represents the broader target architecture and roadmap.
-
-## Core Workflows
-
-### 1. Library Ingestion
-
-The ingestion flow takes source documents such as templates, playbooks, precedents, and comment banks. Place source files in [`contract-review/library/inbox/raw/`](./contract-review/library/inbox/raw/), then run `/ingest`. The pipeline:
-
-1. detects the file format
-2. fingerprints the file and checks duplicates
-3. normalizes content to machine-usable text
-4. classifies and routes the document
-5. parses structure and segments clauses
-6. enriches metadata
-7. validates the package and applies approval rules
-8. publishes approved assets and rebuilds indexes
-
-Auto-approval is enabled by default: templates and precedents that pass validation are published to `approved/` automatically. Playbooks and comment banks still require human review. This behavior is configured in [`approval-rules.yaml`](./contract-review/library/policies/approval-rules.yaml).
-
-### 2. Contract Review
-
-The review flow parses a target contract, retrieves relevant library candidates, performs clause-by-clause comparative analysis, and prepares:
-
-- redline suggestions
-- internal and external comment candidates
-- structured review JSON
-- a review report
-
-The design supports review modes such as `strict`, `moderate`, and `loose`, configured in [`contract-review/library/policies/review-mode.yaml`](./contract-review/library/policies/review-mode.yaml).
-
-### 3. Library Management
-
-The library workflow handles listing, searching, showing, deprecating, archiving, and rebuilding metadata/index state for approved assets.
-
-### 4. Re-review
-
-The re-review workflow compares a revised draft against a prior negotiation round, identifies changed clauses, and produces delta-focused analysis.
-
-### 5. Drafting
-
-The design also includes a drafting workflow for interview-based or prompt-based contract generation, followed by self-review and DOCX output. This is part of the target architecture and should be treated as roadmap-driven unless you have wired the full drafting flow in your Claude Code environment.
-
-## How The System Works
-
-### Invocation Model
-
-The project is designed for Claude Code, not for direct use as a traditional web service. The primary entry points are slash commands or natural-language routing:
-
-- `/ingest`
-- `/review`
-- `/rereview`
-- `/draft`
-- `/library`
-- `/export-clean`
-- `/resume`
-
-### Retrieval Strategy
-
-The design intentionally avoids embeddings and vector infrastructure in the default architecture. Retrieval is done in stages:
-
-1. deterministic JSON filtering over indexed metadata
-2. candidate narrowing using structural attributes such as contract family and clause type
-3. LLM judgment over the filtered set
-4. priority ordering controlled by policy files
-
-This keeps the system easy to audit and operate locally, at the cost of some scalability compared with embedding-heavy retrieval systems.
-
-### DOCX Output Strategy
-
-DOCX tracked changes are not modeled as a high-level document rewrite. Instead, the design uses unpack-edit-repack XML manipulation so the system can insert tracked changes and comments in a way closer to native Word behavior.
-
-## Repository Layout
-
-The current repository centers on these locations:
-
-```text
-.
-+-- .claude/
-|   +-- agents/
-|   +-- skills/
-|   `-- settings.json
-+-- contract-review/
-|   +-- uploads/              # Contracts to review (gitignored)
-|   `-- library/
-|       +-- inbox/raw/        # Drop source templates here (gitignored)
-|       +-- inbox/sidecars/   # Auxiliary metadata (gitignored)
-|       +-- staging/          # Validated, awaiting approval (gitignored)
-|       +-- approved/         # Published assets (gitignored)
-|       +-- quarantine/       # Failed/rejected (gitignored)
-|       +-- indexes/
-|       `-- policies/
-+-- docs/
-+-- CLAUDE.md
-+-- contract-review-agent-design.md
-+-- package.json
-`-- README.md
-```
-
-Important subtrees:
-
-- `.claude/skills/doc-parser/`: normalization, fingerprinting, and file format detection
-- `.claude/skills/index-manager/`: index build, query, and supersession helpers
-- `.claude/skills/metadata-validator/`: manifest, package, and privilege-leak validation
-- `.claude/skills/docx-redliner/`: clause mapping, redline application, comment insertion, and internal comment stripping
-- `.claude/skills/report-compiler/`: DOCX report generation
-- `.claude/skills/pipeline-state/`: save, load, and round diff helpers
-- `contract-review/library/policies/`: behavior and retrieval configuration
-- `contract-review/library/indexes/`: seed index files for documents, clauses, terms, retrieval mapping, and supersession
-
-## Prerequisites
-
-The implementation notes in this repository currently assume:
-
-- Python 3.14+ for the helper scripts
-- Node.js 24+ for the DOCX report compilers
-- `PyYAML` for YAML-backed Python scripts
-- `docx` for report generation
-
-Optional tools:
-
-- `pdftotext`, `pymupdf`, or `pypdf` for richer PDF support
-- `pandoc` for enhanced DOCX conversion paths
-
-## Setup
-
-Install the declared and implied dependencies:
+### 1. Install
 
 ```bash
+git clone https://github.com/kipeum86/contract-review-agent.git
+cd contract-review-agent
 npm install
 python -m pip install pyyaml
 ```
 
-Then open the repository in Claude Code and use it as a Claude Code project rather than as a generic shell-only program.
+### 2. Customize Policies to Your Practice
 
-## Getting Started — Before First Use
+The policy files in [`contract-review/library/policies/`](./contract-review/library/policies/) control how the agent classifies and reviews contracts. They ship with broad defaults covering 27 contract families, but you should tailor them to your practice.
 
-This agent ships with broadly applicable defaults, but it works best when tuned to your practice. Complete these two steps before running your first review.
-
-### Step 1. Customize Policies
-
-The policy files in [`contract-review/library/policies/`](./contract-review/library/policies/) control how the agent classifies, retrieves, and reviews contracts. They ship with reasonable defaults, but you should adjust them to reflect the contract types you actually work with.
-
-The easiest way to do this is to ask Claude Code directly:
+Ask Claude Code directly:
 
 ```text
 Policies를 내가 평소 많이 검토하는 계약서 유형에 맞게 수정해줘.
@@ -194,102 +45,190 @@ Policies를 내가 평소 많이 검토하는 계약서 유형에 맞게 수정�
 - NDA, 라이선스, IP양도, 콘텐츠유통, 게임개발, ...
 ```
 
-Claude Code will read the existing policy files and rewrite them to match your practice areas — contract families, clause taxonomy, review mode recommendations, and retrieval affinity groups will all be updated in one pass.
+Claude Code will rewrite all six policy files (contract families, clause taxonomy, review modes, retrieval rules, etc.) in one pass. You can also [edit the YAML files manually](#policy-files).
 
-You can also edit the YAML files manually. See [Policy Surfaces You Will Customize](#policy-surfaces-you-will-customize) below for what each file controls.
+### 3. Seed Your Library
 
-### Step 2. Seed Your Library
-
-Place your house templates, approved precedents, and other reference contracts into [`contract-review/library/inbox/raw/`](./contract-review/library/inbox/raw/). These are the source documents the agent will use as your "house position" when reviewing counterparty paper.
-
-Guidelines:
-- **50 documents or fewer** is recommended for initial setup. You can always add more later.
-- Supported formats: DOCX, PDF, and plain text (Markdown).
-- One document per file — do not combine multiple agreements into a single file.
-- These files are **gitignored** by default and will never be pushed to a remote repository.
-
-Once files are in place, run:
+Drop your house templates and reference contracts into [`contract-review/library/inbox/raw/`](./contract-review/library/inbox/raw/), then run:
 
 ```text
 /ingest
 ```
 
-Auto-approval is enabled by default, so templates and precedents that pass validation will be published to `approved/` without manual review. Playbooks and comment banks still require human confirmation.
+| Guideline | Detail |
+|-----------|--------|
+| Volume | **50 documents or fewer** for initial setup. Add more anytime. |
+| Formats | DOCX, PDF, Markdown |
+| Structure | One agreement per file |
+| Privacy | All uploaded files are **gitignored** — they never leave your machine |
 
-### Step 3. Review the Architecture (Optional)
+Templates and precedents are **auto-approved** by default. Playbooks and comment banks still require human confirmation. See [`approval-rules.yaml`](./contract-review/library/policies/approval-rules.yaml).
 
-For a deeper understanding of the system:
-
-1. Review [`contract-review-agent-design.md`](./contract-review-agent-design.md) for the target workflows and artifact model.
-2. Review [`CLAUDE.md`](./CLAUDE.md) for routing, safety rules, and folder access assumptions.
-
-## Typical Usage In Claude Code
-
-Examples of intended usage:
+### 4. Review a Contract
 
 ```text
-/ingest
 /review
-/rereview
-/library search nda
 ```
 
-Natural language requests are also part of the design, for example:
+Or use natural language:
 
 ```text
-Review this SaaS agreement in moderate mode.
-Ingest the template I just added to the library.
-Re-review round 2 against the prior draft.
+이 SaaS 계약서 moderate 모드로 검토해줘.
+Review this NDA strictly.
 ```
 
-## Policy Surfaces You Will Customize
+---
 
-The policy files under `contract-review/library/policies/` are central to the system's behavior:
+## Commands
 
-- `contract-families.yaml`: supported agreement families and routing taxonomy
-- `clause-taxonomy.yaml`: clause types used for segmentation and retrieval
-- `metadata-schema.yaml`: required metadata structure
-- `approval-rules.yaml`: approval gates and auto-approval behavior
-- `retrieval-priority.yaml`: ordering of preferred sources during retrieval
-- `review-mode.yaml`: strictness, tolerance, and comment/redline scope
+| Command | What it does |
+|---------|-------------|
+| `/ingest` | Ingest documents into the library |
+| `/review` | Review a counterparty contract |
+| `/rereview` | Re-review a revised draft against a prior round |
+| `/library` | Search, list, show, deprecate, or archive library assets |
+| `/export-clean` | Strip `[INTERNAL]` comments from a redlined DOCX |
+| `/resume` | Resume an interrupted pipeline |
+| `/draft` | Draft a new contract *(roadmap — v2)* |
 
-## Outputs Defined By The Design
+Natural language works too — the orchestrator routes to the right workflow.
 
-The target architecture produces artifacts such as:
+---
 
-- internal redlined DOCX
-- external-clean redlined DOCX with internal comments stripped
-- review report DOCX
-- delta report DOCX
-- machine-readable review JSON
-- ingestion result JSON
-- refreshed index JSON files
+## How It Works
 
-Some of these outputs are already supported by helper scripts in the repository, while others depend on how completely the surrounding Claude Code workflow has been wired together in your local environment.
+### Review Pipeline
 
-## Current Gaps To Be Aware Of
+```
+Target contract (DOCX/PDF)
+    │
+    ├── Parse & segment into clauses
+    ├── Retrieve matching house clauses from library
+    ├── Compare clause-by-clause (risk grading, gap analysis)
+    ├── Generate redline suggestions + comments
+    ├── Apply tracked changes to DOCX
+    │
+    ├── 📄 Internal redlined DOCX   (all comments)
+    ├── 📄 External-clean DOCX      ([INTERNAL] stripped — safe for counterparty)
+    └── 📄 Review report DOCX       (executive summary + full analysis)
+```
 
-- `package.json` only declares the `docx` dependency and does not expose the full workflow as npm commands.
-- There is no top-level automated test suite configured yet.
-- The design document is broader than the current repository snapshot, so not every roadmap feature should be assumed turnkey.
-- The main operational surface is Claude Code orchestration plus local filesystem conventions, not a standalone application server.
+### Review Modes
 
-## Roadmap Alignment
+| Mode | When to use | Redline scope |
+|------|------------|---------------|
+| **strict** | High-value deals, M&A, strong leverage | All deviations |
+| **moderate** | Standard commercial deals | Critical + High risk |
+| **loose** | Low leverage, quick assessments, LOI/MOU | Critical only |
 
-The design document breaks implementation into three phases:
+Default is `moderate`. Override per-review: `"이거 엄격하게 검토해줘"` or `"do a loose review"`.
 
-- `v1-alpha`: ingestion, library management, report-oriented review, indexes, and resumability
-- `v1-beta`: DOCX redlines/comments, clean export, and re-review lifecycle
-- `v2`: drafting, deeper negotiation support, and more advanced retrieval
+### Library Ingestion
 
-Use that phasing to decide whether a missing feature is a bug, an integration gap, or simply not in scope for the current state of the project.
+```
+inbox/raw/  ──→  validate  ──→  classify  ──→  segment  ──→  approved/
+                                                    ↘
+                                                 quarantine/  (on failure)
+```
 
-## Reference Documents
+Auto-approval is on by default for templates and precedents. No manual approval step needed.
 
-- [`contract-review-agent-design.md`](./contract-review-agent-design.md): target architecture, workflows, folder structure, and roadmap
-- [`CLAUDE.md`](./CLAUDE.md): orchestrator behavior and safety rules
-- [`docs/implementation-notes.md`](./docs/implementation-notes.md): repository implementation notes
+### Retrieval Strategy
+
+No embeddings or vector databases. Retrieval works in stages:
+
+1. **Deterministic filter** — JSON index filtering by contract family, clause type, jurisdiction
+2. **Narrowing** — structural attribute matching when candidates exceed threshold
+3. **LLM judgment** — best-match selection from the filtered set
+4. **Priority ranking** — controlled by [`retrieval-priority.yaml`](./contract-review/library/policies/retrieval-priority.yaml)
+
+Fully auditable. Every match is traceable.
+
+---
+
+## Repository Layout
+
+```
+.
+├── .claude/
+│   ├── agents/                  # Sub-agents: ingestion, review, drafting
+│   ├── skills/                  # Skills: parsing, indexing, validation, redlining, etc.
+│   └── settings.json
+│
+├── contract-review/
+│   ├── uploads/                 # Drop contracts to review here (gitignored)
+│   └── library/
+│       ├── inbox/raw/           # Drop source templates here (gitignored)
+│       ├── inbox/sidecars/      # Auxiliary metadata (gitignored)
+│       ├── staging/             # Validated, awaiting approval (gitignored)
+│       ├── approved/            # Published assets (gitignored)
+│       ├── quarantine/          # Failed / rejected (gitignored)
+│       ├── indexes/             # JSON indexes (auto-managed)
+│       └── policies/            # YAML config files (user-managed)
+│
+├── docs/
+├── CLAUDE.md                    # Orchestrator routing rules
+├── contract-review-agent-design.md  # Full architecture document
+└── package.json
+```
+
+---
+
+## Policy Files
+
+Six YAML files under [`contract-review/library/policies/`](./contract-review/library/policies/) control the agent's behavior. These are the primary customization surface.
+
+| File | Controls | Edit? |
+|------|----------|-------|
+| `contract-families.yaml` | Supported agreement types (27 families: NDA, SPA, game dev, publishing, ...) | **Yes** |
+| `clause-taxonomy.yaml` | Clause classification hierarchy (M&A, IP, content, game dev categories, ...) | **Yes** |
+| `review-mode.yaml` | Strict / moderate / loose review settings + recommended modes per deal type | **Yes** |
+| `approval-rules.yaml` | Auto-approval toggle and per-asset-type rules | **Yes** |
+| `retrieval-priority.yaml` | Search ranking, affinity groups for cross-family matching | Optional |
+| `metadata-schema.yaml` | Metadata field definitions (bilingual support, industry tags, ...) | Optional |
+
+Policies are **read-only for the agent** — only you edit them. The agent manages `indexes/` automatically.
+
+---
+
+## Prerequisites
+
+| Requirement | Version |
+|-------------|---------|
+| Python | 3.14+ |
+| Node.js | 24+ |
+| PyYAML | `pip install pyyaml` |
+
+Optional: `pymupdf` or `pypdf` (PDF support), `pandoc` (enhanced DOCX conversion).
+
+---
+
+## Design Principles
+
+- **Human in the loop** — the agent proposes, the human decides
+- **Local and auditable** — all data on disk, all artifacts inspectable
+- **Audience firewall** — internal strategy never leaks into external-facing output
+- **Resume-friendly** — pipelines persist state and can resume after interruption
+- **Industry-agnostic** — all domain specialization lives in policy files, not code
+
+---
+
+## Roadmap
+
+| Phase | Scope |
+|-------|-------|
+| **v1-alpha** | Ingestion, library management, review (JSON/MD reports), pipeline state, slash commands |
+| **v1-beta** | DOCX redlines/comments, external-clean export, re-review delta reports |
+| **v2** | Contract drafting, table-level redlines, playbook auto-suggestion, embedding retrieval |
+
+---
+
+## Reference
+
+- [Architecture & Design Document](./contract-review-agent-design.md) — full workflow specs, folder schema, implementation phases
+- [CLAUDE.md](./CLAUDE.md) — orchestrator routing and safety rules
+- [Implementation Notes](./docs/implementation-notes.md) — repository implementation details
 
 ## License
 
-This repository is licensed under the MIT License. See [`LICENSE`](./LICENSE).
+MIT — see [LICENSE](./LICENSE).
