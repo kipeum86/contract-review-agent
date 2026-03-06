@@ -3,6 +3,7 @@
 # Each clause_type has a unique ID, display name, and optional description.
 
 categories:
+  # ── Preamble & Recitals ──────────────────────────────
   - id: preamble
     name: Preamble & Recitals
     clause_types:
@@ -13,6 +14,7 @@ categories:
       - id: interpretation
         name: Interpretation Rules
 
+  # ── Scope & Obligations ──────────────────────────────
   - id: scope
     name: Scope & Obligations
     clause_types:
@@ -32,7 +34,12 @@ categories:
         name: Exclusivity
       - id: subcontracting
         name: Subcontracting
+      - id: minimum_commitment
+        name: Minimum Commitment / Volume
+      - id: change_order
+        name: Change Order / Scope Change
 
+  # ── Commercial Terms ─────────────────────────────────
   - id: commercial
     name: Commercial Terms
     clause_types:
@@ -40,13 +47,25 @@ categories:
         name: Fees & Payment
       - id: price_adjustment
         name: Price Adjustment / Escalation
+      - id: royalties
+        name: Royalties / Revenue Share
+        description: Revenue share, royalty rates, minimum guarantees
+      - id: advance_payment
+        name: Advance / Minimum Guarantee
+        description: Upfront payments, MG, recoupment terms
       - id: expenses
         name: Expenses & Reimbursement
       - id: taxes
-        name: Taxes
+        name: Taxes / Withholding
       - id: audit_rights
         name: Audit Rights
+      - id: late_payment
+        name: Late Payment / Interest
+      - id: milestones
+        name: Milestone Payments
+        description: Payment tied to development or delivery milestones
 
+  # ── Term & Termination ───────────────────────────────
   - id: term_termination
     name: Term & Termination
     clause_types:
@@ -58,20 +77,48 @@ categories:
         name: Termination for Convenience
       - id: termination_for_cause
         name: Termination for Cause / Breach
+      - id: termination_insolvency
+        name: Termination on Insolvency / Bankruptcy
       - id: effects_of_termination
         name: Effects of Termination
+      - id: transition_assistance
+        name: Transition / Wind-Down Assistance
       - id: survival
         name: Survival
 
+  # ── IP & Confidentiality ─────────────────────────────
   - id: ip_confidentiality
     name: IP & Confidentiality
     clause_types:
       - id: confidentiality
         name: Confidentiality
+      - id: confidentiality_exceptions
+        name: Confidentiality Exceptions
+      - id: confidentiality_duration
+        name: Confidentiality Duration
       - id: ip_ownership
         name: IP Ownership
+      - id: ip_assignment
+        name: IP Assignment / Transfer
+        description: Transfer of copyright, patent, or other IP rights
       - id: ip_license_grant
         name: IP License Grant
+      - id: license_scope
+        name: License Scope / Restrictions
+        description: Territory, duration, exclusivity, sublicensing of license
+      - id: moral_rights
+        name: Moral Rights Waiver
+        description: Waiver of moral rights (저작인격권 불행사)
+      - id: background_ip
+        name: Background IP / Pre-Existing IP
+      - id: foreground_ip
+        name: Foreground IP / Developed IP
+      - id: joint_ip
+        name: Joint IP Ownership
+      - id: ip_indemnity
+        name: IP Infringement Indemnity
+      - id: open_source
+        name: Open Source Obligations
       - id: non_compete
         name: Non-Compete
       - id: non_solicitation
@@ -79,6 +126,132 @@ categories:
       - id: publicity
         name: Publicity / Use of Name
 
+  # ── Content & Publishing ─────────────────────────────
+  - id: content_publishing
+    name: Content & Publishing
+    clause_types:
+      - id: grant_of_rights
+        name: Grant of Rights
+        description: Publishing rights, distribution rights, adaptation rights
+      - id: territory
+        name: Territory
+      - id: editorial_rights
+        name: Editorial Rights / Approval
+        description: Publisher's editing authority, author approval rights
+      - id: delivery_manuscript
+        name: Delivery of Manuscript / Content
+      - id: publication_schedule
+        name: Publication Schedule / Release Date
+      - id: format_medium
+        name: Format / Medium
+        description: Print, digital, audio, serialization (연재)
+      - id: adaptation_rights
+        name: Adaptation / Derivative Work Rights
+        description: Film, drama, game, merchandise adaptation rights
+      - id: reversion_of_rights
+        name: Reversion of Rights
+        description: Conditions under which rights revert to the author/creator
+      - id: out_of_print
+        name: Out of Print Clause
+      - id: author_copies
+        name: Author Copies / Contributor Copies
+
+  # ── Game Development ─────────────────────────────────
+  - id: game_development
+    name: Game Development
+    clause_types:
+      - id: development_milestones
+        name: Development Milestones
+        description: Alpha, beta, gold master, submission milestones
+      - id: milestone_acceptance
+        name: Milestone Acceptance / Rejection
+      - id: creative_control
+        name: Creative Control / Approval Rights
+        description: Publisher vs developer creative authority
+      - id: platform_requirements
+        name: Platform Requirements
+        description: Target platforms, certification, TRC/TCR compliance
+      - id: live_operations
+        name: Live Operations / Post-Launch
+        description: DLC, updates, seasonal content obligations
+      - id: user_data
+        name: User Data Ownership / Access
+      - id: ratings_compliance
+        name: Age Ratings / Content Compliance
+        description: GRAC, ESRB, PEGI compliance
+      - id: source_code_escrow
+        name: Source Code / Build Escrow
+      - id: localization
+        name: Localization Obligations
+
+  # ── M&A / Investment ─────────────────────────────────
+  - id: ma_investment
+    name: M&A / Investment
+    clause_types:
+      - id: purchase_price
+        name: Purchase Price / Subscription Price
+      - id: price_adjustment_ma
+        name: Purchase Price Adjustment
+        description: Closing adjustments, earn-out, escrow holdback
+      - id: conditions_precedent
+        name: Conditions Precedent to Closing
+        description: Regulatory approval, due diligence completion, third-party consents
+      - id: closing_mechanics
+        name: Closing Mechanics
+        description: Simultaneous sign-close, deferred closing, deliverables at closing
+      - id: reps_warranties_seller
+        name: Seller Representations & Warranties
+        description: Title to shares, financial statements, no undisclosed liabilities, material contracts
+      - id: reps_warranties_buyer
+        name: Buyer Representations & Warranties
+      - id: covenants_pre_closing
+        name: Pre-Closing Covenants
+        description: Ordinary course, no-shop, access to information
+      - id: covenants_post_closing
+        name: Post-Closing Covenants
+        description: Non-compete, employee retention, transition
+      - id: indemnification_ma
+        name: M&A Indemnification
+        description: Indemnification basket, cap, survival, escrow
+      - id: material_adverse_change
+        name: Material Adverse Change / MAC
+      - id: disclosure_schedules
+        name: Disclosure Schedules
+      - id: tag_along
+        name: Tag-Along Rights
+      - id: drag_along
+        name: Drag-Along Rights
+      - id: preemptive_rights
+        name: Preemptive Rights / Anti-Dilution
+      - id: right_of_first_refusal
+        name: Right of First Refusal / ROFR
+      - id: lock_up
+        name: Lock-Up / Transfer Restriction
+      - id: put_call_option
+        name: Put Option / Call Option
+      - id: board_composition
+        name: Board Composition / Governance
+      - id: information_rights
+        name: Information Rights / Reporting
+      - id: dividend_distribution
+        name: Dividend / Distribution
+      - id: liquidation_preference
+        name: Liquidation Preference
+      - id: conversion_rights
+        name: Conversion Rights
+        description: Convertible note / preferred share conversion mechanics
+      - id: valuation_cap
+        name: Valuation Cap / Discount
+        description: SAFE / convertible instrument economics
+      - id: no_shop
+        name: No-Shop / Exclusivity
+      - id: break_fee
+        name: Break-Up Fee / Termination Fee
+      - id: employee_matters
+        name: Employee Matters
+        description: Key employee retention, ESOP, severance
+
+  # ── Data & Privacy ───────────────────────────────────
   - id: data_privacy
     name: Data & Privacy
     clause_types:
@@ -94,7 +267,14 @@ categories:
         name: Cross-Border Data Transfer
       - id: data_retention
         name: Data Retention & Deletion
+      - id: consent_management
+        name: Consent Management
+      - id: data_subject_rights
+        name: Data Subject Rights
+      - id: sub_processor
+        name: Sub-Processor Management
 
+  # ── Liability & Indemnity ────────────────────────────
   - id: liability_indemnity
     name: Liability & Indemnity
     clause_types:
@@ -108,17 +288,30 @@ categories:
         name: Indemnification
       - id: insurance
         name: Insurance
+      - id: liquidated_damages
+        name: Liquidated Damages / Penalty
+        description: Contractual penalty (위약금), liquidated damages
 
+  # ── Representations & Warranties ─────────────────────
   - id: representations
     name: Representations & Warranties
     clause_types:
       - id: representations_warranties
-        name: Representations & Warranties
+        name: Representations & Warranties (General)
+      - id: authority_capacity
+        name: Authority & Capacity
+      - id: no_conflict
+        name: No Conflict / No Violation
+      - id: compliance_representation
+        name: Compliance Representation
+      - id: financial_condition
+        name: Financial Condition
       - id: warranty_disclaimer
         name: Warranty Disclaimer
       - id: warranty_period
         name: Warranty Period
 
+  # ── Compliance & Regulatory ──────────────────────────
   - id: compliance_regulatory
     name: Compliance & Regulatory
     clause_types:
@@ -132,7 +325,13 @@ categories:
         name: Sanctions
       - id: regulatory_approvals
         name: Regulatory Approvals
+      - id: competition_law
+        name: Competition / Antitrust
+      - id: industry_specific
+        name: Industry-Specific Regulations
+        description: Game rating (게임등급), content regulation, financial regulation
 
+  # ── Dispute Resolution ───────────────────────────────
   - id: dispute_resolution
     name: Dispute Resolution
     clause_types:
@@ -146,7 +345,10 @@ categories:
         name: Mediation
       - id: dispute_escalation
         name: Dispute Escalation Procedure
+      - id: injunctive_relief
+        name: Injunctive Relief / Provisional Remedies
 
+  # ── Boilerplate / General ────────────────────────────
   - id: boilerplate
     name: Boilerplate / General
     clause_types:
@@ -170,7 +372,18 @@ categories:
         name: Third Party Rights
       - id: relationship_of_parties
         name: Relationship of Parties
+      - id: further_assurances
+        name: Further Assurances
+      - id: set_off
+        name: Set-Off Rights
+      - id: language_clause
+        name: Language / Translation
+        description: Which language version prevails (국문/영문 우선 조항)
+      - id: binding_effect
+        name: Binding Effect / Non-Binding
+        description: Particularly relevant for MOU, LOI
 
+  # ── Execution ────────────────────────────────────────
   - id: execution
     name: Execution
     clause_types:
@@ -179,6 +392,7 @@ categories:
       - id: exhibits_schedules
         name: Exhibits / Schedules / Annexes
 
+  # ── Unmapped ─────────────────────────────────────────
   - id: unmapped
     name: Unmapped
     clause_types:

@@ -49,7 +49,7 @@ In other words, the repo already implements important building blocks, but the d
 
 ### 1. Library Ingestion
 
-The ingestion flow takes source documents such as templates, playbooks, precedents, and comment banks, then:
+The ingestion flow takes source documents such as templates, playbooks, precedents, and comment banks. Place source files in [`contract-review/library/inbox/raw/`](./contract-review/library/inbox/raw/), then run `/ingest`. The pipeline:
 
 1. detects the file format
 2. fingerprints the file and checks duplicates
@@ -59,6 +59,8 @@ The ingestion flow takes source documents such as templates, playbooks, preceden
 6. enriches metadata
 7. validates the package and applies approval rules
 8. publishes approved assets and rebuilds indexes
+
+Auto-approval is enabled by default: templates and precedents that pass validation are published to `approved/` automatically. Playbooks and comment banks still require human review. This behavior is configured in [`approval-rules.yaml`](./contract-review/library/policies/approval-rules.yaml).
 
 ### 2. Contract Review
 
@@ -123,7 +125,13 @@ The current repository centers on these locations:
 |   +-- skills/
 |   `-- settings.json
 +-- contract-review/
+|   +-- uploads/              # Contracts to review (gitignored)
 |   `-- library/
+|       +-- inbox/raw/        # Drop source templates here (gitignored)
+|       +-- inbox/sidecars/   # Auxiliary metadata (gitignored)
+|       +-- staging/          # Validated, awaiting approval (gitignored)
+|       +-- approved/         # Published assets (gitignored)
+|       +-- quarantine/       # Failed/rejected (gitignored)
 |       +-- indexes/
 |       `-- policies/
 +-- docs/
@@ -169,13 +177,51 @@ python -m pip install pyyaml
 
 Then open the repository in Claude Code and use it as a Claude Code project rather than as a generic shell-only program.
 
-## Recommended Starting Sequence
+## Getting Started — Before First Use
+
+This agent ships with broadly applicable defaults, but it works best when tuned to your practice. Complete these two steps before running your first review.
+
+### Step 1. Customize Policies
+
+The policy files in [`contract-review/library/policies/`](./contract-review/library/policies/) control how the agent classifies, retrieves, and reviews contracts. They ship with reasonable defaults, but you should adjust them to reflect the contract types you actually work with.
+
+The easiest way to do this is to ask Claude Code directly:
+
+```text
+Policies를 내가 평소 많이 검토하는 계약서 유형에 맞게 수정해줘.
+
+내가 주로 다루는 계약서 유형:
+- NDA, 라이선스, IP양도, 콘텐츠유통, 게임개발, ...
+```
+
+Claude Code will read the existing policy files and rewrite them to match your practice areas — contract families, clause taxonomy, review mode recommendations, and retrieval affinity groups will all be updated in one pass.
+
+You can also edit the YAML files manually. See [Policy Surfaces You Will Customize](#policy-surfaces-you-will-customize) below for what each file controls.
+
+### Step 2. Seed Your Library
+
+Place your house templates, approved precedents, and other reference contracts into [`contract-review/library/inbox/raw/`](./contract-review/library/inbox/raw/). These are the source documents the agent will use as your "house position" when reviewing counterparty paper.
+
+Guidelines:
+- **50 documents or fewer** is recommended for initial setup. You can always add more later.
+- Supported formats: DOCX, PDF, and plain text (Markdown).
+- One document per file — do not combine multiple agreements into a single file.
+- These files are **gitignored** by default and will never be pushed to a remote repository.
+
+Once files are in place, run:
+
+```text
+/ingest
+```
+
+Auto-approval is enabled by default, so templates and precedents that pass validation will be published to `approved/` without manual review. Playbooks and comment banks still require human confirmation.
+
+### Step 3. Review the Architecture (Optional)
+
+For a deeper understanding of the system:
 
 1. Review [`contract-review-agent-design.md`](./contract-review-agent-design.md) for the target workflows and artifact model.
 2. Review [`CLAUDE.md`](./CLAUDE.md) for routing, safety rules, and folder access assumptions.
-3. Adjust the policy files under [`contract-review/library/policies`](./contract-review/library/policies) to reflect your contract families, clause taxonomy, approval rules, metadata schema, and review posture.
-4. Place source assets into the library intake path expected by your ingestion workflow.
-5. Run an ingestion pass before attempting library-backed review.
 
 ## Typical Usage In Claude Code
 

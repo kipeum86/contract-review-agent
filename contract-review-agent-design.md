@@ -277,7 +277,7 @@ Asset registered in library
 |-------|--------|
 | **Executor** | **Conditional: Auto-approval or Human review** |
 | **Input** | Staging package + validation report + review flags + classification confidence |
-| **Actions** | **Auto-approval path**: If all of the following are true — (1) zero soft-fail conditions, (2) classification confidence = high, (3) schema validation passed — the agent automatically approves and proceeds to Step 10. **Human review path**: If any condition above is not met, the agent presents a package summary to the human. The human renders an approval decision: approve / reference-only / reject / archive. The auto-approval policy is defined in `approval-rules.yaml` and can be toggled on/off by the user. |
+| **Actions** | **Auto-approval path (default)**: If all of the following are true — (1) zero soft-fail conditions, (2) classification confidence = high, (3) schema validation passed — the agent automatically approves and proceeds to Step 10. Auto-approval is enabled by default so that templates and precedents uploaded to `inbox/raw/` flow through to `approved/` without manual intervention. **Human review path**: If any condition above is not met, or if the asset type requires human review (e.g., playbooks, comment banks), the agent presents a package summary to the human. The human renders an approval decision: approve / reference-only / reject / archive. The auto-approval policy is defined in `approval-rules.yaml` and can be toggled on/off by the user. |
 | **Output** | Updated `approval_state` |
 | **Success criteria** | An explicit decision exists (auto or human) |
 | **Validation method** | Rule-based — confirm the decision value is valid |
@@ -1047,7 +1047,7 @@ CLAUDE.md includes only the following sections:
 | `contract-families.yaml` | Enumeration of supported contract families. Users may freely add or remove entries. | **Yes** — primary customization entry point |
 | `clause-taxonomy.yaml` | Clause type classification hierarchy. Users may extend with domain-specific types. | **Yes** — ships with a versatile default; user extends as needed |
 | `metadata-schema.yaml` | Required and optional field definitions for `manifest.yaml` | Optional |
-| `approval-rules.yaml` | Per-asset-type approval rules. Includes auto-approval toggle: when enabled, assets with high classification confidence and zero soft-fail conditions are automatically approved without human review. | **Yes** — auto-approval on/off is a key user setting |
+| `approval-rules.yaml` | Per-asset-type approval rules. Auto-approval is **enabled by default**: assets with high classification confidence and zero soft-fail conditions (templates, precedents) are automatically approved without human review. Playbooks and comment banks still require human review. The toggle can be turned off if manual approval is preferred. | **Yes** — auto-approval on/off is a key user setting |
 | `retrieval-priority.yaml` | Retrieval priority ordering, filter rules, and exclusion rules | Optional |
 | `review-mode.yaml` | Defines the three review modes (strict / moderate / loose). Each mode specifies: (1) which risk grades trigger redline suggestions, (2) which playbook tiers are considered acceptable, (3) whether comments are generated for Medium/Low items. Ships with sensible defaults; user can switch modes per review or globally. | **Yes** — controls review aggressiveness |
 
