@@ -5,9 +5,13 @@ __pycache__/
 .DS_Store
 /tmp/
 
-# User-uploaded contracts for review (confidential - do not commit)
-/contract-review/uploads/*
-!/contract-review/uploads/.gitkeep
+# Contracts to review — drop here (confidential - do not commit)
+/input/*
+!/input/.gitkeep
+
+# Review results and deliverables (confidential - do not commit)
+/output/*
+!/output/.gitkeep
 
 # Library assets containing real contract content (confidential - do not commit)
 /contract-review/library/inbox/raw/*
@@ -20,3 +24,7 @@ __pycache__/
 !/contract-review/library/approved/.gitkeep
 /contract-review/library/quarantine/*
 !/contract-review/library/quarantine/.gitkeep
+
+# Matter working directories (confidential - do not commit)
+/contract-review/matters/*
+!/contract-review/matters/.gitkeep
