@@ -8,7 +8,7 @@ modes:
     description: >
       Flag all deviations from template. Only the 'preferred' playbook tier
       is considered acceptable. Generates comments for all risk levels.
-      Best for high-value deals or when you have strong leverage.
+      Best for high-value deals, M&A transactions, or when you have strong leverage.
     redline_scope:
       - critical
       - high
@@ -22,6 +22,13 @@ modes:
       - medium
       - low
     risk_tolerance: minimal
+    recommended_for:
+      - spa
+      - ssa
+      - sha
+      - merger
+      - apa
+      - joint_venture
 
   moderate:
     description: >
@@ -39,12 +46,21 @@ modes:
       - high
       - medium
     risk_tolerance: moderate
+    recommended_for:
+      - license
+      - services
+      - game_development
+      - publishing
+      - content_distribution
+      - saas
+      - lease
 
   loose:
     description: >
       Flag Critical items only. 'Preferred', 'acceptable', and 'fallback'
       playbook tiers are all tolerated. Comments only for Critical and High
-      items. Use when you have low leverage or need a quick assessment.
+      items. Use when you have low leverage, for low-value deals, or for
+      preliminary assessments of LOIs and MOUs.
     redline_scope:
       - critical
     acceptable_playbook_tiers:
@@ -55,6 +71,11 @@ modes:
       - critical
       - high
     risk_tolerance: high
+    recommended_for:
+      - nda
+      - mou
+      - loi
+      - sow
 
 # Natural language triggers for mode override
 mode_triggers:
@@ -64,11 +85,15 @@ mode_triggers:
     - "엄격하게"
     - "꼼꼼하게"
     - "철저하게"
+    - "빡빡하게"
+    - "중요한 딜"
+    - "high value"
   moderate:
     - "moderate"
     - "balanced"
     - "보통"
     - "일반적으로"
+    - "표준"
   loose:
     - "loose"
     - "loosely"
@@ -76,3 +101,12 @@ mode_triggers:
     - "간단하게"
     - "빠르게"
     - "대략적으로"
+    - "러프하게"
+    - "개략적으로"
+
+# Output language preference
+output_language:
+  default: match_input  # match_input | ko | en
+  description: >
+    By default, review output language matches the input contract language.
+    Override with explicit instruction (e.g., "리뷰를 영문으로 해줘").

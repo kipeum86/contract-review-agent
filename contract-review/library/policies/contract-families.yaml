@@ -3,22 +3,158 @@
 # Each family defines the broad category; subtypes provide further specificity.
 
 families:
+  # ── NDA ──────────────────────────────────────────────
   - id: nda
     name: Non-Disclosure Agreement
-    aliases: ["NDA", "Confidentiality Agreement", "CDA", "비밀유지계약", "비밀유지계약서"]
+    aliases: ["NDA", "Confidentiality Agreement", "CDA", "비밀유지계약", "비밀유지계약서", "기밀유지계약"]
     subtypes:
       - mutual_nda
       - one_way_nda
       - employee_nda
+      - deal_nda              # M&A / investment due-diligence NDA
 
-  - id: msa
-    name: Master Service Agreement
-    aliases: ["MSA", "기본계약", "기본계약서", "마스터계약"]
+  # ── Licensing ────────────────────────────────────────
+  - id: license
+    name: License Agreement
+    aliases: ["License", "라이선스계약", "사용권계약", "이용허락계약"]
+    subtypes:
+      - software_license
+      - ip_license             # Patent, trademark, or general IP license
+      - patent_license
+      - trademark_license
+      - content_license        # Music, image, video, text content
+      - game_ip_license        # Game IP sub-license or cross-license
+      - brand_license
+
+  # ── IP Transfer / Assignment ─────────────────────────
+  - id: ip_transfer
+    name: IP Transfer / Assignment Agreement
+    aliases: ["IP Assignment", "IP Transfer", "지식재산권양도계약", "IP양도계약", "저작권양도계약", "특허양도계약"]
+    subtypes:
+      - copyright_assignment
+      - patent_assignment
+      - trademark_assignment
+      - general_ip_assignment
+      - work_for_hire          # 업무상저작물 / work-made-for-hire
+
+  # ── Publishing ───────────────────────────────────────
+  - id: publishing
+    name: Publishing Agreement
+    aliases: ["Publishing Contract", "출판계약", "출판권설정계약", "저작물이용허락계약"]
+    subtypes:
+      - book_publishing
+      - digital_publishing
+      - webtoon_publishing     # 웹툰 연재계약
+      - webnovel_publishing    # 웹소설 연재계약
+      - music_publishing
+      - co_publishing
+
+  # ── Content Distribution ─────────────────────────────
+  - id: content_distribution
+    name: Content Distribution Agreement
+    aliases: ["Distribution Agreement", "콘텐츠유통계약", "콘텐츠배급계약", "배급계약", "유통계약"]
+    subtypes:
+      - digital_distribution   # OTT, streaming platform
+      - physical_distribution
+      - game_distribution      # Platform store distribution (Steam, App Store)
+      - content_syndication
+      - localization_distribution  # 해외 현지화 유통
+
+  # ── Game Development ─────────────────────────────────
+  - id: game_development
+    name: Game Development Agreement
+    aliases: ["Game Dev Agreement", "게임개발계약", "게임제작계약", "게임퍼블리싱계약"]
+    subtypes:
+      - game_publishing        # Publisher-developer deal
+      - game_co_development    # 공동개발
+      - game_porting           # Platform porting
+      - game_outsourcing       # Art, QA, localization outsourcing
+      - live_ops               # Post-launch operation / live service
+
+  # ── Joint Venture ────────────────────────────────────
+  - id: joint_venture
+    name: Joint Venture Agreement
+    aliases: ["JV Agreement", "합작투자계약", "합작계약", "조인트벤처계약"]
+    subtypes:
+      - equity_jv              # Separate entity JV
+      - contractual_jv         # No separate entity
+      - consortium             # Project-based consortium
+
+  # ── M&A — Share Purchase ─────────────────────────────
+  - id: spa
+    name: Share Purchase Agreement
+    aliases: ["SPA", "주식양수도계약", "지분양수도계약", "주식매매계약"]
+    subtypes:
+      - share_purchase
+      - membership_interest_purchase  # LLC interest
+
+  # ── M&A — Share Subscription ─────────────────────────
+  - id: ssa
+    name: Share Subscription Agreement
+    aliases: ["SSA", "Subscription Agreement", "주식인수계약", "신주인수계약", "투자계약"]
+    subtypes:
+      - common_share_subscription
+      - preferred_share_subscription
+      - convertible_note       # 전환사채 인수계약
+
+  # ── M&A — Shareholders Agreement ─────────────────────
+  - id: sha
+    name: Shareholders Agreement
+    aliases: ["SHA", "Shareholders' Agreement", "주주간계약", "주주간협약"]
+    subtypes:
+      - founders_agreement     # 창업자간 계약
+      - investor_sha           # Post-investment SHA
+      - jv_sha                 # JV entity SHA
+
+  # ── M&A — SAFE / Convertible ─────────────────────────
+  - id: safe
+    name: SAFE / Convertible Instrument
+    aliases: ["SAFE", "Simple Agreement for Future Equity", "조건부지분인수계약"]
+    subtypes:
+      - safe_standard          # Y Combinator style SAFE
+      - safe_mfn               # Most Favored Nation
+      - convertible_note       # 전환사채
+      - kiss                   # Keep It Simple Security
+
+  # ── M&A — Asset Purchase ─────────────────────────────
+  - id: apa
+    name: Asset Purchase Agreement
+    aliases: ["APA", "영업양수도계약", "자산양수도계약", "사업양수도계약"]
+    subtypes:
+      - business_transfer      # 영업양도
+      - asset_sale
+
+  # ── M&A — Merger ─────────────────────────────────────
+  - id: merger
+    name: Merger Agreement
+    aliases: ["Merger", "합병계약", "흡수합병계약", "신설합병계약"]
+    subtypes:
+      - absorption_merger      # 흡수합병
+      - consolidation_merger   # 신설합병
+
+  # ── Purchase & Sales ─────────────────────────────────
+  - id: purchase_sales
+    name: Purchase & Sales Agreement
+    aliases: ["PSA", "Supply Agreement", "매매계약", "공급계약", "물품매매계약", "물품공급계약"]
+    subtypes:
+      - goods_sale
+      - supply_agreement       # Long-term supply
+      - equipment_purchase
+      - distribution_purchase  # Distributor purchase terms
+
+  # ── Services ─────────────────────────────────────────
+  - id: services
+    name: Service Agreement
+    aliases: ["MSA", "Master Service Agreement", "서비스계약", "용역계약", "기본계약"]
     subtypes:
       - general_msa
-      - it_services_msa
-      - consulting_msa
+      - it_services
+      - consulting
+      - professional_services
+      - managed_services
+      - maintenance_support    # 유지보수계약
 
+  # ── SaaS ─────────────────────────────────────────────
   - id: saas
     name: SaaS Subscription Agreement
     aliases: ["SaaS Agreement", "Software Subscription", "SaaS 이용약관", "소프트웨어 구독계약"]
@@ -27,14 +163,102 @@ families:
       - saas_enterprise
       - saas_reseller
 
+  # ── Marketing ────────────────────────────────────────
+  - id: marketing
+    name: Marketing Agreement
+    aliases: ["Marketing Contract", "마케팅계약", "광고계약", "프로모션계약"]
+    subtypes:
+      - advertising            # 광고대행계약
+      - influencer             # 인플루언서 계약
+      - sponsorship            # 스폰서십/후원계약
+      - affiliate              # 제휴마케팅
+      - media_buying           # 매체 구매
+
+  # ── Independent Contractor ───────────────────────────
+  - id: independent_contractor
+    name: Independent Contractor Agreement
+    aliases: ["Contractor Agreement", "Freelancer Agreement", "업무위탁계약", "프리랜서계약", "외주계약", "도급계약"]
+    subtypes:
+      - general_contractor
+      - consulting_contractor
+      - creative_contractor    # Designer, writer, artist
+      - tech_contractor        # Developer, engineer
+
+  # ── Employment ───────────────────────────────────────
+  - id: employment
+    name: Employment Agreement
+    aliases: ["Employment Contract", "근로계약", "고용계약", "근로계약서"]
+    subtypes:
+      - full_time
+      - part_time
+      - executive              # 임원계약
+      - intern
+
+  # ── Lease ────────────────────────────────────────────
+  - id: lease
+    name: Lease Agreement
+    aliases: ["Lease", "Rental Agreement", "임대차계약", "임대차계약서"]
+    subtypes:
+      - commercial_lease       # 상가임대차
+      - office_lease           # 사무실임대차
+      - equipment_lease
+      - residential_lease      # 주거임대차
+
+  # ── MOU ──────────────────────────────────────────────
+  - id: mou
+    name: Memorandum of Understanding
+    aliases: ["MOU", "양해각서", "합의각서"]
+    subtypes:
+      - business_mou
+      - government_mou
+      - partnership_mou
+
+  # ── LOI ──────────────────────────────────────────────
+  - id: loi
+    name: Letter of Intent
+    aliases: ["LOI", "의향서", "투자의향서", "인수의향서"]
+    subtypes:
+      - investment_loi         # 투자 LOI
+      - acquisition_loi        # 인수 LOI
+      - business_loi           # General business LOI
+
+  # ── Terms of Service ─────────────────────────────────
+  - id: tos
+    name: Terms of Service
+    aliases: ["ToS", "Terms and Conditions", "Terms of Use", "이용약관", "서비스이용약관"]
+    subtypes:
+      - platform_tos           # Online platform
+      - app_tos                # Mobile app
+      - marketplace_tos        # Marketplace / e-commerce
+
+  # ── EULA ─────────────────────────────────────────────
+  - id: eula
+    name: End-User License Agreement
+    aliases: ["EULA", "최종사용자계약", "소프트웨어사용권계약"]
+    subtypes:
+      - software_eula
+      - game_eula
+      - saas_eula
+
+  # ── Privacy Policy ───────────────────────────────────
+  - id: privacy_policy
+    name: Privacy Policy
+    aliases: ["Privacy Notice", "개인정보처리방침", "개인정보보호정책"]
+    subtypes:
+      - general_privacy_policy
+      - app_privacy_policy
+      - children_privacy       # 아동 개인정보
+
+  # ── DPA ──────────────────────────────────────────────
   - id: dpa
     name: Data Processing Agreement
-    aliases: ["DPA", "Data Protection Agreement", "개인정보처리위탁계약"]
+    aliases: ["DPA", "Data Protection Agreement", "개인정보처리위탁계약", "개인정보위탁계약"]
     subtypes:
       - gdpr_dpa
-      - ccpa_dpa
+      - pipa_dpa               # 한국 개인정보보호법
       - general_dpa
 
+  # ── SOW ──────────────────────────────────────────────
   - id: sow
     name: Statement of Work
     aliases: ["SOW", "Work Order", "과업지시서", "작업명세서"]
@@ -42,41 +266,25 @@ families:
       - fixed_price_sow
       - time_and_materials_sow
 
-  - id: license
-    name: License Agreement
-    aliases: ["License", "Software License", "라이선스계약", "사용권계약"]
+  # ── Settlement ───────────────────────────────────────
+  - id: settlement
+    name: Settlement Agreement
+    aliases: ["Settlement", "합의서", "화해계약", "분쟁해결합의서"]
     subtypes:
-      - software_license
-      - ip_license
-      - patent_license
+      - litigation_settlement
+      - commercial_settlement
+      - ip_settlement          # IP dispute settlement
 
-  - id: employment
-    name: Employment Agreement
-    aliases: ["Employment Contract", "근로계약", "고용계약"]
-    subtypes:
-      - full_time
-      - part_time
-      - contractor
-
-  - id: lease
-    name: Lease Agreement
-    aliases: ["Lease", "Rental Agreement", "임대차계약"]
-    subtypes:
-      - commercial_lease
-      - equipment_lease
-
-  - id: partnership
-    name: Partnership / Joint Venture Agreement
-    aliases: ["JV Agreement", "합작투자계약", "파트너십계약"]
-    subtypes:
-      - joint_venture
-      - strategic_partnership
-
+  # ── Other ────────────────────────────────────────────
   - id: other
     name: Other / Unclassified
     aliases: ["기타"]
     subtypes:
       - general
-      - amendment
-      - side_letter
-      - memorandum_of_understanding
+      - amendment              # 변경계약
+      - side_letter            # 부속합의서
+      - addendum               # 추가약정
+      - waiver_letter          # 권리포기서
+      - guarantee              # 보증서
+      - escrow                 # 에스크로계약
+      - power_of_attorney      # 위임장

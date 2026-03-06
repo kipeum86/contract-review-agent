@@ -2,7 +2,7 @@
 # Users can toggle auto-approval on/off as a key setting.
 
 auto_approval:
-  enabled: false  # Set to true to enable automatic approval for qualifying assets
+  enabled: true  # Automatic approval for qualifying assets (templates, precedents)
   conditions:
     # ALL conditions must be met for auto-approval
     - classification_confidence: high

@@ -22,6 +22,9 @@ filter_rules:
     - filter: governing_law
       match: exact_or_null
       required: false
+    - filter: language
+      match: exact_or_null    # Prefer same-language matches but don't exclude
+      required: false
     - filter: approval_state
       match: exact
       value: approved
@@ -51,6 +54,20 @@ filter_rules:
       exclude_when_external: true
       field: external_safe
       required_value: true
+
+  # Stage 3 — Bonus scoring for closely related families
+  stage_3_affinity:
+    description: >
+      When exact contract_family match yields fewer than 3 candidates,
+      expand search to related families with a ranking penalty.
+    affinity_groups:
+      - [license, ip_transfer, content_distribution]
+      - [publishing, content_distribution, game_development]
+      - [spa, ssa, sha, safe, apa, merger]
+      - [services, independent_contractor, sow]
+      - [mou, loi]
+      - [tos, eula, privacy_policy, saas]
+    penalty: 1  # Shift priority rank down by 1 level
 
 freshness_rules:
   stale_threshold_days: 365  # Assets older than this without refresh are flagged

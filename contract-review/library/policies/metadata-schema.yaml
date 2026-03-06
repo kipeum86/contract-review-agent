@@ -56,15 +56,25 @@ manifest_schema:
 
     - field: jurisdiction
       type: string
-      description: Primary jurisdiction
+      description: Primary jurisdiction (e.g., "KR", "US-DE", "UK")
 
     - field: governing_law
       type: string
-      description: Governing law
+      description: Governing law (e.g., "Korean law", "Laws of the State of Delaware")
 
     - field: language
       type: string
-      description: Primary document language (ISO 639-1)
+      description: Primary document language (ISO 639-1, e.g., "ko", "en", "ko-en")
+
+    - field: bilingual
+      type: boolean
+      default: false
+      description: Whether the document is bilingual (국문/영문 병기)
+
+    - field: prevailing_language
+      type: enum
+      values: [ko, en, null]
+      description: Which language prevails in case of conflict
 
     - field: authority_level
       type: enum
@@ -100,6 +110,18 @@ manifest_schema:
     - field: related_comment_bank
       type: string
       description: doc_id of the linked comment bank
+
+    - field: counterparty
+      type: string
+      description: Counterparty name (for precedents and review targets)
+
+    - field: deal_value
+      type: string
+      description: Approximate deal value or tier (e.g., "high", "medium", "low", or amount)
+
+    - field: industry
+      type: string
+      description: Industry context (e.g., "gaming", "publishing", "tech", "entertainment")
 
     - field: tags
       type: list
@@ -154,6 +176,10 @@ playbook_schema:
       type: string
       description: Internal strategy notes for negotiation
 
+    - field: jurisdiction_variants
+      type: list
+      description: Jurisdiction-specific position variations (e.g., Korean law vs common law differences)
+
 # Comment bank entry schema
 comment_bank_schema:
   required_fields:
@@ -170,5 +196,9 @@ comment_bank_schema:
       values: [critical, high, medium, low]
     - field: contract_family
       type: string
+    - field: language
+      type: enum
+      values: [ko, en]
+      description: Language of the comment text
     - field: tags
       type: list
