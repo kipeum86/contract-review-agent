@@ -4,7 +4,9 @@
 > Drop a contract in, get back a **Word file with tracked-change redlines, margin comments (internal strategy + external-facing), a full analysis report, and negotiation recommendations** — all generated directly in DOCX.
 > Final legal judgment stays with the human.
 
-**[Disclaimer](./docs/DISCLAIMER.md)** | **[How to Use](./docs/HOW-TO-USE.md)**
+> **Before you start, please read:**
+> **[Disclaimer](./docs/DISCLAIMER.md)** — important limitations and data security considerations
+> **[How to Use](./docs/HOW-TO-USE.md)** — setup, environment, and step-by-step guide
 
 ---
 
