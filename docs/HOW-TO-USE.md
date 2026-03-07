@@ -1,5 +1,7 @@
 # How to Use
 
+> **Stuck on any step?** Ask Claude Code directly in the terminal, or paste a screenshot into any LLM — they are usually great at walking you through it.
+
 ## Environment
 
 This project is built and tested in the following environment:
