@@ -4,6 +4,8 @@
 > The agent handles the repetitive analysis — clause segmentation, risk grading, redline drafting, comment generation.
 > Final legal judgment stays with the human.
 
+**[Disclaimer](./docs/DISCLAIMER.md)** | **[How to Use](./docs/HOW-TO-USE.md)**
+
 ---
 
 ## Overview
