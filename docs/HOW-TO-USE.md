@@ -8,8 +8,8 @@ This project is built and tested in the following environment:
 |-----------|--------|
 | Editor | **VS Code** |
 | AI Interface | **Claude Code** (Anthropic's CLI for Claude, running in VS Code's integrated terminal) |
-| OS | Windows 11 |
-| Shell | Bash (Git Bash via VS Code terminal) |
+| OS | Windows 11 / macOS |
+| Shell | Bash (Git Bash on Windows, default Terminal on macOS) |
 
 Claude Code runs as an interactive agent inside your terminal. You give it natural-language instructions or slash commands, and it reads/writes files, runs scripts, and coordinates sub-agents — all within your local project directory.
 

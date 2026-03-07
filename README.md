@@ -1,7 +1,7 @@
 # Contract Review Agent
 
 > AI-powered contract review pipeline built on Claude Code.
-> The agent handles the repetitive analysis — clause segmentation, risk grading, redline drafting, comment generation.
+> Drop a contract in, get back a **Word file with tracked-change redlines, margin comments (internal strategy + external-facing), a full analysis report, and negotiation recommendations** — all generated directly in DOCX.
 > Final legal judgment stays with the human.
 
 **[Disclaimer](./docs/DISCLAIMER.md)** | **[How to Use](./docs/HOW-TO-USE.md)**
