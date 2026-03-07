@@ -12,7 +12,8 @@
 
 ## Overview
 
-Contract Review Agent is a **Claude Code-native** project for legal contract operations:
+Contract Review Agent is a **Claude Code-native** project for legal contract operations.
+Use it from **VS Code's integrated terminal** (`claude` CLI) or the **Claude Code VS Code extension** (chat panel) — both support the same slash commands and natural language input.
 
 | Capability | Description |
 |------------|-------------|
@@ -40,7 +41,7 @@ python -m pip install pyyaml
 
 The policy files in [`contract-review/library/policies/`](./contract-review/library/policies/) control how the agent classifies and reviews contracts. They ship with broad defaults covering 27 contract families, but you should tailor them to your practice.
 
-Ask Claude Code directly:
+Ask Claude Code directly — in the terminal or the extension chat panel:
 
 ```text
 Rewrite the policy files to match the contract types I work with.
@@ -62,7 +63,7 @@ Claude Code will rewrite all six policy files (contract families, clause taxonom
 
 ### 3. Seed Your Library
 
-Drop your house templates and reference contracts into [`contract-review/library/inbox/raw/`](./contract-review/library/inbox/raw/), then run:
+Drop your house templates and reference contracts into [`contract-review/library/inbox/raw/`](./contract-review/library/inbox/raw/), then type (in the terminal or extension chat):
 
 ```text
 /ingest
@@ -79,7 +80,7 @@ Templates and precedents are **auto-approved** by default. Playbooks and comment
 
 ### 4. Review a Contract
 
-Drop the contract you want reviewed into the [`input/`](./input/) folder at the project root, then run:
+Drop the contract you want reviewed into the [`input/`](./input/) folder at the project root, then type:
 
 ```text
 /contract-review

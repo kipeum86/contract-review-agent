@@ -1,6 +1,6 @@
 # How to Use
 
-> **Stuck on any step?** Ask Claude Code directly in the terminal, or paste a screenshot into any LLM — they are usually great at walking you through it.
+> **Stuck on any step?** Ask Claude Code directly — in the terminal or the VS Code extension chat panel — or paste a screenshot into any LLM. They are usually great at walking you through it.
 
 ## Environment
 
@@ -9,11 +9,20 @@ This project is built and tested in the following environment:
 | Component | Detail |
 |-----------|--------|
 | Editor | **VS Code** |
-| AI Interface | **Claude Code** (Anthropic's CLI for Claude, running in VS Code's integrated terminal) |
+| AI Interface | **Claude Code** (Anthropic's CLI for Claude — runs in VS Code's integrated terminal **or** as a VS Code extension with a chat panel) |
 | OS | Windows 11 / macOS |
 | Shell | Bash (Git Bash on Windows, default Terminal on macOS) |
 
-Claude Code runs as an interactive agent inside your terminal. You give it natural-language instructions or slash commands, and it reads/writes files, runs scripts, and coordinates sub-agents — all within your local project directory.
+Claude Code runs as an interactive agent. You give it natural-language instructions or slash commands, and it reads/writes files, runs scripts, and coordinates sub-agents — all within your local project directory.
+
+**Two ways to interact with Claude Code in VS Code:**
+
+| Method | How to start | Best for |
+|--------|-------------|----------|
+| **Terminal CLI** | Open VS Code terminal → type `claude` | Power users, scripting, verbose output |
+| **VS Code Extension** | Install the Claude Code extension → open the chat panel (`Ctrl+Shift+P` → "Claude Code: Open") | Beginners, quick questions, visual workflow |
+
+Both methods support the same slash commands and natural language — choose whichever feels more comfortable. The examples in this guide work identically in either interface.
 
 > If you are not using Claude Code, the slash commands (`/ingest`, `/contract-review`, etc.) won't work directly. You would need to adapt the prompts for your own AI setup.
 
@@ -54,7 +63,7 @@ python -m pip install pyyaml
 
 The policy files in [`contract-review/library/policies/`](../contract-review/library/policies/) control how the agent classifies and reviews contracts. They ship with broad defaults covering 27 contract families, but you should tailor them to your practice area.
 
-In the Claude Code terminal, just ask:
+In the Claude Code terminal or extension chat panel, just ask:
 
 ```text
 Rewrite the policy files to match the contract types I work with.
@@ -76,7 +85,7 @@ Claude Code will rewrite all six policy files (contract families, clause taxonom
 
 ### 2. Seed Your Library
 
-Drop your house templates and reference contracts into [`contract-review/library/inbox/raw/`](../contract-review/library/inbox/raw/), then type in the Claude Code terminal:
+Drop your house templates and reference contracts into [`contract-review/library/inbox/raw/`](../contract-review/library/inbox/raw/), then type (in the terminal or extension chat):
 
 ```text
 /ingest
@@ -93,7 +102,7 @@ Templates and precedents are **auto-approved** by default. Playbooks and comment
 
 ### 3. Review a Contract
 
-Drop the contract you want reviewed into the [`input/`](../input/) folder at the project root, then type:
+Drop the contract you want reviewed into the [`input/`](../input/) folder at the project root, then type (in the terminal or extension chat):
 
 ```text
 /contract-review
@@ -137,15 +146,26 @@ You can also use natural language — the orchestrator routes to the correct wor
 
 Here is what a typical session looks like:
 
+### Option A: Terminal CLI
+
 1. **Open the project** in VS Code.
-2. **Open the integrated terminal** (`Ctrl+`` ` or `View > Terminal`).
+2. **Open the integrated terminal** (`` Ctrl+` `` or `View > Terminal`).
 3. **Start Claude Code** by typing `claude` in the terminal.
 4. **Give instructions** — either slash commands or natural language, in English or Korean.
 5. **Watch Claude Code work** — it reads files, runs scripts, writes outputs, and reports progress in the terminal.
 6. **Review the results** — open the output files in VS Code to inspect redlines, reports, and analysis.
 7. **Iterate** — ask follow-up questions, request changes, or proceed to the next step.
 
-The entire interaction happens inside the VS Code terminal. There is no separate web UI or browser window.
+### Option B: VS Code Extension (Chat Panel)
+
+1. **Open the project** in VS Code.
+2. **Open the Claude Code panel** (`Ctrl+Shift+P` → "Claude Code: Open", or click the Claude icon in the sidebar).
+3. **Type your instructions** in the chat input — slash commands or natural language, in English or Korean.
+4. **Watch Claude Code work** — progress and results appear directly in the chat panel.
+5. **Review the results** — output files are clickable in the chat; you can also open them from the `output/` folder.
+6. **Iterate** — continue the conversation in the same panel.
+
+Both options produce identical results. The extension panel is often easier for first-time users since there is no terminal setup step.
 
 ---
 
