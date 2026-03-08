@@ -1,12 +1,12 @@
-# Design document (internal reference only)
-contract-review-agent-design.md
-
 node_modules/
 .claude/settings.local.json
 *.pyc
 __pycache__/
 .DS_Store
 /tmp/
+*.log
+.env
+.env.*
 
 # Contracts to review — drop here (confidential - do not commit)
 /input/*
