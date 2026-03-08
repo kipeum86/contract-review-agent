@@ -1,3 +1,6 @@
+# Design document (internal reference only)
+contract-review-agent-design.md
+
 node_modules/
 .claude/settings.local.json
 *.pyc
