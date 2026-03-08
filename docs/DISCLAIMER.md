@@ -26,7 +26,7 @@ All processing runs **locally on your filesystem** — no external servers or da
 If you intend to use this for real legal work with confidential documents:
 
 - **At minimum**, use a **commercial API key** (not a free-tier or consumer plan) so that standard commercial data handling terms apply.
-- **Ideally**, use an **Enterprise plan with a Zero Data Retention (ZDR) agreement** — this ensures your data is not used for model training and is not retained on Anthropic's servers beyond the request lifecycle.
+- **Ideally**, use an **Enterprise plan with a Zero Data Retention (ZDR) agreement**. Note that ZDR is **not a complete guarantee** — your data still passes through the provider's infrastructure. Review Anthropic's official documentation on [ZDR and data handling](https://docs.anthropic.com) to determine whether it meets your organization's requirements.
 - **Always** check with your organization's **security, compliance, and IT departments** before processing any confidential, privileged, or personally identifiable information through any AI tool.
 - Review [Anthropic's data usage policies](https://www.anthropic.com) for the most current terms applicable to your plan.
 
