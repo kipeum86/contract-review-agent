@@ -191,7 +191,6 @@ Fully auditable. Every match is traceable.
 │
 ├── docs/
 ├── CLAUDE.md                    # Orchestrator routing rules
-├── contract-review-agent-design.md  # Full architecture document
 └── package.json
 ```
 
@@ -246,9 +245,25 @@ Optional: `pymupdf` or `pypdf` (PDF support), `pandoc` (enhanced DOCX conversion
 
 ---
 
+## Architecture
+
+The agent is composed of three specialized sub-agents coordinated by an orchestrator (`CLAUDE.md`):
+
+| Component | Role |
+|-----------|------|
+| **Orchestrator** | Routes user commands to the correct workflow, enforces safety rules |
+| **Ingestion Agent** | Parses, classifies, segments, and publishes library assets |
+| **Review Agent** | Clause-level comparison, risk grading, redline/comment generation, DOCX assembly |
+| **Drafting Agent** | Interview-driven contract generation with self-review *(roadmap)* |
+
+Key architectural choices:
+- **No embeddings / no vector DB** — retrieval uses deterministic JSON index filtering + LLM judgment
+- **Pipeline state persistence** — each step writes `pipeline-state.json`, enabling resume after interruption
+- **Audience firewall** — `[INTERNAL]` and `[EXTERNAL]` comment streams are strictly separated at every stage
+- **File-based data handoff** — large payloads pass between agents as files under `matters/` or `library/runs/`, not inline
+
 ## Reference
 
-- [Architecture & Design Document](./contract-review-agent-design.md) — full workflow specs, folder schema, implementation phases
 - [CLAUDE.md](./CLAUDE.md) — orchestrator routing and safety rules
 - [Implementation Notes](./docs/implementation-notes.md) — repository implementation details
 
