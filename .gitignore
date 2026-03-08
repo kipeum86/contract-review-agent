@@ -31,3 +31,8 @@ __pycache__/
 # Matter working directories (confidential - do not commit)
 /contract-review/matters/*
 !/contract-review/matters/.gitkeep
+
+# Local-only files (not for public repo)
+release-note-*.md
+contract-review-agent-design.md
+/scripts/generate_*.py
