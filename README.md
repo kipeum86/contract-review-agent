@@ -56,7 +56,7 @@ Claude Code will rewrite all six policy files (contract families, clause taxonom
 >
 > ```text
 > ingest된 계약서 유형에 맞게 policies파일 수정해줘.
-> Rewrite policies to match the contra2ct types already in my library.
+> Rewrite policies to match the contract types already in my library.
 > ```
 >
 > This is often easier than writing policy specs from scratch — let your actual contracts drive the configuration.
@@ -217,8 +217,8 @@ Policies are **read-only for the agent** — only you edit them. The agent manag
 
 | Requirement | Version |
 |-------------|---------|
-| Python | 3.14+ |
-| Node.js | 24+ |
+| Python | 3.10+ |
+| Node.js | 18+ |
 | PyYAML | `pip install pyyaml` |
 
 Optional: `pymupdf` or `pypdf` (PDF support), `pandoc` (enhanced DOCX conversion).
@@ -264,6 +264,7 @@ Key architectural choices:
 
 ## Reference
 
+- [How to Use](./docs/HOW-TO-USE.md) — setup guide and step-by-step walkthrough
 - [CLAUDE.md](./CLAUDE.md) — orchestrator routing and safety rules
 - [Implementation Notes](./docs/implementation-notes.md) — repository implementation details
 
