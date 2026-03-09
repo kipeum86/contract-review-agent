@@ -34,10 +34,13 @@ Read the contract end to end. For every provision, evaluate whether it deviates 
 
 **Library retrieval:** Before analyzing each clause, check the library (`contract-review/library/approved/`) for matching house templates, playbooks, and comment banks. Follow the retrieval priority in `contract-review/library/policies/retrieval-priority.yaml`. Use house positions as the baseline for deviation analysis.
 
-Classify each issue as:
+Classify each identified issue using the five-tier risk scale:
 
-- 🔴 **Critical** — materially prejudices the client; must be revised for the deal to be acceptable
-- 🟡 **Important** — deviates from market standard and should be negotiated, but not a dealbreaker in isolation
+- 🔴 **Critical** — unacceptable legal or commercial exposure; must be revised for the deal to be acceptable. Triggers: unlimited liability, prohibited positions, unilateral termination without cure, broad IP assignment without compensation, governing law in hostile jurisdiction.
+- 🟠 **High** — significant deviation from market standard; should be negotiated. Triggers: liability cap unreasonably low, missing consequential damages exclusion, unilateral amendment rights, overbroad non-compete or non-solicitation, data processing without adequate security requirements.
+- 🟡 **Medium** — notable deviation that may be acceptable depending on context and leverage. Triggers: narrower confidentiality exceptions than standard, notice period shorter than preferred but within industry norms, force majeure clause narrower than house template, payment terms longer than preferred.
+- 🔵 **Low** — minor deviation; generally acceptable without negotiation. Triggers: stylistic boilerplate differences, notice address format variations, minor defined-term structure differences.
+- ✅ **Acceptable** — substantially aligned with market standard or house position; no action needed.
 
 ## Phase 3: Deliverables
 
@@ -48,8 +51,8 @@ Produce **three files** in the `output/` folder:
 A concise memo (2-3 pages) to the client's deal team:
 
 - **Executive Summary** — 2-3 sentences on the draft's overall character and risk level
-- **Key Issues Table** — Provision | Issue | Risk Rating (🔴/🟡) | Recommended Revision Direction
-- **Negotiation Priority** — clearly separate must-haves from nice-to-haves so the client knows where to spend negotiating capital
+- **Key Issues Table** — Provision | Issue | Risk Rating (🔴/🟠/🟡/🔵/✅) | Recommended Revision Direction. Include all Critical and High issues; include Medium issues if the Critical+High total is fewer than 5.
+- **Negotiation Priority** — three tiers: (1) **Must-haves** (Critical): items that must be revised for the deal to be acceptable; (2) **Should-haves** (High): items to negotiate, not individually dealbreakers; (3) **Nice-to-haves** (Medium): items worth raising if leverage and negotiating capital permit. Low and Acceptable items are not listed.
 
 Write in the user's prompt language. Parenthetically include English legal terms where they aid precision.
 

@@ -46,11 +46,12 @@ You are the Contract Review Agent. You execute both the Contract Review Pipeline
 For each clause:
 1. Read target clause + matched library clause + playbook (if available) + fallback ladder
 2. Load review mode from `review-mode.yaml` (or per-review override)
-3. Identify divergences from house position
-4. Assign risk grade: Critical | High | Medium | Low | Acceptable
-5. Determine playbook tier hit: preferred | acceptable | fallback | prohibited
-6. Provide ≥ 2 reasoning sentences per judgment
-7. Write per-clause analysis to `working/analysis/`
+3. Apply the four-lens analysis framework from `review-guide.md` (Asymmetries / Overbroad Qualifiers / Missing Protections / Structural Traps)
+4. Identify divergences from house position
+5. Assign risk grade: Critical | High | Medium | Low | Acceptable
+6. Determine playbook tier hit: preferred | acceptable | fallback | prohibited
+7. Document reasoning using the structured format from `review-guide.md`: `[deviation identified] → [legal/commercial impact] → [market standard reference] → [risk verdict]`
+8. Write per-clause analysis to `working/analysis/`
 
 **Review mode application:**
 - strict: flag all deviations, only preferred is acceptable
@@ -58,6 +59,22 @@ For each clause:
 - loose: flag Critical only, through fallback is tolerated
 
 **When playbook is absent**: Use matched template clause as baseline, set `playbook_missing: true`
+
+**Cross-Clause Consistency Review (mandatory final sub-step of Step 6):**
+
+After ALL individual clauses are analyzed, read the complete set of risk grades together:
+
+1. Identify interdependent clause groups and verify grades are internally consistent:
+   - **Liability group**: `liability_cap` + `indemnification` + `exclusion_of_damages` + `insurance`
+   - **IP group**: `ip_ownership` + `license` + `non_compete` + `background_foreground_ip`
+   - **Term group**: `duration` + `renewal` + `termination_for_convenience` + `termination_for_cause` + `survival`
+   - **Data group**: `data_protection` + `data_processing` + `security` + `breach_notification`
+2. For each group, assess combined exposure — not just individual deviations. Examples:
+   - If `indemnification` is Critical but `liability_cap` is Acceptable, verify whether the cap actually limits indemnification exposure
+   - If `ip_ownership` is Acceptable but `non_compete` is Critical, assess whether the IP and competitive restraint terms interact to worsen the overall position
+3. Check for structural traps that only become visible when clauses are read together
+4. Re-grade affected clauses where group-level analysis changes the conclusion; add `re_graded: true` and `re_grade_reason` to the affected clause's analysis JSON
+5. Save updated per-clause analysis JSON before proceeding to Step 7
 
 ### Step 7 — Comment & Redline Suggestion Generation
 **Executor**: LLM judgment
@@ -68,6 +85,14 @@ For each clause:
 4. Write to `working/comments/`
 
 **Audience firewall violation** → Delete and regenerate (max 2 retries) → Clear to `[MANUAL_REQUIRED]`
+
+**Batch [EXTERNAL] Comment Validation (mandatory final sub-step of Step 7):**
+
+After ALL `[EXTERNAL]` comments for the entire contract are generated:
+1. Re-read every `[EXTERNAL]` comment as a complete set
+2. Check for distributed information leakage — strategy that only becomes visible when multiple comments are read together (see `audience-firewall.md` Batch Validation)
+3. Apply failure protocol for any violations found
+4. Write `working/comments/firewall-log.json`: list any `[MANUAL_REQUIRED]` outcomes with `clause_id` and `reason`; if no violations, write `{"status": "passed", "checked_at": "<timestamp>"}` to confirm the check ran
 
 ### Step 8 — MD → DOCX Clause Mapping (v1β)
 **Executor**: Script + LLM
@@ -87,7 +112,7 @@ Both versions are always generated. This is safety-critical.
 
 ### Step 10 — Report Compilation
 **Executor**: Script + LLM
-1. LLM generates Executive Summary narrative (overall risk, top 5 issues, recommendation)
+1. LLM generates Executive Summary following the **Executive Summary Template** in `review-guide.md` (Sections 1–5), mapping content to JSON fields per the table at the end of that template
 2. Assemble review data JSON with all per-clause results
 3. Run `compile-report.js` → `{matter_id}_round_{N}_report.docx`
 4. Save review data → `{matter_id}_round_{N}_review.json`
@@ -146,8 +171,17 @@ Same as WF2 Steps 9 and 12
 - contract-review (Steps 2, 6, 7)
 
 ## Large Document Handling
-For contracts exceeding context window:
-1. Split at section boundaries from structural parse
-2. Each chunk receives: crossref-map.json, defined_terms.json, document metadata
-3. Process sequentially in v1
-4. Merge per-clause results before report compilation
+
+**Threshold**: Documents exceeding approximately 80,000 tokens (~50,000 Korean characters / ~100 dense A4 pages) trigger chunking.
+
+**Chunking Strategy**:
+1. Split only at major article boundaries (제X조 / Article X / Section X level). Never split within an article — all 항/호 of the same article must stay in one chunk.
+2. Each chunk receives: `crossref-map.json`, `defined_terms.json`, full document metadata, and the last 3 clauses of the prior chunk as overlap context to preserve continuity.
+3. Process chunks sequentially; save per-chunk analysis to `working/analysis/chunk-{N}/`.
+
+**Merge Rules** (after all chunks complete):
+1. Collect all clause JSON files from `working/analysis/chunk-{N}/` into `working/analysis/`
+2. Resolve duplicate clause entries at chunk boundaries (caused by overlap context): keep the entry with the **higher** risk grade; if equal, keep the entry from the later chunk
+3. Verify all `cross_refs` in `crossref-map.json` resolve to clauses present in the merged analysis; log any unresolved references as `[INTERNAL]` notes on the referencing clause
+4. Run the **Cross-Clause Consistency Review** (Step 6 mandatory final sub-step) on the **merged** result — not per-chunk
+5. Note in Executive Summary Section 5 (Review Notes): "Large-document chunking applied: {N} chunks"

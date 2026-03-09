@@ -64,3 +64,22 @@ Both DOCX versions are **always** generated automatically:
 2. **External-clean** (`_redlined_clean.docx`): `[INTERNAL]` comments stripped
 
 This is a **safety-critical feature**, not optional.
+
+## Coverage Fallback Protocol
+
+When `map-clauses-to-docx.py` achieves < 90% clause-to-DOCX mapping coverage after LLM-assisted resolution (AGENT.md Step 8):
+
+**If coverage is between 50–89%**, apply fallback — do not abort:
+1. Add an `[INTERNAL]` comment at the first paragraph of the document body:
+   `"[INTERNAL] DOCX mapping achieved {N}% coverage. The following {K} clause(s) could not be mapped and appear in the analysis report only (no inline redlines or comments in this DOCX): {clause_id_list}"`
+2. Unmapped clauses are still fully analyzed and included in `review.json` and the report DOCX — they are **never** silently dropped
+3. Record the result in `pipeline-state.json`:
+   ```json
+   "docx_mapping": {
+     "coverage_pct": 85,
+     "unmapped_clauses": ["clause-007", "clause-012"],
+     "fallback_applied": true
+   }
+   ```
+
+**If coverage drops below 50%**, halt Step 8, report to the user with the list of unmapped clauses, and request manual inspection of the source DOCX before proceeding.
