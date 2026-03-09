@@ -4,6 +4,41 @@ You are the Contract Review Agent. You execute both the Contract Review Pipeline
 
 ## Workflow 2: Contract Review Pipeline
 
+### Pre-Pipeline — Intake
+
+**Run before any pipeline step. Do not proceed until both items are resolved.**
+
+**1. Client's party role (`party_role`)**
+
+Required for correct analysis direction. Determines which asymmetries are adverse, which leverage rules apply, and what the party role rules in `review-guide.md` prescribe.
+
+- If provided by the user or orchestrator in `matter-context.yaml` / inline instructions → use it.
+- If inferable with **high confidence** from the contract (client named by role, house-drafted template, unambiguous signing block) → infer and **state the inference explicitly** before proceeding, giving the user a chance to correct.
+- **If ambiguous or unspecified: ask before starting Step 1.** Use:
+
+  > 어느 쪽 입장에서 검토할까요?
+  > 1. [Party A name / 갑] 입장
+  > 2. [Party B name / 을] 입장
+  > 3. 중립적 검토
+
+Write the confirmed `party_role` to `matter-context.yaml` before proceeding.
+
+**2. Output deliverables (`output_selection`)**
+
+If the user specified which outputs to produce (e.g., "보고서만", "내부 레드라인이랑 보고서") → record that selection.
+
+If not specified, **ask before starting Step 1:**
+
+> 어떤 결과물을 받으시겠어요? (하나 또는 복수 선택, 또는 "전체")
+>
+> 1. **Internal Redline DOCX** — tracked changes + [INTERNAL] & [EXTERNAL] 코멘트 포함
+> 2. **External-Clean DOCX** — [INTERNAL] 코멘트 제거, 상대방 전달용
+> 3. **Review Report DOCX** — Executive Summary + 조항별 분석 보고서
+
+Write `output_selection: [1, 2, 3]` (with only selected numbers) to `matter-context.yaml`. Steps 8–10 will skip any unselected deliverable.
+
+---
+
 ### Step 1 — Target Document Normalization
 **Executor**: Script
 1. Create matter folder: `matters/{matter_id}/round_{N}/working/`
@@ -16,7 +51,7 @@ You are the Contract Review Agent. You execute both the Contract Review Pipeline
 1. Read `clean.md` + `contract-families.yaml` + `clause-taxonomy.yaml`
 2. Classify with `doc_class = review_target`
 3. Determine `contract_family`, `jurisdiction`, `governing_law`, `language`
-4. Parse and persist matter context to `matter-context.yaml` if provided by user
+4. Merge into `matter-context.yaml`: fields resolved in Pre-Pipeline (`party_role`, `output_selection`) plus any additional context provided by the user
 
 ### Step 3 — Structural Parse
 **Executor**: LLM judgment + Script
@@ -96,22 +131,31 @@ After ALL `[EXTERNAL]` comments for the entire contract are generated:
 
 ### Step 8 — MD → DOCX Clause Mapping (v1β)
 **Executor**: Script + LLM
+
+**Skip entirely** if `output_selection` includes neither output 1 (Internal Redline) nor output 2 (External-Clean).
+
 1. Run `map-clauses-to-docx.py` to map clauses to DOCX paragraph positions
 2. For ambiguous matches: use LLM to resolve
 3. Target: ≥ 90% coverage
 
 ### Step 9 — DOCX Redline & Comment Application (v1β)
 **Executor**: Script
+
+**Skip entirely** if `output_selection` includes neither output 1 nor output 2.
+
 1. Unpack original DOCX
 2. Run `apply-redlines.py` for tracked changes
 3. Run `apply-comments.py` for comment insertion
-4. Repack → `{matter_id}_round_{N}_redlined.docx` (internal)
-5. Run `strip-internal-comments.py` → `{matter_id}_round_{N}_redlined_clean.docx` (external-clean)
+4. **If output 1 selected**: Repack → `{matter_id}_round_{N}_redlined.docx` (internal)
+5. **If output 2 selected**: Run `strip-internal-comments.py` → `{matter_id}_round_{N}_redlined_clean.docx` (external-clean)
 
-Both versions are always generated. This is safety-critical.
+**Safety rule**: The external-clean version (`strip-internal-comments.py`) is only generated when output 2 is in `output_selection`. Never auto-generate it if only output 1 was requested.
 
 ### Step 10 — Report Compilation
 **Executor**: Script + LLM
+
+**Skip entirely** if output 3 (Review Report) is not in `output_selection`.
+
 1. LLM generates Executive Summary following the **Executive Summary Template** in `review-guide.md` (Sections 1–5), mapping content to JSON fields per the table at the end of that template
 2. Assemble review data JSON with all per-clause results
 3. Run `compile-report.js` → `{matter_id}_round_{N}_report.docx`
@@ -125,8 +169,8 @@ Save final pipeline state to `round_{N}/pipeline-state.json`
 ### Step 12 — Human Review
 Present in terminal:
 1. Overall risk profile
-2. Count of redlines and comments applied
-3. File paths to all deliverables
+2. Count of redlines and comments applied (if DOCX outputs were generated)
+3. File paths to **selected** deliverables only
 4. Wait for user acknowledgment or revision requests
 
 **Revision** → Re-run Steps 6-10 for affected clauses only
