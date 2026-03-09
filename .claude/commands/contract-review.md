@@ -14,14 +14,42 @@ $ARGUMENTS
 
 ## Phase 1: Intake
 
-Before beginning analysis, confirm or infer the following from the user's instructions and the contract itself:
+Before beginning analysis, confirm two required items, then infer the rest.
 
-- **Client's party role** (e.g., buyer, seller, licensor, licensee, borrower, lender)
-- **Counterparty** (who drafted the contract — if not stated, infer from formatting, counsel identification, and the overall lean of the terms)
-- **Deal context** (if provided by the user — e.g., strategic investment, routine vendor agreement, M&A)
-- **Language preferences** (if not specified: client memo in the user's prompt language; external comments in the contract's language; internal comments in the user's prompt language)
+### Required — confirm or ask
 
-If critical context is missing and cannot be reliably inferred, ask before proceeding. Otherwise, begin analysis immediately.
+**1. Client's party role**
+
+Determines which asymmetries are acceptable and which are adverse. This affects the entire analysis direction and cannot be wrong.
+
+- If the user's instruction explicitly states the role (e.g., "우리가 을이야", "review as the licensee"), use that.
+- If inferable with **high confidence** from the contract (the client is named by role, the document is clearly a house template, the signing block is unambiguous), infer it — and **state the inference explicitly** so the user can correct it before you proceed.
+- **If ambiguous or unspecified: stop and ask.** Do not guess. Use this prompt:
+
+  > 어느 쪽 입장에서 검토할까요?
+  > 1. [Party A name / 갑] 입장
+  > 2. [Party B name / 을] 입장
+  > 3. 중립적 검토 (어느 일방을 대리하지 않는 경우)
+
+**2. Output deliverables**
+
+If the user has already specified which outputs to produce (e.g., "리포트만 줘", "내부용 레드라인이랑 보고서"), use that selection.
+
+If not specified, **ask before proceeding:**
+
+> 어떤 결과물을 받으시겠어요? (하나 또는 복수 선택, 또는 "전체")
+>
+> 1. **Internal Redline DOCX** — tracked changes + [INTERNAL] & [EXTERNAL] 코멘트 포함 (내부용)
+> 2. **External-Clean DOCX** — [INTERNAL] 코멘트 제거, 상대방 전달용
+> 3. **Review Report DOCX** — Executive Summary + 조항별 분석 보고서
+
+Produce only the selected deliverables. If the user selects all three, produce all three. If they select only one, produce only that one.
+
+### Infer from context (no need to ask)
+
+- **Counterparty** — who drafted the contract (infer from formatting, counsel identification, and the overall lean of the terms)
+- **Deal context** — strategic investment, routine vendor agreement, M&A (use if provided; otherwise proceed without it)
+- **Language preferences** — client memo in the user's prompt language; external comments in the contract's language; internal comments in the user's prompt language
 
 ## Phase 2: Analysis
 
@@ -44,7 +72,7 @@ Classify each identified issue using the five-tier risk scale:
 
 ## Phase 3: Deliverables
 
-Produce **three files** in the `output/` folder:
+Produce **only the deliverables selected in Phase 1** in the `output/` folder. Skip any deliverable the user did not select.
 
 ### 1. Client Memo (new DOCX)
 
