@@ -31,13 +31,28 @@
 
 ## Validation Process
 
-Before finalizing any `[EXTERNAL]` comment:
+### Per-Comment Validation
+
+Before finalizing each individual `[EXTERNAL]` comment:
 
 1. **Read the comment in full**
 2. **Ask**: "If the counterparty reads this, would it reveal our strategy?"
 3. **Check**: Does it reference any material marked `external_safe: false`?
 4. **Check**: Does it contain any of the prohibited patterns above?
 5. **If any check fails**: Delete and regenerate
+
+### Batch Validation (mandatory — after ALL comments are generated)
+
+After all `[EXTERNAL]` comments for the contract are written, re-read every comment as a complete set:
+
+1. **Check for distributed information leakage** — information that reveals internal strategy only when multiple comments are read in combination. Examples:
+   - Comment A says "market standard allows X months"; Comment B says "this term aligns with our expectations" — together they expose our acceptable range
+   - Multiple comments each narrowing or expanding a definition in ways that collectively reveal our interpretation of scope
+   - A series of comments that, read in sequence, makes our negotiation priority order obvious
+
+2. **If distributed leakage is found**: Revise or remove the comments that contribute to the pattern; ensure each comment is defensible in isolation and as part of the full set
+
+3. **Log any `[MANUAL_REQUIRED]` outcomes** to `working/comments/firewall-log.json` with `clause_id` and reason
 
 ## Failure Protocol
 

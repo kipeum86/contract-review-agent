@@ -51,8 +51,13 @@ Manage pipeline state persistence for resume support and round-level diffs.
 
 1. On any pipeline command, first check for `pipeline-state.json` in the round folder
 2. If found with `last_completed_step < final_step`, prompt the user to resume
-3. On confirmation, load intermediate artifacts from `step_artifacts` and continue
-4. Step counts per pipeline: ingestion=10, review=12, rereview=7, drafting=8
+3. **Before resuming, verify artifact existence:**
+   - For each step in `step_artifacts` where `step_num ≤ last_completed_step`, check that the `output` file path exists on disk
+   - Find the earliest step whose artifact file is missing — this becomes the **effective resume point**, not `last_completed_step + 1`
+   - Log: `"Resuming from Step {actual_step}: artifact for declared Step {missing_step} not found at {path}"`
+   - If more than half of declared artifacts are missing, warn the user and ask whether to restart from Step 1 rather than resuming
+4. On confirmation, load verified intermediate artifacts and continue from the effective resume point
+5. Step counts per pipeline: ingestion=10, review=12, rereview=7, drafting=8
 
 ## State Save Timing
 
