@@ -1,12 +1,14 @@
 # Contract Review Agent
 
+[English](./README.md) | [한국어](./docs/ko/README.md)
+
 > AI-powered contract review pipeline built on Claude Code.
 > Drop a contract in, get back a **Word file with tracked-change redlines, margin comments (internal strategy + external-facing), a full analysis report, and negotiation recommendations** — all generated directly in DOCX.
 > Final legal judgment stays with the human.
 
 > **Before you start, please read:**
-> **[Disclaimer](./docs/DISCLAIMER.md)** — important limitations and data security considerations
-> **[How to Use](./docs/HOW-TO-USE.md)** — setup, environment, and step-by-step guide
+> **[Disclaimer](./docs/en/DISCLAIMER.md)** — important limitations and data security considerations
+> **[How to Use](./docs/en/HOW-TO-USE.md)** — setup, environment, and step-by-step guide
 
 ---
 
@@ -264,9 +266,9 @@ Key architectural choices:
 
 ## Reference
 
-- [How to Use](./docs/HOW-TO-USE.md) — setup guide and step-by-step walkthrough
+- [How to Use](./docs/en/HOW-TO-USE.md) — setup guide and step-by-step walkthrough
 - [CLAUDE.md](./CLAUDE.md) — orchestrator routing and safety rules
-- [Implementation Notes](./docs/implementation-notes.md) — repository implementation details
+- [Implementation Notes](./docs/en/implementation-notes.md) — repository implementation details
 
 ## License
 
