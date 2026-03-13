@@ -10,6 +10,13 @@
 > **[Disclaimer](./docs/en/DISCLAIMER.md)** — important limitations and data security considerations
 > **[How to Use](./docs/en/HOW-TO-USE.md)** — setup, environment, and step-by-step guide
 
+### Example Outputs
+
+| Language | Redlined DOCX | Review Report |
+|----------|---------------|---------------|
+| **English** | [Redlined DOCX](https://docs.google.com/document/d/1KIIW5lY-H-LddPgUGWLiA1kcFQxbJECq/edit?usp=sharing&ouid=105178834220477378953&rtpof=true&sd=true) | [Client Memo](https://docs.google.com/document/d/1QinVyQHdyb5VxxkjpmFVdVYgFoxgwX0e/edit?usp=sharing&ouid=105178834220477378953&rtpof=true&sd=true) |
+| **한국어** | [레드라인 DOCX](https://docs.google.com/document/d/1g6AFUqiJp8fCb_3NayHfNhqRDFAq6c0Q/edit?usp=sharing&ouid=105178834220477378953&rtpof=true&sd=true) | [검토 의견서](https://docs.google.com/document/d/1y_iMJBNwlvubzs1wfcLq1q8lNL3pQxXQ/edit?usp=sharing&ouid=105178834220477378953&rtpof=true&sd=true) |
+
 ---
 
 ## Overview
