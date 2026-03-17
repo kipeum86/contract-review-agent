@@ -35,4 +35,5 @@ __pycache__/
 # Local-only files (not for public repo)
 release-note-*.md
 contract-review-agent-design.md
+drafting-system-prompt.md
 /scripts/generate_*.py

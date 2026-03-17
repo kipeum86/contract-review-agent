@@ -29,7 +29,7 @@ Contract Review Agent는 법률 계약 운영을 위한 **Claude Code 네이티�
 | **Ingest** | 사내 템플릿, 선례, 플레이북을 라이브러리로 등록하여 검색 가능한 형태로 구축합니다 |
 | **Review** | 상대방 초안을 사내 기준과 조항별로 비교·분석합니다 |
 | **Re-review** | 협상 후 수정본이 접수되었을 때 변경 사항을 분석합니다 |
-| **Draft** | 인터뷰 방식으로 계약서 초안을 작성하고 자체 검토를 수행합니다 *(로드맵)* |
+| **Draft** | 인터뷰 방식으로 계약서 초안을 작성하고 자체 검토를 수행합니다 |
 
 모든 처리는 **로컬 파일시스템 내에서만** 이루어집니다. 외부 서버나 벡터 데이터베이스를 사용하지 않으며, 데이터가 사용자의 컴퓨터 밖으로 나가지 않습니다.
 
@@ -118,7 +118,7 @@ Review this NDA strictly.
 | `/library` | 라이브러리 자산을 검색, 조회, 표시, 폐기, 보관합니다 |
 | `/export-clean` | 레드라인 DOCX에서 `[INTERNAL]` 코멘트를 제거합니다 |
 | `/resume` | 중단된 파이프라인을 이어서 실행합니다 |
-| `/draft` | 새 계약서를 초안 작성합니다 *(로드맵 — v2)* |
+| `/draft` | 새 계약서를 초안 작성합니다 |
 
 자연어도 지원되며, 오케스트레이터가 적절한 워크플로로 라우팅합니다.
 
@@ -141,6 +141,15 @@ Target contract (DOCX/PDF)
     ├── 📄 외부 공유용 정리 DOCX  (`[INTERNAL]` 제거 — 상대방 공유용으로 안전)
     └── 📄 검토 보고서 DOCX      (요약 + 전체 분석)
 ```
+
+**결과물 예시** — 실제 산출물을 확인하세요:
+
+| 산출물 | 언어 | 링크 |
+|--------|------|------|
+| Client Memo | English | [Google Docs에서 보기](https://docs.google.com/document/d/1QinVyQHdyb5VxxkjpmFVdVYgFoxgwX0e/edit?usp=sharing&ouid=105178834220477378953&rtpof=true&sd=true) |
+| Contract Redlined | English | [Google Docs에서 보기](https://docs.google.com/document/d/1KIIW5lY-H-LddPgUGWLiA1kcFQxbJECq/edit?usp=sharing&ouid=105178834220477378953&rtpof=true&sd=true) |
+| 검토 의견서 | 한국어 | [Google Docs에서 보기](https://docs.google.com/document/d/1y_iMJBNwlvubzs1wfcLq1q8lNL3pQxXQ/edit?usp=sharing&ouid=105178834220477378953&rtpof=true&sd=true) |
+| 계약서 검토본 | 한국어 | [Google Docs에서 보기](https://docs.google.com/document/d/1g6AFUqiJp8fCb_3NayHfNhqRDFAq6c0Q/edit?usp=sharing&ouid=105178834220477378953&rtpof=true&sd=true) |
 
 ### 검토 모드
 
@@ -265,7 +274,7 @@ inbox/raw/  ──→  validate  ──→  classify  ──→  segment  ──
 | **Orchestrator** | 사용자 명령을 올바른 워크플로로 라우팅하고 안전 규칙을 강제합니다 |
 | **Ingestion Agent** | 라이브러리 자산을 파싱, 분류, 분절, 게시합니다 |
 | **Review Agent** | 조항 단위 비교, 리스크 등급화, 레드라인/코멘트 생성, DOCX 조립을 담당합니다 |
-| **Drafting Agent** | 인터뷰 기반 계약서 초안 작성과 자체 검토를 담당합니다 *(로드맵)* |
+| **Drafting Agent** | 인터뷰 기반 계약서 초안 작성과 자체 검토를 담당합니다 |
 
 주요 아키텍처 설계 원칙:
 - **임베딩 / 벡터 DB 미사용** — 검색은 결정적 JSON 인덱스 필터링 + LLM 판단으로 처리합니다

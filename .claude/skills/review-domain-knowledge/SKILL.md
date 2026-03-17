@@ -1,6 +1,6 @@
 # review-domain-knowledge Skill
 
-Domain knowledge for contract review: classification, analysis, and comment generation.
+Domain knowledge for contract review and drafting: classification, analysis, comment generation, and contract generation.
 
 ## References
 
@@ -8,6 +8,7 @@ Detailed domain knowledge is in the `references/` directory:
 - `domain-policy.md` — Folder schema, ingestion policy, document lifecycle
 - `review-guide.md` — Review judgment criteria, risk grading, analysis methodology
 - `audience-firewall.md` — External/internal content separation rules
+- `drafting-guide.md` — Contract generation checklists, Korean law baselines, drafting rules
 
 ## Classification (WF1 Step 4, WF2 Step 2)
 
@@ -55,6 +56,15 @@ When no playbook exists, use matched template clause as baseline and set `playbo
 - Propose alternative clause text from the fallback ladder
 - Scope governed by review mode
 - Text must be in the contract's original language
+
+## Drafting (WF5 Steps 5-6)
+
+When generating contracts using the drafting workflow:
+1. **Checklist application**: Use contract-family-specific checklists from `drafting-guide.md` to ensure completeness
+2. **Statutory compliance**: For Korean-law contracts, verify against Korean Law Statutory Baselines in `drafting-guide.md`
+3. **Tier selection**: Apply leverage-based clause selection (preferred / acceptable / fallback) per `drafting-guide.md`
+4. **Self-review**: Run five-point checklist and four-lens framework from `drafting-guide.md`
+5. **Generation rules**: Follow defined terms, cross-references, numbering, and placeholder rules in `drafting-guide.md`
 
 ## Review Mode Definitions
 

@@ -99,10 +99,10 @@ Present in terminal:
 
 ## Skills Used
 - index-manager (Step 4)
+- review-domain-knowledge (Steps 5-6 — generation checklists, risk baselines, self-review)
 - report-compiler (Step 7 — DOCX generation)
 - docx-redliner (Step 7 — DOCX formatting)
 - pipeline-state (all steps)
-- contract-review (Steps 4-6)
 
 ## Human Review Checkpoints
 - Step 2: Interview summary confirmation

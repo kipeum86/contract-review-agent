@@ -29,7 +29,7 @@ Use it from **VS Code's integrated terminal** (`claude` CLI) or the **Claude Cod
 | **Ingest** | Build a searchable library from your house templates, precedents, and playbooks |
 | **Review** | Clause-by-clause analysis of counterparty paper against your house positions |
 | **Re-review** | Delta analysis when a revised draft comes back from negotiation |
-| **Draft** | Interview-driven contract generation with self-review *(roadmap)* |
+| **Draft** | Interview-driven contract generation with self-review |
 
 All processing runs **locally on your filesystem** — no external servers, no vector databases, no data leaves your machine.
 
@@ -118,7 +118,7 @@ Review this NDA strictly.
 | `/library` | Search, list, show, deprecate, or archive library assets |
 | `/export-clean` | Strip `[INTERNAL]` comments from a redlined DOCX |
 | `/resume` | Resume an interrupted pipeline |
-| `/draft` | Draft a new contract *(roadmap — v2)* |
+| `/draft` | Draft a new contract |
 
 Natural language works too — the orchestrator routes to the right workflow.
 
@@ -141,6 +141,15 @@ Target contract (DOCX/PDF)
     ├── 📄 External-clean DOCX      ([INTERNAL] stripped — safe for counterparty)
     └── 📄 Review report DOCX       (executive summary + full analysis)
 ```
+
+**Example Output** — see what the deliverables actually look like:
+
+| Deliverable | Language | Link |
+|-------------|----------|------|
+| Client Memo | English | [View on Google Docs](https://docs.google.com/document/d/1QinVyQHdyb5VxxkjpmFVdVYgFoxgwX0e/edit?usp=sharing&ouid=105178834220477378953&rtpof=true&sd=true) |
+| Contract Redlined | English | [View on Google Docs](https://docs.google.com/document/d/1KIIW5lY-H-LddPgUGWLiA1kcFQxbJECq/edit?usp=sharing&ouid=105178834220477378953&rtpof=true&sd=true) |
+| 검토 의견서 | 한국어 | [Google Docs에서 보기](https://docs.google.com/document/d/1y_iMJBNwlvubzs1wfcLq1q8lNL3pQxXQ/edit?usp=sharing&ouid=105178834220477378953&rtpof=true&sd=true) |
+| 계약서 검토본 | 한국어 | [Google Docs에서 보기](https://docs.google.com/document/d/1g6AFUqiJp8fCb_3NayHfNhqRDFAq6c0Q/edit?usp=sharing&ouid=105178834220477378953&rtpof=true&sd=true) |
 
 ### Review Modes
 
@@ -263,7 +272,7 @@ The agent is composed of three specialized sub-agents coordinated by an orchestr
 | **Orchestrator** | Routes user commands to the correct workflow, enforces safety rules |
 | **Ingestion Agent** | Parses, classifies, segments, and publishes library assets |
 | **Review Agent** | Clause-level comparison, risk grading, redline/comment generation, DOCX assembly |
-| **Drafting Agent** | Interview-driven contract generation with self-review *(roadmap)* |
+| **Drafting Agent** | Interview-driven contract generation with self-review |
 
 Key architectural choices:
 - **No embeddings / no vector DB** — retrieval uses deterministic JSON index filtering + LLM judgment
