@@ -1,43 +1,95 @@
+<div align="center">
+
 # Contract Review Agent
 
-[English](./README.md) | [한국어](./docs/ko/README.md)
+### AI-Powered Contract Review Pipeline Built on Claude Code
 
-> AI-powered contract review pipeline built on Claude Code.
-> Drop a contract in, get back a **Word file with tracked-change redlines, margin comments (internal strategy + external-facing), a full analysis report, and negotiation recommendations** — all generated directly in DOCX.
-> Final legal judgment stays with the human.
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](./LICENSE)
+[![Claude Code](https://img.shields.io/badge/Built_with-Claude_Code-blueviolet)](https://claude.ai/claude-code)
+[![Node.js](https://img.shields.io/badge/Node.js-18%2B-green)](https://nodejs.org/)
+[![Python](https://img.shields.io/badge/Python-3.10%2B-yellow)](https://www.python.org/)
 
-> **Before you start, please read:**
-> **[Disclaimer](./docs/en/DISCLAIMER.md)** — important limitations and data security considerations
-> **[How to Use](./docs/en/HOW-TO-USE.md)** — setup, environment, and step-by-step guide
-
-### Example Outputs
-
-| Language | Redlined DOCX | Review Report |
-|----------|---------------|---------------|
-| **English** | [Redlined DOCX](https://docs.google.com/document/d/1KIIW5lY-H-LddPgUGWLiA1kcFQxbJECq/edit?usp=sharing&ouid=105178834220477378953&rtpof=true&sd=true) | [Client Memo](https://docs.google.com/document/d/1QinVyQHdyb5VxxkjpmFVdVYgFoxgwX0e/edit?usp=sharing&ouid=105178834220477378953&rtpof=true&sd=true) |
-| **한국어** | [레드라인 DOCX](https://docs.google.com/document/d/1g6AFUqiJp8fCb_3NayHfNhqRDFAq6c0Q/edit?usp=sharing&ouid=105178834220477378953&rtpof=true&sd=true) | [검토 의견서](https://docs.google.com/document/d/1y_iMJBNwlvubzs1wfcLq1q8lNL3pQxXQ/edit?usp=sharing&ouid=105178834220477378953&rtpof=true&sd=true) |
+[English](./README.md)&ensp;·&ensp;[한국어](./docs/ko/README.md)
 
 ---
 
-## Overview
+Drop a contract in, get back a **Word file with tracked-change redlines,
+margin comments (internal strategy + external-facing), a full analysis report,
+and negotiation recommendations** — all generated directly in DOCX.
 
-Contract Review Agent is a **Claude Code-native** project for legal contract operations.
-Use it from **VS Code's integrated terminal** (`claude` CLI) or the **Claude Code VS Code extension** (chat panel) — both support the same slash commands and natural language input.
+**Final legal judgment stays with the human.**
 
-| Capability | Description |
-|------------|-------------|
-| **Ingest** | Build a searchable library from your house templates, precedents, and playbooks |
-| **Review** | Clause-by-clause analysis of counterparty paper against your house positions |
-| **Re-review** | Delta analysis when a revised draft comes back from negotiation |
-| **Draft** | Interview-driven contract generation with self-review |
+</div>
 
-All processing runs **locally on your filesystem** — no external servers, no vector databases, no data leaves your machine.
+> [!IMPORTANT]
+> **Before you start, please read:**
+> - **[Disclaimer](./docs/en/DISCLAIMER.md)** — important limitations and data security considerations
+> - **[How to Use](./docs/en/HOW-TO-USE.md)** — setup, environment, and step-by-step guide
+
+---
+
+## Example Outputs
+
+<table>
+<tr>
+<th width="120">Language</th>
+<th>Redlined DOCX</th>
+<th>Review Report</th>
+</tr>
+<tr>
+<td><strong>English</strong></td>
+<td><a href="https://docs.google.com/document/d/1KIIW5lY-H-LddPgUGWLiA1kcFQxbJECq/edit?usp=sharing&ouid=105178834220477378953&rtpof=true&sd=true">Redlined DOCX</a></td>
+<td><a href="https://docs.google.com/document/d/1QinVyQHdyb5VxxkjpmFVdVYgFoxgwX0e/edit?usp=sharing&ouid=105178834220477378953&rtpof=true&sd=true">Client Memo</a></td>
+</tr>
+<tr>
+<td><strong>한국어</strong></td>
+<td><a href="https://docs.google.com/document/d/1g6AFUqiJp8fCb_3NayHfNhqRDFAq6c0Q/edit?usp=sharing&ouid=105178834220477378953&rtpof=true&sd=true">레드라인 DOCX</a></td>
+<td><a href="https://docs.google.com/document/d/1y_iMJBNwlvubzs1wfcLq1q8lNL3pQxXQ/edit?usp=sharing&ouid=105178834220477378953&rtpof=true&sd=true">검토 의견서</a></td>
+</tr>
+</table>
+
+---
+
+## What It Does
+
+<table>
+<tr>
+<td width="80" align="center"><h3>1</h3></td>
+<td>
+<strong>Ingest</strong><br/>
+Build a searchable library from your house templates, precedents, and playbooks
+</td>
+</tr>
+<tr>
+<td align="center"><h3>2</h3></td>
+<td>
+<strong>Review</strong><br/>
+Clause-by-clause analysis of counterparty paper against your house positions
+</td>
+</tr>
+<tr>
+<td align="center"><h3>3</h3></td>
+<td>
+<strong>Re-review</strong><br/>
+Delta analysis when a revised draft comes back from negotiation
+</td>
+</tr>
+<tr>
+<td align="center"><h3>4</h3></td>
+<td>
+<strong>Draft</strong><br/>
+Interview-driven contract generation with self-review
+</td>
+</tr>
+</table>
+
+> All processing runs **locally on your filesystem** — no external servers, no vector databases, no data leaves your machine.
 
 ---
 
 ## Quick Start
 
-### 1. Install
+### Step 1 — Install
 
 ```bash
 git clone https://github.com/kipeum86/contract-review-agent.git
@@ -46,7 +98,7 @@ npm install
 python -m pip install pyyaml
 ```
 
-### 2. Customize Policies to Your Practice
+### Step 2 — Customize Policies to Your Practice
 
 The policy files in [`contract-review/library/policies/`](./contract-review/library/policies/) control how the agent classifies and reviews contracts. They ship with broad defaults covering 27 contract families, but you should tailor them to your practice.
 
@@ -59,9 +111,10 @@ Contract types I handle:
 - NDA, license, IP assignment, content distribution, game development, ...
 ```
 
-Claude Code will rewrite all six policy files (contract families, clause taxonomy, review modes, retrieval rules, etc.) in one pass. You can also [edit the YAML files manually](#policy-files).
+Claude Code will rewrite all six policy files (contract families, clause taxonomy, review modes, retrieval rules, etc.) in one pass. You can also [edit the YAML files manually](#-policy-files).
 
-> **Tip — Not sure how to configure policies yet?** Skip to Step 3 first. Ingest your house templates, then come back and ask Claude Code to customize the policies based on the ingested contracts:
+> [!TIP]
+> **Not sure how to configure policies yet?** Skip to Step 3 first. Ingest your house templates, then come back and ask Claude Code to customize the policies based on the ingested contracts:
 >
 > ```text
 > ingest된 계약서 유형에 맞게 policies파일 수정해줘.
@@ -70,7 +123,7 @@ Claude Code will rewrite all six policy files (contract families, clause taxonom
 >
 > This is often easier than writing policy specs from scratch — let your actual contracts drive the configuration.
 
-### 3. Seed Your Library
+### Step 3 — Seed Your Library
 
 Drop your house templates and reference contracts into [`contract-review/library/inbox/raw/`](./contract-review/library/inbox/raw/), then type (in the terminal or extension chat):
 
@@ -87,7 +140,7 @@ Drop your house templates and reference contracts into [`contract-review/library
 
 Templates and precedents are **auto-approved** by default. Playbooks and comment banks still require human confirmation. See [`approval-rules.yaml`](./contract-review/library/policies/approval-rules.yaml).
 
-### 4. Review a Contract
+### Step 4 — Review a Contract
 
 Drop the contract you want reviewed into the [`input/`](./input/) folder at the project root, then type:
 
@@ -129,20 +182,39 @@ Natural language works too — the orchestrator routes to the right workflow.
 ### Review Pipeline
 
 ```
-Target contract (DOCX/PDF)
-    │
-    ├── Parse & segment into clauses
-    ├── Retrieve matching house clauses from library
-    ├── Compare clause-by-clause (risk grading, gap analysis)
-    ├── Generate redline suggestions + comments
-    ├── Apply tracked changes to DOCX
-    │
-    ├── 📄 Internal redlined DOCX   (all comments)
-    ├── 📄 External-clean DOCX      ([INTERNAL] stripped — safe for counterparty)
-    └── 📄 Review report DOCX       (executive summary + full analysis)
+  Target contract (DOCX/PDF)
+      |
+      v
+  +-----------------------+
+  |  Parse & Segment      |  Break into individual clauses
+  +-----------------------+
+      |
+      v
+  +-----------------------+
+  |  Library Retrieval    |  Match against house clauses
+  +-----------------------+
+      |
+      v
+  +-----------------------+
+  |  Clause Comparison    |  Risk grading + gap analysis
+  +-----------------------+
+      |
+      v
+  +-----------------------+
+  |  Generate Redlines    |  Tracked changes + comments
+  +-----------------------+
+      |
+      +------+------+------+
+      |      |      |
+      v      v      v
+    Internal  External  Review
+    Redline   Clean     Report
+    DOCX      DOCX      DOCX
 ```
 
-**Example Output** — see what the deliverables actually look like:
+<details>
+<summary><strong>Example Output</strong> — see what the deliverables actually look like</summary>
+<br/>
 
 | Deliverable | Language | Link |
 |-------------|----------|------|
@@ -151,22 +223,24 @@ Target contract (DOCX/PDF)
 | 검토 의견서 | 한국어 | [Google Docs에서 보기](https://docs.google.com/document/d/1y_iMJBNwlvubzs1wfcLq1q8lNL3pQxXQ/edit?usp=sharing&ouid=105178834220477378953&rtpof=true&sd=true) |
 | 계약서 검토본 | 한국어 | [Google Docs에서 보기](https://docs.google.com/document/d/1g6AFUqiJp8fCb_3NayHfNhqRDFAq6c0Q/edit?usp=sharing&ouid=105178834220477378953&rtpof=true&sd=true) |
 
+</details>
+
 ### Review Modes
 
 | Mode | When to use | Redline scope |
 |------|------------|---------------|
-| **strict** | High-value deals, M&A, strong leverage | All deviations |
-| **moderate** | Standard commercial deals | Critical + High risk |
-| **loose** | Low leverage, quick assessments, LOI/MOU | Critical only |
+| **`strict`** | High-value deals, M&A, strong leverage | All deviations |
+| **`moderate`** | Standard commercial deals | Critical + High risk |
+| **`loose`** | Low leverage, quick assessments, LOI/MOU | Critical only |
 
 Default is `moderate`. Override per-review: `"이거 엄격하게 검토해줘"` or `"do a loose review"`.
 
 ### Library Ingestion
 
 ```
-inbox/raw/  ──→  validate  ──→  classify  ──→  segment  ──→  approved/
-                                                    ↘
-                                                 quarantine/  (on failure)
+inbox/raw/  ──>  validate  ──>  classify  ──>  segment  ──>  approved/
+                                                   \
+                                                    └──>  quarantine/  (on failure)
 ```
 
 Auto-approval is on by default for templates and precedents. No manual approval step needed.
@@ -188,8 +262,8 @@ Fully auditable. Every match is traceable.
 
 ```
 .
-├── input/                       # ⬅ Drop contracts to review here (gitignored)
-├── output/                      # ⬅ Review results appear here (gitignored)
+├── input/                       # Drop contracts to review here (gitignored)
+├── output/                      # Review results appear here (gitignored)
 │
 ├── .claude/
 │   ├── agents/                  # Sub-agents: ingestion, review, drafting
@@ -243,13 +317,47 @@ Optional: `pymupdf` or `pypdf` (PDF support), `pandoc` (enhanced DOCX conversion
 
 ---
 
+## Architecture
+
+The agent is composed of three specialized sub-agents coordinated by an orchestrator (`CLAUDE.md`):
+
+```
+                    ┌─────────────────────┐
+                    │    Orchestrator      │
+                    │    (CLAUDE.md)       │
+                    └──────┬──────────────┘
+                           │
+            ┌──────────────┼──────────────┐
+            │              │              │
+            v              v              v
+   ┌────────────┐  ┌────────────┐  ┌────────────┐
+   │  Ingestion │  │   Review   │  │  Drafting  │
+   │   Agent    │  │   Agent    │  │   Agent    │
+   └────────────┘  └────────────┘  └────────────┘
+```
+
+<details>
+<summary><strong>Key architectural choices</strong></summary>
+<br/>
+
+- **No embeddings / no vector DB** — retrieval uses deterministic JSON index filtering + LLM judgment
+- **Pipeline state persistence** — each step writes `pipeline-state.json`, enabling resume after interruption
+- **Audience firewall** — `[INTERNAL]` and `[EXTERNAL]` comment streams are strictly separated at every stage
+- **File-based data handoff** — large payloads pass between agents as files under `matters/` or `library/runs/`, not inline
+
+</details>
+
+---
+
 ## Design Principles
 
-- **Human in the loop** — the agent proposes, the human decides
-- **Local and auditable** — all data on disk, all artifacts inspectable
-- **Audience firewall** — internal strategy never leaks into external-facing output
-- **Resume-friendly** — pipelines persist state and can resume after interruption
-- **Industry-agnostic** — all domain specialization lives in policy files, not code
+| Principle | Description |
+|-----------|-------------|
+| **Human in the loop** | The agent proposes, the human decides |
+| **Local and auditable** | All data on disk, all artifacts inspectable |
+| **Audience firewall** | Internal strategy never leaks into external-facing output |
+| **Resume-friendly** | Pipelines persist state and can resume after interruption |
+| **Industry-agnostic** | All domain specialization lives in policy files, not code |
 
 ---
 
@@ -262,23 +370,6 @@ Optional: `pymupdf` or `pypdf` (PDF support), `pandoc` (enhanced DOCX conversion
 | **v2** | Contract drafting, table-level redlines, playbook auto-suggestion, embedding retrieval |
 
 ---
-
-## Architecture
-
-The agent is composed of three specialized sub-agents coordinated by an orchestrator (`CLAUDE.md`):
-
-| Component | Role |
-|-----------|------|
-| **Orchestrator** | Routes user commands to the correct workflow, enforces safety rules |
-| **Ingestion Agent** | Parses, classifies, segments, and publishes library assets |
-| **Review Agent** | Clause-level comparison, risk grading, redline/comment generation, DOCX assembly |
-| **Drafting Agent** | Interview-driven contract generation with self-review |
-
-Key architectural choices:
-- **No embeddings / no vector DB** — retrieval uses deterministic JSON index filtering + LLM judgment
-- **Pipeline state persistence** — each step writes `pipeline-state.json`, enabling resume after interruption
-- **Audience firewall** — `[INTERNAL]` and `[EXTERNAL]` comment streams are strictly separated at every stage
-- **File-based data handoff** — large payloads pass between agents as files under `matters/` or `library/runs/`, not inline
 
 ## Reference
 
