@@ -1,0 +1,54 @@
+{
+  "grades": {
+    "A": {
+      "label": "공식 1차 소스",
+      "description": "법령 원문, 감독기관 공식 가이드라인, 정부 발행 표준계약서",
+      "trust_level": "authoritative",
+      "can_be_sole_basis": true,
+      "signals": [
+        "법률 번호 (법률 제XXXXX호)",
+        "대통령령/시행규칙",
+        "금융위/공정위/법무부 고시",
+        "law.go.kr 출처",
+        "상법, 자본시장법, 민법, 공정거래법, 벤처투자법",
+        "공정위 승인 표준약관",
+        "KVCA 표준계약서 원문"
+      ]
+    },
+    "B": {
+      "label": "교차검증된 2차 소스",
+      "description": "대형 로펌 해설, 판례, KVCA 해설서, 업계 실무 가이드",
+      "trust_level": "verified",
+      "can_be_sole_basis": true,
+      "requires_note": "Grade A 소스로 교차검증 권장",
+      "signals": [
+        "판례 번호 (대법원 20XXdaXXXXX)",
+        "로펌 뉴스레터/Client Alert",
+        "KVCA 표준계약서 해설서",
+        "법률실무 해설서",
+        "변호사협회 법조 칼럼"
+      ]
+    },
+    "C": {
+      "label": "학술/참고 소스",
+      "description": "학술 논문, 세미나 자료, 학회 발표",
+      "trust_level": "reference",
+      "can_be_sole_basis": false,
+      "requires_note": "[REFERENCE: Single-source, Grade C] 표시 필수",
+      "signals": [
+        "학술지/저널 게재",
+        "초록/Abstract + 참고문헌/References",
+        "KCI/RISS/SSRN",
+        "학위논문",
+        "세미나/컨퍼런스 발표자료"
+      ]
+    },
+    "D": {
+      "label": "제외",
+      "description": "일반 뉴스, AI 생성 요약, 위키, 소셜 미디어",
+      "trust_level": "excluded",
+      "can_be_sole_basis": false,
+      "note": "라이브러리에 포함하지 않음. ingest 거부."
+    }
+  }
+}
