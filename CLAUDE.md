@@ -20,7 +20,7 @@ Route user commands to the appropriate workflow. Accept both natural language an
 
 | Slash Command | Workflow | Trigger Patterns |
 |---------------|----------|------------------|
-| `/ingest` | WF1 — Library Ingestion | "ingest", "등록", "추가", file placed in inbox/raw |
+| `/ingest` | WF1 — Library Ingestion | "ingest", "등록", "추가", "소스 추가", "자료 넣었어", file placed in inbox/raw |
 | `/contract-review` | WF2 — Contract Review | "review", "검토", "분석", "이 계약서 검토해줘" |
 | `/library` | WF3 — Library Management | "library", "라이브러리", "list", "search", "목록", "검색" |
 | `/rereview` | WF4 — Contract Re-review | "re-review", "재검토", "revised version", "수정본" |
@@ -40,6 +40,46 @@ Route user commands to the appropriate workflow. Accept both natural language an
 
 **Data handoff**: Pass file paths and short metadata inline. Large payloads are always file-based under `matters/{matter_id}/round_{N}/working/` or `library/runs/ingestion/`.
 
+## Source Ingest (Grade-Based Reference Library)
+
+계약서 템플릿 외에 **참조 소스**(법령, 판례, 해설 등)를 Grade 기반으로 분류·관리한다.
+
+### 구조
+
+```
+contract-review/library/
+├── inbox/               # 파일 드롭 (템플릿 + 참조 소스 공용)
+│   ├── raw/             # 사용자 파일 드롭
+│   ├── sidecars/        # 선택적 메타데이터
+│   ├── _processed/      # 처리 완료 원본 보관
+│   └── _failed/         # 변환 실패 파일
+├── grade-a/             # 공식 1차 소스 (법령, 규정, 가이드라인)
+├── grade-b/             # 2차 소스 (판례, 로펌 해설, KVCA 해설)
+└── grade-c/             # 학술/참고 (논문, 세미나)
+```
+
+### 워크플로우
+
+사용자가 참조 소스를 `inbox/`에 넣고 `/ingest` 또는 "소스 추가", "자료 넣었어" 등 요청 시:
+
+1. `.claude/skills/ingest/SKILL.md`를 읽어 워크플로우 확인
+2. inbox 내 파일을 markitdown으로 .md 변환
+3. 내용 분석하여 Grade 자동 판별 (A/B/C, D는 거부)
+4. frontmatter 생성 + 적절한 `library/grade-x/` 폴더로 배치
+5. 인덱스 업데이트 (`indexes/source-registry.json`)
+6. 원본은 `inbox/_processed/`로 보존
+
+### Grade 판별 기준
+
+| Grade | 소스 유형 | Trust Level |
+|-------|-----------|-------------|
+| A | 법령, 시행령, 금융위/공정위 고시, 정부 가이드라인, KVCA 표준계약서 | authoritative |
+| B | 판례, 로펌 뉴스레터, KVCA 해설서, 법률실무 해설 | verified |
+| C | 학술 논문, 세미나 자료, 학회 발표 | reference |
+| D | 뉴스, AI 요약, 위키 | excluded (거부) |
+
+상세 판별 시그널: `library/policies/source-grades.json` 참조
+
 ## Core Safety Rules
 
 1. **Audience Firewall**: `[EXTERNAL]` comments must NEVER contain internal strategy, fallback positions, or negotiation leverage information. Only materials flagged `external_safe = true` may be referenced in external-facing output.
@@ -53,7 +93,10 @@ Route user commands to the appropriate workflow. Accept both natural language an
 |--------|------|-------|-------|
 | `input/` | Yes | No (user drops files) | Review target contracts |
 | `output/` | Yes | Yes | Final deliverables (redlined DOCX, reports) |
-| `contract-review/library/inbox/` | Yes | No (user drops files) | Library source templates |
+| `contract-review/library/inbox/` | Yes | No (user drops files) | Library source templates & reference sources |
+| `contract-review/library/grade-a/` | Yes | Yes (ingest only) | Grade A: 법령, 규정, 공식 가이드라인 |
+| `contract-review/library/grade-b/` | Yes | Yes (ingest only) | Grade B: 판례, 로펌 해설, 업계 표준 |
+| `contract-review/library/grade-c/` | Yes | Yes (ingest only) | Grade C: 학술 논문, 세미나 자료 |
 | `contract-review/library/staging/` | Yes | Yes | Ingestion intermediate storage |
 | `contract-review/library/quarantine/` | Yes | Yes | Failed/rejected assets |
 | `contract-review/library/approved/` | Yes | Yes (publish only) | Only via publish step |

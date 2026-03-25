@@ -127,3 +127,19 @@ Step 9 — Approval gate. Always present the summary. Respect the user's decisio
 1. Keep package in `library/staging/{doc_id}/`
 2. Write `staging-reason.json` with soft-fail details
 3. Notify user and wait for review
+
+---
+
+## Source Ingest (참조 소스 Grade 기반 분류)
+
+계약서 템플릿이 아닌 **참조 소스**(법령, 판례, 해설 등)가 inbox에 들어온 경우:
+
+1. `.claude/skills/ingest/SKILL.md`를 읽어 워크플로우 확인
+2. inbox 내 파일을 markitdown으로 .md 변환
+3. 내용 분석하여 Grade 자동 판별 (A/B/C)
+4. frontmatter 생성 + 적절한 `library/grade-x/` 폴더로 배치
+5. 인덱스 업데이트
+
+**트리거 키워드:** "ingest", "소스 추가", "자료 넣었어", "참조 자료", "inbox"
+
+**구분 기준:** 사용자가 "소스", "참조 자료", "법령", "판례" 등을 언급하면 Grade 기반 스킬로 라우팅. "템플릿", "계약서 추가" 등을 언급하면 위의 10단계 파이프라인으로 라우팅.

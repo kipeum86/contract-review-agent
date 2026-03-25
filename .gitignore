@@ -37,3 +37,4 @@ release-note-*.md
 contract-review-agent-design.md
 drafting-system-prompt.md
 /scripts/generate_*.py
+.gstack/
