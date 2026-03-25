@@ -244,6 +244,30 @@ inbox/raw/  ──>  validate  ──>  classify  ──>  segment  ──>  app
 
 템플릿과 선례는 기본적으로 자동 승인 처리되므로, 별도의 수동 승인 절차가 필요하지 않습니다.
 
+### 참조 소스 추가하기
+
+계약서 템플릿 외에 **법령, 판례, 로펌 해설, 학술 논문** 등의 참조 소스를 Grade 기반으로 분류하여 라이브러리에 등록할 수 있습니다. 등록된 참조 소스는 계약 검토 시 맥락 정보로 활용됩니다.
+
+1. 파일(PDF, DOCX 등)을 `contract-review/library/inbox/raw/`에 넣습니다
+2. 에이전트에게 알려줍니다: `/ingest` 또는 "참조 자료 넣었어"
+3. 에이전트가 자동으로:
+   - 구조화된 Markdown으로 변환
+   - 소스 등급(A/B/C) 자동 판별
+   - 메타데이터(frontmatter) 생성
+   - 적절한 `library/grade-{a,b,c}/` 폴더에 배치
+   - 검색 인덱스 업데이트
+
+| 등급 | 소스 유형 | 신뢰 수준 |
+|------|-----------|-----------|
+| **A** | 법령, 시행령, 정부 가이드라인, KVCA 표준계약서 | 권위적 (authoritative) |
+| **B** | 판례, 로펌 뉴스레터, KVCA 해설서, 실무 가이드 | 검증됨 (verified) |
+| **C** | 학술 논문, 세미나 자료, 학회 발표 | 참고용 (reference) |
+| **D** | 뉴스, AI 요약, 위키 | 제외 (거부) |
+
+> **참고:** 파일을 넣는 것만으로는 자동 처리되지 않습니다.
+> `/ingest`를 실행하거나 에이전트에게 알려줘야(예: "inbox에 자료 넣었어")
+> 파싱 파이프라인이 시작됩니다.
+
 ### 검색 전략
 
 임베딩이나 벡터 데이터베이스를 사용하지 않습니다. 검색은 다음 단계로 이루어집니다:
@@ -276,6 +300,9 @@ inbox/raw/  ──>  validate  ──>  classify  ──>  segment  ──>  app
 │   │   ├── staging/             # 검증 완료, 승인 대기 (gitignored)
 │   │   ├── approved/            # 게시된 자산 (gitignored)
 │   │   ├── quarantine/          # 실패 / 거절된 항목 (gitignored)
+│   │   ├── grade-a/             # Grade A 참조 소스 (법령, 규정)
+│   │   ├── grade-b/             # Grade B 참조 소스 (판례, 해설)
+│   │   ├── grade-c/             # Grade C 참조 소스 (학술, 세미나)
 │   │   ├── indexes/             # JSON 인덱스 (자동 관리)
 │   │   └── policies/            # YAML 설정 파일 (사용자 관리)
 │   └── matters/                 # 딜별 작업 디렉터리 (gitignored)
