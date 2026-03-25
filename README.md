@@ -247,23 +247,15 @@ Auto-approval is on by default for templates and precedents. No manual approval 
 
 ### Adding Reference Sources
 
-Beyond contract templates, you can build a **reference library** of statutes, court decisions, law firm analyses, and academic papers. These are classified by grade and used as context during reviews.
+Beyond contract templates, you can build a **reference library** of statutes, court decisions, law firm analyses, sample forms, and more. These are converted to structured Markdown and used as context during reviews.
 
 1. Drop any file (PDF, DOCX, etc.) into `contract-review/library/inbox/raw/`
 2. Tell the agent: `/ingest` or "참조 자료 넣었어"
 3. The agent will automatically:
    - Convert to structured Markdown
-   - Classify source grade (A/B/C)
    - Generate metadata (frontmatter)
-   - Place in the appropriate `library/grade-{a,b,c}/` folder
+   - Place in `library/sources/`
    - Update search indexes
-
-| Grade | Source Type | Trust Level |
-|-------|------------|-------------|
-| **A** | Statutes, regulations, official guidelines, KVCA standard forms | Authoritative |
-| **B** | Court decisions, law firm newsletters, KVCA commentary, practice guides | Verified |
-| **C** | Academic papers, seminar materials, conference presentations | Reference |
-| **D** | News, AI summaries, wikis | Excluded (rejected) |
 
 > **Note:** Dropping files alone does not trigger processing.
 > You must run `/ingest` or tell the agent (e.g. "inbox에 자료 넣었어")
@@ -301,9 +293,7 @@ Fully auditable. Every match is traceable.
 │   │   ├── staging/             # Validated, awaiting approval (gitignored)
 │   │   ├── approved/            # Published assets (gitignored)
 │   │   ├── quarantine/          # Failed / rejected (gitignored)
-│   │   ├── grade-a/             # Grade A reference sources (statutes, regulations)
-│   │   ├── grade-b/             # Grade B reference sources (precedents, analyses)
-│   │   ├── grade-c/             # Grade C reference sources (academic, seminars)
+│   │   ├── sources/             # Reference sources (statutes, precedents, sample forms, etc.)
 │   │   ├── indexes/             # JSON indexes (auto-managed)
 │   │   └── policies/            # YAML config files (user-managed)
 │   └── matters/                 # Per-deal working directories (gitignored)
