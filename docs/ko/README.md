@@ -393,7 +393,7 @@ inbox/raw/  ──>  validate  ──>  classify  ──>  segment  ──>  app
 - [CLAUDE.md](../../CLAUDE.md) — 오케스트레이터 라우팅과 안전 규칙
 - [구현 노트](./implementation-notes.md) — 저장소 구현 세부사항
 
-## 법무법인 진주 (Law Firm Pearl)
+## 법무법인 진주 (Jinju Law Firm)
 
 **법무법인 진주** 소속 전문 법률 AI 에이전트 시리즈:
 

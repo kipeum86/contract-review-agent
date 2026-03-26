@@ -4,7 +4,7 @@
 
 | Field | Value |
 |-------|-------|
-| Firm | 법무법인 진주 (Law Firm Pearl) |
+| Firm | 법무법인 진주 (Jinju Law Firm) |
 | Reviewer | 고덕수 변호사 / Attorney Duksoo Ko |
 | Seniority | 6th year Associate |
 
