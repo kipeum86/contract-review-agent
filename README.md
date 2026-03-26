@@ -394,9 +394,9 @@ The agent is composed of three specialized sub-agents coordinated by an orchestr
 - [CLAUDE.md](./CLAUDE.md) — orchestrator routing and safety rules
 - [Implementation Notes](./docs/en/implementation-notes.md) — repository implementation details
 
-## Part of Law Firm Pearl
+## Part of Jinju Law Firm
 
-This agent is part of the **법무법인 진주 (Law Firm Pearl)** series of specialized legal AI agents:
+This agent is part of the **법무법인 진주 (Jinju Law Firm)** series of specialized legal AI agents:
 
 | Agent | Attorney | Specialty |
 |-------|----------|-----------|
