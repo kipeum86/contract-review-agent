@@ -172,7 +172,7 @@ Review this NDA strictly.
 | `/library` | Search, list, show, deprecate, or archive library assets |
 | `/export-clean` | Strip `[INTERNAL]` comments from a redlined DOCX |
 | `/resume` | Resume an interrupted pipeline |
-| `/draft` | Draft a new contract (assisted drafting; DOCX packaging is still manual/experimental) |
+| `/draft` | Draft a new contract with interview-driven generation and DOCX export |
 
 Natural language works too — the orchestrator routes to the right workflow.
 
