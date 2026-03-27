@@ -403,6 +403,7 @@ inbox/raw/  ──>  validate  ──>  classify  ──>  segment  ──>  app
 | [legal-translation-agent](https://github.com/kipeum86/legal-translation-agent) | 변혁기 | 법률 번역 |
 | [general-legal-research](https://github.com/kipeum86/general-legal-research) | 김재식 | 법률 리서치 |
 | [PIPA-expert](https://github.com/kipeum86/PIPA-expert) | 정보호 | 개인정보보호법 |
+| [GDPR-expert](https://github.com/kipeum86/GDPR-expert) | 김덕배 | GDPR / EU 개인정보보호 |
 | **[contract-review-agent](https://github.com/kipeum86/contract-review-agent)** | **고덕수** | **계약서 검토** |
 | [legal-writing-agent](https://github.com/kipeum86/legal-writing-agent) | 한석봉 | 법률 문서 작성 |
 | [second-review-agent](https://github.com/kipeum86/second-review-agent) | 반성문 | 품질 리뷰 (파트너) |
