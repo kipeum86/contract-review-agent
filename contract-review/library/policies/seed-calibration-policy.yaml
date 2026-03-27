@@ -1,0 +1,120 @@
+# Seed Calibration Policy — governs synthetic seed review metadata and authority promotion.
+
+synthetic_seed:
+  manifest_tag: synthetic-seed
+  calibration_review_path: quality/calibration-review.json
+
+  internal_review_status_values:
+    - complete
+
+  external_domain_review_status_values:
+    - pending
+    - completed
+    - waived
+
+  promotion_recommendation_values:
+    - keep_acceptable
+    - promote_to_preferred
+    - needs_revision
+    - needs_family_split
+
+  preferred_authority_requires:
+    external_domain_review_status: completed
+    promotion_recommendation: promote_to_preferred
+    required_external_review_fields:
+      - reviewer_name
+      - reviewer_role
+      - reviewed_at
+
+  review_execution:
+    default_output_dir: output/seed-review-packets
+    family_priority_order:
+      - privacy_policy
+      - dpa
+      - employment
+      - lease
+      - nda
+      - services
+      - saas
+      - tos
+      - eula
+      - license
+      - independent_contractor
+      - purchase_sales
+      - sow
+      - settlement
+      - ip_transfer
+      - content_distribution
+      - publishing
+      - game_development
+      - marketing
+      - mou
+      - loi
+      - spa
+      - apa
+      - joint_venture
+      - merger
+      - other
+    family_clusters:
+      privacy_policy: data_compliance
+      dpa: data_compliance
+      tos: data_compliance
+      eula: data_compliance
+      saas: data_compliance
+      employment: workforce_and_services
+      independent_contractor: workforce_and_services
+      services: workforce_and_services
+      sow: workforce_and_services
+      lease: workforce_and_services
+      purchase_sales: workforce_and_services
+      nda: workforce_and_services
+      license: ip_and_content
+      ip_transfer: ip_and_content
+      publishing: ip_and_content
+      content_distribution: ip_and_content
+      game_development: ip_and_content
+      marketing: ip_and_content
+      mou: corporate_and_transactional
+      loi: corporate_and_transactional
+      spa: corporate_and_transactional
+      apa: corporate_and_transactional
+      joint_venture: corporate_and_transactional
+      merger: corporate_and_transactional
+      settlement: corporate_and_transactional
+      other: corporate_and_transactional
+    cluster_checklists:
+      data_compliance:
+        - Confirm that notice, consent, outsourcing, and retention language matches current Korean-law practice for the family.
+        - Check whether party roles and data-flow allocations are explicit enough to avoid controller/processor ambiguity.
+        - Verify that security, incident-response, subcontracting, and deletion/return mechanics are operationally usable.
+        - Review mandatory consumer-facing disclosures and unfair-term risk in unilateral platform or policy language.
+        - Decide whether the baseline is strong enough to be `preferred` or should remain `acceptable` pending narrower specialization.
+      workforce_and_services:
+        - Confirm that scope of work, role allocation, deliverables, and acceptance mechanics reflect ordinary market structure.
+        - Review payment, expense, tax, and withholding wording for hidden reclassification or labor-law risk.
+        - Check IP ownership, confidentiality, non-solicit, and return-of-materials language for missing asymmetry or overreach.
+        - Verify termination, survival, indemnity, and liability allocation against practical dispute scenarios.
+        - Decide whether this baseline is merely safe as a generic template or strong enough to recommend as `preferred`.
+      ip_and_content:
+        - Confirm that ownership, license scope, sublicensing, territory, media, and derivative-work language are internally coherent.
+        - Review royalty, reporting, approval, takedown, infringement, and indemnity mechanics for commercial operability.
+        - Check moral-rights, attribution, open-source, platform, and release constraints where the family usually requires them.
+        - Verify termination and post-termination consequences, including continued use, archival copies, and transition duties.
+        - Decide whether the document is reliable enough for `preferred` status or should remain an interim `acceptable` baseline.
+      corporate_and_transactional:
+        - Confirm that binding versus non-binding sections, condition precedent structure, approvals, and closing mechanics are clear.
+        - Review reps and warranties, covenants, indemnity, limitation-of-liability, and dispute provisions for market realism.
+        - Check price adjustment, leakage, escrow, earnout, release, or settlement logic where the family typically needs it.
+        - Verify signing authority, corporate approvals, governing law, notices, and amendment mechanics for execution readiness.
+        - Decide whether the template is generic-but-usable (`acceptable`) or calibrated enough to be promoted to `preferred`.
+    promotion_blockers:
+      pending_external_review:
+        - external_domain_expert_review_pending
+      keep_acceptable:
+        - reviewer_kept_as_acceptable
+      needs_revision:
+        - revision_required_before_promotion
+      needs_family_split:
+        - family_split_required_before_promotion
+      waived_external_review:
+        - external_review_waived_not_eligible_for_preferred
