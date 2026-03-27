@@ -1,0 +1,17 @@
+{
+  "clause_id": "clause-003",
+  "section_no": "제3조",
+  "heading": "양수도대금",
+  "header": "(양수도대금)",
+  "start_line": 9,
+  "end_line": 10,
+  "clause_type": "purchase_price",
+  "text": "매수인은 대상주식 양수도대금으로 합의된 금액을 지급하며, 계약금·잔금 구조와 지급일정은 별첨 지급표에 따른다.",
+  "defined_terms_used": [
+    "매수인",
+    "대상주식"
+  ],
+  "cross_refs": [],
+  "paragraph_count": 1,
+  "char_count": 61
+}

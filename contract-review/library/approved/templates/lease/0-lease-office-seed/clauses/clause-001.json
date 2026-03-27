@@ -1,0 +1,18 @@
+{
+  "clause_id": "clause-001",
+  "section_no": "제1조",
+  "heading": "임대목적물",
+  "header": "(임대목적물)",
+  "start_line": 3,
+  "end_line": 4,
+  "clause_type": "premises_description",
+  "text": "임대인은 서울특별시 소재 건물 8층 전부를 임차인에게 사무실 용도로 임대한다.",
+  "defined_terms_used": [
+    "임대인",
+    "임차인",
+    "임대목적물"
+  ],
+  "cross_refs": [],
+  "paragraph_count": 1,
+  "char_count": 43
+}

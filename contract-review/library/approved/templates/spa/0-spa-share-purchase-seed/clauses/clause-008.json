@@ -1,0 +1,17 @@
+{
+  "clause_id": "clause-008",
+  "section_no": "제8조",
+  "heading": "종결 전 의무",
+  "header": "(종결 전 의무)",
+  "start_line": 24,
+  "end_line": 25,
+  "clause_type": "covenants_pre_closing",
+  "text": "매도인은 종결 전까지 대상회사를 통상적인 영업 범위 내에서 운영하고, 중요한 신규 채무, 자산 처분 또는 인력 구조조정을 매수인의 사전 동의 없이 하지 아니한다.",
+  "defined_terms_used": [
+    "매도인",
+    "대상회사"
+  ],
+  "cross_refs": [],
+  "paragraph_count": 1,
+  "char_count": 90
+}

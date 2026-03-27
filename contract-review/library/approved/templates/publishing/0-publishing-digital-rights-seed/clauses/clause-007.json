@@ -1,0 +1,17 @@
+{
+  "clause_id": "clause-007",
+  "section_no": "제7조",
+  "heading": "출간 일정",
+  "header": "(출간 일정)",
+  "start_line": 21,
+  "end_line": 22,
+  "clause_type": "publication_schedule",
+  "text": "출판사는 최종 원고 수령 후 6개월 이내를 목표로 출간 일정을 수립하고, 주요 일정 변경 시 저자에게 통지한다.",
+  "defined_terms_used": [
+    "출판사",
+    "저자"
+  ],
+  "cross_refs": [],
+  "paragraph_count": 1,
+  "char_count": 62
+}

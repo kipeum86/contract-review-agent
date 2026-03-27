@@ -7,6 +7,7 @@ Parse and normalize contract documents from various formats into standardized ou
 1. **Format Detection** (`scripts/detect-format.py`)
    - Validates file format (DOCX, PDF, MD, TXT, HTML)
    - Checks file integrity via magic bytes
+   - Rejects legacy `.doc` binaries with explicit `.docx` conversion guidance
    - Usage: `python3 detect-format.py <file_path>`
 
 2. **Fingerprinting** (`scripts/fingerprint.py`)
@@ -20,6 +21,7 @@ Parse and normalize contract documents from various formats into standardized ou
    - Converts any supported format to `clean.md` + `plain.txt`
    - DOCX: parses document.xml preserving headings, lists, tables
    - PDF: uses pdftotext → pymupdf → pypdf fallback chain
+   - Flags likely image-only/scanned PDFs as `needs_ocr: true` instead of silently failing
    - Validates output quality (text length ratio check)
    - Usage: `python3 normalize.py <file_path> <output_dir>`
 
@@ -43,3 +45,5 @@ Parse and normalize contract documents from various formats into standardized ou
 - Normalization validates that output text length is ≥ 50% of source (10% for binary formats)
 - Heading count is tracked for structural integrity comparison
 - Empty files are rejected at detection stage
+- Legacy `.doc` files must be converted to `.docx` before normalization
+- Scanned PDFs are reported as OCR-required when no extractable text is detected

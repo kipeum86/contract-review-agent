@@ -1,0 +1,17 @@
+{
+  "clause_id": "clause-003",
+  "section_no": "제3조",
+  "heading": "동의 및 처리 근거",
+  "header": "(동의 및 처리 근거)",
+  "start_line": 9,
+  "end_line": 10,
+  "clause_type": "consent_management",
+  "text": "회사는 정보주체의 동의가 필요한 경우 사전에 수집 목적, 항목, 보유기간 및 동의 거부권을 고지하고 동의를 받으며, 법령상 허용되는 경우에만 예외적으로 동의 없이 처리한다.",
+  "defined_terms_used": [
+    "정보주체",
+    "개인정보"
+  ],
+  "cross_refs": [],
+  "paragraph_count": 1,
+  "char_count": 96
+}

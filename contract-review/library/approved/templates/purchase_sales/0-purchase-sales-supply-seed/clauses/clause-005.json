@@ -1,0 +1,18 @@
+{
+  "clause_id": "clause-005",
+  "section_no": "제5조",
+  "heading": "납품 및 검수",
+  "header": "(납품 및 검수)",
+  "start_line": 15,
+  "end_line": 16,
+  "clause_type": "acceptance",
+  "text": "공급인은 합의된 납기일에 물품을 납품하고, 매수인은 수령 후 7영업일 내 외관 및 수량 검수 결과를 통지한다.",
+  "defined_terms_used": [
+    "공급인",
+    "물품",
+    "매수인"
+  ],
+  "cross_refs": [],
+  "paragraph_count": 1,
+  "char_count": 61
+}

@@ -1,0 +1,38 @@
+doc_id: 0-apa-business-transfer-seed
+title: 영업양수도계약서
+title_en: Asset Purchase Agreement
+doc_class: template
+paper_role: neutral
+jurisdiction: KR
+governing_law: 대한민국 법률 (Korean law)
+language: ko
+approval_state: approved
+status: active
+classification_confidence: high
+authority_level: acceptable
+external_safe: false
+freshness_sensitive: false
+contract_family: apa
+subtype: business_transfer
+sha256: 14ff5b99e0b30db63ab3865fc2e98a1dac9a12b13fd5bbe6b81538a6d0647fb9
+source_file: session-k-seed-business-transfer.md
+created_at: '2026-03-27T20:10:00+00:00'
+updated_at: '2026-03-27T20:10:00+00:00'
+tags:
+- seed-baseline
+- synthetic-seed
+- session-k
+- kr-law
+- apa
+- commercial-act-informed
+notes: Synthetic interim baseline seed package for a zero-coverage family; internal
+  sanity review applied, domain expert calibration pending. Drafted against Korean
+  business-transfer approval baseline assumptions.
+industry: ma
+stats:
+  total_clauses: 11
+  unmapped_clauses: 0
+  unmapped_ratio: 0.0
+  defined_terms: 3
+  sections: 11
+  exhibits: 0

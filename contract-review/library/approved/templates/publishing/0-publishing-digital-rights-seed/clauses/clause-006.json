@@ -1,0 +1,18 @@
+{
+  "clause_id": "clause-006",
+  "section_no": "제6조",
+  "heading": "편집권",
+  "header": "(편집권)",
+  "start_line": 18,
+  "end_line": 19,
+  "clause_type": "editorial_rights",
+  "text": "출판사는 오탈자, 구성, 디자인 및 판매 적합성 확보를 위한 합리적인 편집을 할 수 있으나, 저작물의 본질적 내용 변경은 저자의 승인을 받아야 한다.",
+  "defined_terms_used": [
+    "출판사",
+    "저자",
+    "저작물"
+  ],
+  "cross_refs": [],
+  "paragraph_count": 1,
+  "char_count": 83
+}

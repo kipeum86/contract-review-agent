@@ -1,0 +1,16 @@
+{
+  "clause_id": "clause-007",
+  "section_no": "제7조",
+  "heading": "이용요금 및 지급",
+  "header": "(이용요금 및 지급)",
+  "start_line": 21,
+  "end_line": 22,
+  "clause_type": "fees_payment",
+  "text": "구독자는 청구서 발행일로부터 30일 이내에 구독료를 지급한다.",
+  "defined_terms_used": [
+    "구독자"
+  ],
+  "cross_refs": [],
+  "paragraph_count": 1,
+  "char_count": 34
+}

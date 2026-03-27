@@ -11,19 +11,21 @@ Apply tracked changes and comments to DOCX files via XML manipulation.
    - Target: ≥ 90% coverage
 
 2. **Redline Application** (`scripts/apply-redlines.py`)
-   - Inserts `<w:del>` and `<w:ins>` tracked change XML
-   - Author: "Claude"
-   - Preserves original `<w:rPr>` formatting
+   - Inserts partial `<w:del>` / `<w:ins>` tracked changes while preserving unchanged prefix/suffix text
+   - Reviewer author/initials can come from `redlines.json` `_meta` or `DOCX_REVIEWER_*` env vars
+   - Preserves unrelated existing revisions/comments in untouched paragraphs
    - Usage: `python3 apply-redlines.py <document.xml> <clause-map.json> <redlines.json> <output.xml>`
 
 3. **Comment Application** (`scripts/apply-comments.py`)
-   - Creates `word/comments.xml` entries
+   - Merges into existing `word/comments.xml` instead of recreating it
    - Inserts `<w:commentRangeStart/End>` markers in `document.xml`
+   - Ensures `document.xml.rels` and `[Content_Types].xml` contain the required comments part wiring
+   - Reviewer author/initials can come from `comments.json` `_meta` or `DOCX_REVIEWER_*` env vars
    - Prefixes: `[INTERNAL]` or `[EXTERNAL]`
    - Usage: `python3 apply-comments.py <unpacked_dir> <clause-map.json> <comments.json>`
 
 4. **Internal Comment Stripping** (`scripts/strip-internal-comments.py`)
-   - Removes all `[INTERNAL]`-prefixed comments for external-clean version
+   - Removes all `[INTERNAL]`-prefixed comments for external-clean version, including threaded comment metadata and stale rel/content-type entries
    - Safety-critical: prevents internal strategy leakage
    - Usage: `python3 strip-internal-comments.py <input.docx> <output.docx>`
 
@@ -50,6 +52,7 @@ Original DOCX
 - Redlines and comments target `<w:p>` elements in the document body only
 - Tables are analyzed at the table level; cell-level redlines within `<w:tc>` are deferred to v2
 - Table-related comments attach at the table-start paragraph
+- Multi-paragraph redlines are supported when the mapped paragraph count and suggested redline paragraph count align
 
 ## Comment Placement Rules
 
@@ -59,11 +62,11 @@ Original DOCX
 
 ## External-Clean Generation
 
-Both DOCX versions are **always** generated automatically:
+Generate the external-clean DOCX **only when output 2 is selected**:
 1. **Internal** (`_redlined.docx`): All redlines + `[INTERNAL]` + `[EXTERNAL]` comments
-2. **External-clean** (`_redlined_clean.docx`): `[INTERNAL]` comments stripped
+2. **External-clean** (`_redlined_clean.docx`): `[INTERNAL]` comments stripped for counterparty delivery
 
-This is a **safety-critical feature**, not optional.
+This is a **safety-critical feature** whenever output 2 is requested.
 
 ## Coverage Fallback Protocol
 

@@ -5,8 +5,11 @@ Compile analysis results into professional DOCX report deliverables.
 ## Capabilities
 
 1. **Analysis Report** (`scripts/compile-report.js`)
-   - Generates DOCX with Executive Summary + per-clause analysis
-   - Input: review data JSON with clauses, executive_summary, risk distribution
+   - Generates DOCX with either:
+     - generic Executive Summary + per-clause analysis, or
+     - Korean memorandum-style opinion when report language is Korean
+   - Korean renderer applies A4 sizing, CJK font, minimal color, disclaimer blocks, information block, and signature block
+   - Input: review data JSON with clauses, executive_summary, risk distribution, and optional memorandum metadata
    - Usage: `node compile-report.js <review_data.json> <output.docx>`
 
 2. **Delta Report** (`scripts/compile-delta-report.js`)
@@ -18,15 +21,33 @@ Compile analysis results into professional DOCX report deliverables.
 
 - WF2 Step 10: compile analysis report
 - WF4 Step 5: compile delta report
-- WF5 Step 7: generate draft contract DOCX (uses docx library directly)
+
+## WF5 Status
+
+- This skill currently ships only the review-report compilers above.
+- The repository does **not** yet include a dedicated Workflow 5 draft-contract DOCX packager or end-to-end drafting orchestrator.
+- For drafting, treat DOCX packaging as manual/experimental until a separate WF5 compiler is added.
 
 ## Input JSON Format — Analysis Report
 
 ```json
 {
+  "report_language": "ko",
   "contract_info": { "title": "...", "contract_family": "nda" },
   "review_mode": "moderate",
   "general_review_mode": false,
+  "memo_metadata": {
+    "date": "2026-03-27",
+    "recipient": "Client Name",
+    "reference": "GC",
+    "sender": "Law Firm Name",
+    "subject": "법률 검토 의견서",
+    "signer": "담당 변호사"
+  },
+  "background_facts": ["..."],
+  "questions_presented": ["..."],
+  "limitations_disclaimer": "...",
+  "closing_disclaimer": "...",
   "executive_summary": {
     "overall_risk": "high",
     "key_issues": ["Issue 1", "Issue 2"],
@@ -79,4 +100,5 @@ Compile analysis results into professional DOCX report deliverables.
 
 - Redline text: always in the contract's original language
 - Analysis report: follows user's prompt language or explicit language instruction
-- The report compiler accepts the text as-is; language adaptation happens at analysis time
+- Korean reports render as memorandum-style DOCX when `report_language`, `language`, or the supplied text indicates Korean
+- The report compiler accepts the substantive text as-is; language adaptation and memorandum metadata selection happen at render time

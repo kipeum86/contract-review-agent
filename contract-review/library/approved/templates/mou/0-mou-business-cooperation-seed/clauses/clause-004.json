@@ -1,0 +1,16 @@
+{
+  "clause_id": "clause-004",
+  "section_no": "제4조",
+  "heading": "비밀유지",
+  "header": "(비밀유지)",
+  "start_line": 12,
+  "end_line": 13,
+  "clause_type": "confidentiality",
+  "text": "본 양해각서와 협력 검토 과정에서 교환되는 비공개 정보는 상대방의 사전 서면동의 없이 제3자에게 공개할 수 없다.",
+  "defined_terms_used": [
+    "당사자"
+  ],
+  "cross_refs": [],
+  "paragraph_count": 1,
+  "char_count": 63
+}

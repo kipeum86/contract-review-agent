@@ -12,8 +12,8 @@ approval_state: approved
 status: active
 sha256: a790a68dfca5a698625cbcd91919d69126f82d87cb94c10863e390690847168b
 source_file: 3-1-1. [후기]_투자계약서_보통주식(통합형)_2309개정.docx
-created_at: '2026-03-06T17:09:47.744621+00:00'
-updated_at: '2026-03-06T17:09:47.744621+00:00'
+created_at: '2026-03-27T07:01:43.176343+00:00'
+updated_at: '2026-03-27T07:01:43.176343+00:00'
 classification_confidence: high
 authority_level: preferred
 external_safe: false
@@ -27,8 +27,8 @@ notes: 한국벤처캐피탈협회(KVCA)/중소벤처기업부 표준투자계�
 industry: venture-capital
 stats:
   total_clauses: 52
-  unmapped_clauses: 4
-  unmapped_ratio: 0.077
-  defined_terms: 0
+  unmapped_clauses: 0
+  unmapped_ratio: 0.0
+  defined_terms: 22
   sections: 50
   exhibits: 2

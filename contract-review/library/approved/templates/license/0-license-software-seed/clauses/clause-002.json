@@ -1,0 +1,18 @@
+{
+  "clause_id": "clause-002",
+  "section_no": "제2조",
+  "heading": "이용허락",
+  "header": "(이용허락)",
+  "start_line": 6,
+  "end_line": 7,
+  "clause_type": "ip_license_grant",
+  "text": "라이선서는 라이선시에게 계약기간 동안 라이선스 제품을 내부 업무 목적으로 사용할 수 있는 비독점적이고 양도 불가능한 사용권을 부여한다.",
+  "defined_terms_used": [
+    "라이선서",
+    "라이선시",
+    "라이선스 제품"
+  ],
+  "cross_refs": [],
+  "paragraph_count": 1,
+  "char_count": 75
+}

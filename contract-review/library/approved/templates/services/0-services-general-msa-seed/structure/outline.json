@@ -1,0 +1,80 @@
+[
+  {
+    "line": 3,
+    "level": 2,
+    "text": "목적",
+    "section": "art1"
+  },
+  {
+    "line": 6,
+    "level": 2,
+    "text": "계약기간",
+    "section": "art2"
+  },
+  {
+    "line": 9,
+    "level": 2,
+    "text": "용역범위",
+    "section": "art3"
+  },
+  {
+    "line": 12,
+    "level": 2,
+    "text": "산출물",
+    "section": "art4"
+  },
+  {
+    "line": 15,
+    "level": 2,
+    "text": "서비스수준",
+    "section": "art5"
+  },
+  {
+    "line": 18,
+    "level": 2,
+    "text": "대금 및 지급조건",
+    "section": "art6"
+  },
+  {
+    "line": 21,
+    "level": 2,
+    "text": "검수",
+    "section": "art7"
+  },
+  {
+    "line": 24,
+    "level": 2,
+    "text": "결과물의 권리귀속",
+    "section": "art8"
+  },
+  {
+    "line": 27,
+    "level": 2,
+    "text": "비밀유지",
+    "section": "art9"
+  },
+  {
+    "line": 30,
+    "level": 2,
+    "text": "간접손해 배제",
+    "section": "art10"
+  },
+  {
+    "line": 33,
+    "level": 2,
+    "text": "재위탁 제한",
+    "section": "art11"
+  },
+  {
+    "line": 36,
+    "level": 2,
+    "text": "책임한도",
+    "section": "art12"
+  },
+  {
+    "line": 39,
+    "level": 2,
+    "text": "해지",
+    "section": "art13"
+  }
+]

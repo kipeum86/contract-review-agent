@@ -1,0 +1,18 @@
+{
+  "clause_id": "clause-011",
+  "section_no": "제11조",
+  "heading": "현지화",
+  "header": "(현지화)",
+  "start_line": 33,
+  "end_line": 34,
+  "clause_type": "localization",
+  "text": "퍼블리셔가 해외 출시를 추진하는 경우 번역, 현지화, 문화적 수정 및 QA 기준은 사전에 합의한 현지화 정책에 따른다.",
+  "defined_terms_used": [
+    "퍼블리셔",
+    "개발사",
+    "게임"
+  ],
+  "cross_refs": [],
+  "paragraph_count": 1,
+  "char_count": 66
+}

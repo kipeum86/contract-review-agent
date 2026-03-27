@@ -1,0 +1,68 @@
+[
+  {
+    "line": 3,
+    "level": 2,
+    "text": "직위 및 업무",
+    "section": "art1"
+  },
+  {
+    "line": 6,
+    "level": 2,
+    "text": "계약기간",
+    "section": "art2"
+  },
+  {
+    "line": 9,
+    "level": 2,
+    "text": "보수 및 복리후생",
+    "section": "art3"
+  },
+  {
+    "line": 12,
+    "level": 2,
+    "text": "근로시간 및 연장근로",
+    "section": "art4"
+  },
+  {
+    "line": 15,
+    "level": 2,
+    "text": "휴가 및 휴일",
+    "section": "art5"
+  },
+  {
+    "line": 18,
+    "level": 2,
+    "text": "수습기간",
+    "section": "art6"
+  },
+  {
+    "line": 21,
+    "level": 2,
+    "text": "퇴직금",
+    "section": "art7"
+  },
+  {
+    "line": 24,
+    "level": 2,
+    "text": "비밀유지",
+    "section": "art8"
+  },
+  {
+    "line": 27,
+    "level": 2,
+    "text": "경업금지",
+    "section": "art9"
+  },
+  {
+    "line": 30,
+    "level": 2,
+    "text": "해고 및 통지",
+    "section": "art10"
+  },
+  {
+    "line": 33,
+    "level": 2,
+    "text": "직무성과의 권리귀속",
+    "section": "art11"
+  }
+]

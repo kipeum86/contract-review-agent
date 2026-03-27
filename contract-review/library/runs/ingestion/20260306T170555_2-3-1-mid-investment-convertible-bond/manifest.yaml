@@ -12,8 +12,8 @@ approval_state: approved
 status: active
 sha256: bdcbda7b4e502104177cd089f6175aae5bac17eaf71677e4b8ca7dfc8308390f
 source_file: 2-3-1. [중기]_투자계약서_전환사채_2309개정.docx
-created_at: '2026-03-06T17:09:47.744621+00:00'
-updated_at: '2026-03-06T17:09:47.744621+00:00'
+created_at: '2026-03-27T07:01:43.176343+00:00'
+updated_at: '2026-03-27T07:01:43.176343+00:00'
 classification_confidence: high
 authority_level: preferred
 external_safe: false
@@ -27,8 +27,8 @@ notes: 한국벤처캐피탈협회(KVCA)/중소벤처기업부 표준투자계�
 industry: venture-capital
 stats:
   total_clauses: 39
-  unmapped_clauses: 1
-  unmapped_ratio: 0.026
-  defined_terms: 4
+  unmapped_clauses: 0
+  unmapped_ratio: 0.0
+  defined_terms: 23
   sections: 36
   exhibits: 3

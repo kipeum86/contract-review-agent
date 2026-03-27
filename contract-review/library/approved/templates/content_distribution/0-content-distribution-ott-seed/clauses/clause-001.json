@@ -1,0 +1,18 @@
+{
+  "clause_id": "clause-001",
+  "section_no": "제1조",
+  "heading": "목적",
+  "header": "(목적)",
+  "start_line": 3,
+  "end_line": 4,
+  "clause_type": "purpose",
+  "text": "본 계약은 제작사가 보유한 콘텐츠를 배급사가 디지털 플랫폼을 통해 유통하는 조건을 정함을 목적으로 한다.",
+  "defined_terms_used": [
+    "제작사",
+    "배급사",
+    "콘텐츠"
+  ],
+  "cross_refs": [],
+  "paragraph_count": 1,
+  "char_count": 58
+}

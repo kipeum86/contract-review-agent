@@ -1,8 +1,14 @@
 {
   "clause_id": "clause-032",
+  "section_no": "제27조",
+  "heading": "준거법 및 분쟁해결",
   "header": "(준거법 및 분쟁해결)",
   "start_line": 273,
   "end_line": 277,
   "clause_type": "governing_law",
+  "text": "(준거법 및 분쟁해결)\n본 계약은 대한민국 법률에 따라 규율되고 해석된다.\n본 계약에 따라 발생한 모든 분쟁의 제1심 관할법원으로 서울중앙지방법원을 지정한다.",
+  "defined_terms_used": [],
+  "cross_refs": [],
+  "paragraph_count": 1,
   "char_count": 88
 }

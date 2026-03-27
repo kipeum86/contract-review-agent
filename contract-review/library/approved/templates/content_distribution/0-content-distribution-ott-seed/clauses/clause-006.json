@@ -1,0 +1,17 @@
+{
+  "clause_id": "clause-006",
+  "section_no": "제6조",
+  "heading": "수익배분",
+  "header": "(수익배분)",
+  "start_line": 18,
+  "end_line": 19,
+  "clause_type": "royalties",
+  "text": "배급사는 플랫폼 수수료와 환불액을 공제한 순매출의 일정 비율을 제작사에게 분기별로 정산한다.",
+  "defined_terms_used": [
+    "배급사",
+    "제작사"
+  ],
+  "cross_refs": [],
+  "paragraph_count": 1,
+  "char_count": 51
+}

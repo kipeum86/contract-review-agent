@@ -1,0 +1,17 @@
+{
+  "clause_id": "clause-008",
+  "section_no": "제8조",
+  "heading": "선급금",
+  "header": "(선급금)",
+  "start_line": 24,
+  "end_line": 25,
+  "clause_type": "advance_payment",
+  "text": "출판사는 계약 체결 후 15일 이내에 합의된 선급금을 지급하며, 선급금은 장래 인세에서 상계할 수 있다.",
+  "defined_terms_used": [
+    "출판사",
+    "저자"
+  ],
+  "cross_refs": [],
+  "paragraph_count": 1,
+  "char_count": 58
+}

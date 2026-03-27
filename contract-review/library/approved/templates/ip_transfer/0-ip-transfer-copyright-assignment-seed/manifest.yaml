@@ -1,0 +1,36 @@
+doc_id: 0-ip-transfer-copyright-assignment-seed
+title: 저작권 양도계약서
+title_en: Copyright Assignment Agreement
+doc_class: template
+paper_role: neutral
+jurisdiction: KR
+governing_law: 대한민국 법률 (Korean law)
+language: ko
+approval_state: approved
+status: active
+classification_confidence: high
+authority_level: acceptable
+external_safe: false
+freshness_sensitive: false
+contract_family: ip_transfer
+subtype: copyright_assignment
+sha256: 32e20e6f8cfb1e040ae2f3353d3654b0e5ef6a5f76bd75b7a877cb0d8fe1c125
+source_file: session-i-seed-copyright-assignment.md
+created_at: '2026-03-27T18:05:00+00:00'
+updated_at: '2026-03-27T18:05:00+00:00'
+tags:
+- seed-baseline
+- synthetic-seed
+- session-i
+- kr-law
+- ip-transfer
+notes: Synthetic interim baseline seed package for a zero-coverage family; internal
+  sanity review applied, domain expert calibration pending.
+industry: creative-ip
+stats:
+  total_clauses: 10
+  unmapped_clauses: 0
+  unmapped_ratio: 0.0
+  defined_terms: 3
+  sections: 10
+  exhibits: 0

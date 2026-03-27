@@ -1,0 +1,18 @@
+{
+  "clause_id": "clause-003",
+  "section_no": "제3조",
+  "heading": "이용범위",
+  "header": "(이용범위)",
+  "start_line": 9,
+  "end_line": 10,
+  "clause_type": "license_scope",
+  "text": "라이선시는 대한민국 내에서만 라이선스 제품을 사용할 수 있으며, 라이선서의 사전 서면동의 없이 재허락, 리버스엔지니어링 또는 무단 복제를 할 수 없다.",
+  "defined_terms_used": [
+    "라이선시",
+    "라이선서",
+    "라이선스 제품"
+  ],
+  "cross_refs": [],
+  "paragraph_count": 1,
+  "char_count": 84
+}

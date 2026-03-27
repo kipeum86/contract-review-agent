@@ -1,0 +1,17 @@
+{
+  "clause_id": "clause-004",
+  "section_no": "제4조",
+  "heading": "예외",
+  "header": "(예외)",
+  "start_line": 12,
+  "end_line": 13,
+  "clause_type": "confidentiality_exceptions",
+  "text": "이미 공지된 정보, 적법하게 제3자로부터 취득한 정보, 수령당사자가 독자적으로 개발한 정보, 법령 또는 법원 명령에 따라 공개가 필요한 정보는 비밀정보에서 제외한다.",
+  "defined_terms_used": [
+    "수령당사자",
+    "비밀정보"
+  ],
+  "cross_refs": [],
+  "paragraph_count": 1,
+  "char_count": 92
+}

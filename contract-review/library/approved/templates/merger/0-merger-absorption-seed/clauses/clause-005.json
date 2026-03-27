@@ -1,0 +1,17 @@
+{
+  "clause_id": "clause-005",
+  "section_no": "제5조",
+  "heading": "종결 전 의무",
+  "header": "(종결 전 의무)",
+  "start_line": 15,
+  "end_line": 16,
+  "clause_type": "covenants_pre_closing",
+  "text": "각 당사자는 효력발생일까지 통상적인 영업 범위 내에서 사업을 운영하고, 상대방의 사전 동의 없이 중대한 자산 처분, 신규 차입 또는 비정상적 배당을 하지 아니한다.",
+  "defined_terms_used": [
+    "존속회사",
+    "소멸회사"
+  ],
+  "cross_refs": [],
+  "paragraph_count": 1,
+  "char_count": 91
+}

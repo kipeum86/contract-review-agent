@@ -1,0 +1,18 @@
+{
+  "clause_id": "clause-006",
+  "section_no": "제6조",
+  "heading": "데이터 보관 및 반환",
+  "header": "(데이터 보관 및 반환)",
+  "start_line": 18,
+  "end_line": 19,
+  "clause_type": "data_retention",
+  "text": "계약 종료 시 제공자는 법령상 보관의무가 없는 고객 데이터를 합리적인 기간 내 삭제하고, 구독자가 요청하는 경우 통상적인 형식으로 데이터를 반환 또는 추출할 수 있게 지원한다.",
+  "defined_terms_used": [
+    "제공자",
+    "고객 데이터",
+    "구독자"
+  ],
+  "cross_refs": [],
+  "paragraph_count": 1,
+  "char_count": 98
+}

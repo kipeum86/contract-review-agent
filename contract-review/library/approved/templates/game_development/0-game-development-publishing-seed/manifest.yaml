@@ -1,0 +1,38 @@
+doc_id: 0-game-development-publishing-seed
+title: 게임개발 및 퍼블리싱계약서
+title_en: Game Development and Publishing Agreement
+doc_class: template
+paper_role: neutral
+jurisdiction: KR
+governing_law: 대한민국 법률 (Korean law)
+language: ko
+approval_state: approved
+status: active
+classification_confidence: high
+authority_level: acceptable
+external_safe: false
+freshness_sensitive: false
+contract_family: game_development
+subtype: game_publishing
+sha256: 6e6545baab03f298840dd427538dd9408b8d1cc036fc45d9f0c7534070410623
+source_file: session-j-seed-game-development-publishing.md
+created_at: '2026-03-27T19:15:00+00:00'
+updated_at: '2026-03-27T19:15:00+00:00'
+tags:
+- seed-baseline
+- synthetic-seed
+- session-j
+- kr-law
+- game-development
+- ratings-informed
+notes: Synthetic interim baseline seed package for a zero-coverage family; internal
+  sanity review applied, domain expert calibration pending. Drafted against Korean
+  game-rating and platform-release baselines.
+industry: gaming
+stats:
+  total_clauses: 14
+  unmapped_clauses: 0
+  unmapped_ratio: 0.0
+  defined_terms: 4
+  sections: 14
+  exhibits: 0

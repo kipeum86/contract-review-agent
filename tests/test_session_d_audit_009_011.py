@@ -1,0 +1,475 @@
+import importlib.util
+import json
+import subprocess
+import tempfile
+import unittest
+import xml.etree.ElementTree as ET
+import zipfile
+from pathlib import Path
+
+
+REPO_ROOT = Path(__file__).resolve().parent.parent
+
+
+def load_module(module_name: str, relative_path: str):
+    module_path = REPO_ROOT / relative_path
+    spec = importlib.util.spec_from_file_location(module_name, module_path)
+    module = importlib.util.module_from_spec(spec)
+    assert spec.loader is not None
+    spec.loader.exec_module(module)
+    return module
+
+
+apply_comments_module = load_module(
+    "apply_comments",
+    ".claude/skills/docx-redliner/scripts/apply-comments.py",
+)
+apply_redlines_module = load_module(
+    "apply_redlines",
+    ".claude/skills/docx-redliner/scripts/apply-redlines.py",
+)
+
+W_NS = "http://schemas.openxmlformats.org/wordprocessingml/2006/main"
+PKG_REL_NS = "http://schemas.openxmlformats.org/package/2006/relationships"
+CONTENT_TYPES_NS = "http://schemas.openxmlformats.org/package/2006/content-types"
+
+
+def write_file(path: Path, content: str) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(content, encoding="utf-8")
+
+
+def read_zip_text(docx_path: Path, member: str) -> str:
+    with zipfile.ZipFile(docx_path, "r") as archive:
+        return archive.read(member).decode("utf-8")
+
+
+def direct_paragraphs(document_path: Path):
+    tree = ET.parse(document_path)
+    root = tree.getroot()
+    body = root.find(f".//{{{W_NS}}}body")
+    assert body is not None
+    return body.findall(f"{{{W_NS}}}p")
+
+
+class SessionDAudit009CommentsTests(unittest.TestCase):
+    def test_apply_comments_preserves_existing_comments_and_package_parts(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            unpacked_dir = Path(tmpdir) / "unpacked"
+            write_file(
+                unpacked_dir / "word" / "document.xml",
+                """<?xml version="1.0" encoding="UTF-8"?>
+<w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">
+  <w:body>
+    <w:p>
+      <w:bookmarkStart w:id="0" w:name="_GoBack"/>
+      <w:r><w:t>Clause text for comments.</w:t></w:r>
+      <w:bookmarkEnd w:id="0"/>
+    </w:p>
+  </w:body>
+</w:document>
+""",
+            )
+            write_file(
+                unpacked_dir / "word" / "comments.xml",
+                """<?xml version="1.0" encoding="UTF-8"?>
+<w:comments xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">
+  <w:comment w:id="4" w:author="Existing Reviewer" w:initials="ER" w:date="2026-03-27T00:00:00Z">
+    <w:p><w:r><w:t>Existing comment</w:t></w:r></w:p>
+  </w:comment>
+</w:comments>
+""",
+            )
+            write_file(
+                unpacked_dir / "word" / "_rels" / "document.xml.rels",
+                """<?xml version="1.0" encoding="UTF-8"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+  <Relationship Id="rIdStyles" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/>
+</Relationships>
+""",
+            )
+            write_file(
+                unpacked_dir / "[Content_Types].xml",
+                """<?xml version="1.0" encoding="UTF-8"?>
+<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">
+  <Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>
+  <Default Extension="xml" ContentType="application/xml"/>
+  <Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/>
+</Types>
+""",
+            )
+
+            clause_map_path = Path(tmpdir) / "clause-map.json"
+            clause_map_path.write_text(
+                json.dumps(
+                    {
+                        "mappings": [
+                            {"clause_id": "clause-001", "mapped": True, "paragraph_indices": [0]}
+                        ]
+                    },
+                    ensure_ascii=False,
+                    indent=2,
+                ),
+                encoding="utf-8",
+            )
+            comments_path = Path(tmpdir) / "comments.json"
+            comments_path.write_text(
+                json.dumps(
+                    {
+                        "_meta": {
+                            "reviewer_author": "Client Legal",
+                            "reviewer_initials": "CL",
+                        },
+                        "clause-001": {
+                            "external_comment": "Please clarify this obligation.",
+                            "internal_note": "Fallback position is 10 business days.",
+                        },
+                    },
+                    ensure_ascii=False,
+                    indent=2,
+                ),
+                encoding="utf-8",
+            )
+
+            result = apply_comments_module.apply_comments(
+                str(unpacked_dir),
+                str(clause_map_path),
+                str(comments_path),
+            )
+
+            self.assertTrue(result["success"], result)
+            self.assertEqual(result["total_comments"], 2)
+            self.assertEqual(result["reviewer"]["author"], "Client Legal")
+            self.assertTrue(result["comments_relationship_added"])
+            self.assertTrue(result["comments_content_type_added"])
+
+            comments_tree = ET.parse(unpacked_dir / "word" / "comments.xml")
+            comments_root = comments_tree.getroot()
+            comments = comments_root.findall(f"{{{W_NS}}}comment")
+            comment_ids = [comment.get(f"{{{W_NS}}}id") for comment in comments]
+
+            self.assertEqual(comment_ids, ["4", "5", "6"])
+            self.assertEqual(comments[0].get(f"{{{W_NS}}}author"), "Existing Reviewer")
+            self.assertEqual(comments[1].get(f"{{{W_NS}}}author"), "Client Legal")
+            self.assertEqual(comments[2].get(f"{{{W_NS}}}author"), "Client Legal")
+
+            document_tree = ET.parse(unpacked_dir / "word" / "document.xml")
+            document_root = document_tree.getroot()
+            paragraph = document_root.find(f".//{{{W_NS}}}p")
+            self.assertIsNotNone(paragraph)
+            child_local_names = [child.tag.split("}")[-1] for child in list(paragraph)]
+            self.assertIn("bookmarkStart", child_local_names)
+            self.assertIn("bookmarkEnd", child_local_names)
+            self.assertIn("commentRangeStart", child_local_names)
+            self.assertIn("commentRangeEnd", child_local_names)
+            self.assertEqual(child_local_names.count("commentReference"), 0)
+            self.assertEqual(child_local_names.count("r"), 3)
+
+            rels_tree = ET.parse(unpacked_dir / "word" / "_rels" / "document.xml.rels")
+            rels_root = rels_tree.getroot()
+            relationship_types = [rel.get("Type") for rel in rels_root.findall(f"{{{PKG_REL_NS}}}Relationship")]
+            self.assertIn(
+                "http://schemas.openxmlformats.org/officeDocument/2006/relationships/comments",
+                relationship_types,
+            )
+
+            content_types_tree = ET.parse(unpacked_dir / "[Content_Types].xml")
+            content_types_root = content_types_tree.getroot()
+            overrides = [
+                override.get("PartName")
+                for override in content_types_root.findall(f"{{{CONTENT_TYPES_NS}}}Override")
+            ]
+            self.assertIn("/word/comments.xml", overrides)
+
+
+class SessionDAudit009RedlinesTests(unittest.TestCase):
+    def test_apply_redlines_preserves_existing_revisions_and_only_tracks_changed_substring(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            document_path = Path(tmpdir) / "document.xml"
+            write_file(
+                document_path,
+                """<?xml version="1.0" encoding="UTF-8"?>
+<w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">
+  <w:body>
+    <w:p>
+      <w:commentRangeStart w:id="9"/>
+      <w:r><w:t>Reviewed clause</w:t></w:r>
+      <w:commentRangeEnd w:id="9"/>
+      <w:r><w:commentReference w:id="9"/></w:r>
+      <w:ins w:id="7" w:author="Existing Reviewer" w:date="2026-03-27T00:00:00Z">
+        <w:r><w:t>Existing insertion</w:t></w:r>
+      </w:ins>
+    </w:p>
+    <w:p>
+      <w:r><w:t xml:space="preserve">Seller shall pay within 30 days.</w:t></w:r>
+    </w:p>
+  </w:body>
+</w:document>
+""",
+            )
+
+            clause_map_path = Path(tmpdir) / "clause-map.json"
+            clause_map_path.write_text(
+                json.dumps(
+                    {
+                        "mappings": [
+                            {"clause_id": "clause-001", "mapped": True, "paragraph_indices": [1]}
+                        ]
+                    },
+                    ensure_ascii=False,
+                    indent=2,
+                ),
+                encoding="utf-8",
+            )
+            redlines_path = Path(tmpdir) / "redlines.json"
+            redlines_path.write_text(
+                json.dumps(
+                    {
+                        "_meta": {
+                            "reviewer_author": "Client Legal",
+                            "reviewer_initials": "CL",
+                        },
+                        "clause-001": {
+                            "suggested_redline": "Seller shall pay within 10 days."
+                        },
+                    },
+                    ensure_ascii=False,
+                    indent=2,
+                ),
+                encoding="utf-8",
+            )
+
+            result = apply_redlines_module.apply_redlines(
+                str(document_path),
+                str(clause_map_path),
+                str(redlines_path),
+                str(document_path),
+            )
+
+            self.assertTrue(result["success"], result)
+            self.assertEqual(result["applied_count"], 1)
+            self.assertEqual(result["paragraphs_touched"], 1)
+            self.assertEqual(result["reviewer"]["author"], "Client Legal")
+
+            paragraphs = direct_paragraphs(document_path)
+            self.assertEqual(
+                paragraphs[0].find(f".//{{{W_NS}}}ins").get(f"{{{W_NS}}}author"),
+                "Existing Reviewer",
+            )
+            self.assertIsNotNone(paragraphs[0].find(f".//{{{W_NS}}}commentRangeStart"))
+
+            second_paragraph_xml = ET.tostring(paragraphs[1], encoding="unicode")
+            self.assertIn("Seller shall pay within ", second_paragraph_xml)
+            self.assertIn("<w:delText", second_paragraph_xml)
+            self.assertIn(">30<", second_paragraph_xml)
+            self.assertIn("<w:ins", second_paragraph_xml)
+            self.assertIn('w:author="Client Legal"', second_paragraph_xml)
+            self.assertIn(">10<", second_paragraph_xml)
+            self.assertIn("> days.<", second_paragraph_xml)
+            self.assertNotIn("Seller shall pay within 30 days.</w:delText>", second_paragraph_xml)
+
+    def test_apply_redlines_can_update_multiple_mapped_paragraphs(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            document_path = Path(tmpdir) / "document.xml"
+            write_file(
+                document_path,
+                """<?xml version="1.0" encoding="UTF-8"?>
+<w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">
+  <w:body>
+    <w:p><w:r><w:t>Seller shall notify Buyer.</w:t></w:r></w:p>
+    <w:p><w:r><w:t>Payment is due within 30 days.</w:t></w:r></w:p>
+  </w:body>
+</w:document>
+""",
+            )
+
+            clause_map_path = Path(tmpdir) / "clause-map.json"
+            clause_map_path.write_text(
+                json.dumps(
+                    {
+                        "mappings": [
+                            {"clause_id": "clause-002", "mapped": True, "paragraph_indices": [0, 1]}
+                        ]
+                    },
+                    ensure_ascii=False,
+                    indent=2,
+                ),
+                encoding="utf-8",
+            )
+            redlines_path = Path(tmpdir) / "redlines.json"
+            redlines_path.write_text(
+                json.dumps(
+                    {
+                        "clause-002": {
+                            "suggested_redline": "Seller shall promptly notify Buyer.\n\nPayment is due within 10 days."
+                        }
+                    },
+                    ensure_ascii=False,
+                    indent=2,
+                ),
+                encoding="utf-8",
+            )
+
+            result = apply_redlines_module.apply_redlines(
+                str(document_path),
+                str(clause_map_path),
+                str(redlines_path),
+                str(document_path),
+            )
+
+            self.assertTrue(result["success"], result)
+            self.assertEqual(result["applied_count"], 1)
+            self.assertEqual(result["paragraphs_touched"], 2)
+
+            paragraphs = direct_paragraphs(document_path)
+            para_texts = [ET.tostring(paragraph, encoding="unicode") for paragraph in paragraphs]
+            self.assertIn("promptly", para_texts[0])
+            self.assertIn(">30<", para_texts[1])
+            self.assertIn(">10<", para_texts[1])
+
+
+class SessionDAudit011ReportTests(unittest.TestCase):
+    def test_compile_report_renders_korean_memorandum_style_docx(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            review_data_path = Path(tmpdir) / "review-data.json"
+            output_docx = Path(tmpdir) / "report.docx"
+            review_data_path.write_text(
+                json.dumps(
+                    {
+                        "report_language": "ko",
+                        "general_review_mode": True,
+                        "contract_info": {
+                            "title": "소프트웨어 라이선스 계약",
+                            "contract_family": "license",
+                        },
+                        "memo_metadata": {
+                            "date": "2026-03-27",
+                            "recipient": "주식회사 예시",
+                            "reference": "법무팀장",
+                            "sender": "법무법인 예시",
+                            "subject": "소프트웨어 라이선스 계약 검토 의견서",
+                            "signer": "담당 변호사 홍길동",
+                        },
+                        "background_facts": [
+                            "귀사는 상대방이 제시한 소프트웨어 라이선스 계약 초안을 검토 요청하였습니다."
+                        ],
+                        "questions_presented": [
+                            "책임 제한 조항의 적정성",
+                            "계약 해지 조항의 균형성",
+                        ],
+                        "executive_summary": {
+                            "overall_risk": "high",
+                            "recommendation": "책임 제한과 해지 조항은 수정 협의가 필요할 것으로 사료됩니다.",
+                            "key_issues": [
+                                "책임 제한 예외가 과도합니다.",
+                                "상대방의 임의 해지 권한이 넓습니다."
+                            ],
+                        },
+                        "clauses": [
+                            {
+                                "clause_id": "clause-001",
+                                "section_no": "제5조",
+                                "heading": "책임 제한",
+                                "clause_type": "liability_cap",
+                                "risk_level": "high",
+                                "risk_rationale": "상대방의 고의·중과실 외에도 광범위한 예외가 인정되어 책임 제한 기능이 약화됩니다.",
+                                "divergence": "통상적인 상호 책임 제한 구조보다 상대방에 유리합니다.",
+                                "playbook_tier": "fallback",
+                                "playbook_missing": False,
+                                "suggested_redline": "각 당사자의 총 책임은 최근 12개월간 지급된 대가를 한도로 합니다.",
+                                "internal_note": "최소한 간접손해 배제와 cap linkage는 확보할 필요가 있습니다.",
+                            }
+                        ],
+                    },
+                    ensure_ascii=False,
+                    indent=2,
+                ),
+                encoding="utf-8",
+            )
+
+            completed = subprocess.run(
+                [
+                    "node",
+                    str(REPO_ROOT / ".claude/skills/report-compiler/scripts/compile-report.js"),
+                    str(review_data_path),
+                    str(output_docx),
+                ],
+                cwd=REPO_ROOT,
+                capture_output=True,
+                text=True,
+                check=True,
+            )
+
+            result = json.loads(completed.stdout)
+            self.assertTrue(result["success"], result)
+            self.assertEqual(result["report_language"], "ko")
+            self.assertTrue(output_docx.exists())
+
+            document_xml = read_zip_text(output_docx, "word/document.xml")
+            self.assertIn("MEMORANDUM", document_xml)
+            self.assertIn("수 신", document_xml)
+            self.assertIn("발 신", document_xml)
+            self.assertIn("제 목", document_xml)
+            self.assertIn("질의의 배경", document_xml)
+            self.assertIn("질의 사항", document_xml)
+            self.assertIn("법률 의견의 한계", document_xml)
+            self.assertIn("검토의견", document_xml)
+            self.assertIn("결론", document_xml)
+            self.assertIn("Malgun Gothic", document_xml)
+            self.assertIn('w:w="11905"', document_xml)
+            self.assertIn('w:h="16837"', document_xml)
+            self.assertNotIn("<w:i/>", document_xml)
+            self.assertNotIn("FF6600", document_xml)
+            self.assertIn("일반 계약 검토 기준에 따라 작성되었습니다", document_xml)
+            self.assertIn("담당 변호사 홍길동", document_xml)
+
+    def test_compile_report_keeps_generic_renderer_for_english_reports(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            review_data_path = Path(tmpdir) / "review-data.json"
+            output_docx = Path(tmpdir) / "report.docx"
+            review_data_path.write_text(
+                json.dumps(
+                    {
+                        "report_language": "en",
+                        "contract_info": {"title": "SaaS Agreement", "contract_family": "saas"},
+                        "executive_summary": {
+                            "overall_risk": "medium",
+                            "key_issues": ["Liability cap is below market."],
+                            "recommendation": "Revise liability and termination terms.",
+                        },
+                        "clauses": [
+                            {
+                                "clause_id": "clause-001",
+                                "heading": "Liability",
+                                "risk_level": "medium",
+                                "risk_rationale": "Cap is too low.",
+                            }
+                        ],
+                    },
+                    indent=2,
+                ),
+                encoding="utf-8",
+            )
+
+            completed = subprocess.run(
+                [
+                    "node",
+                    str(REPO_ROOT / ".claude/skills/report-compiler/scripts/compile-report.js"),
+                    str(review_data_path),
+                    str(output_docx),
+                ],
+                cwd=REPO_ROOT,
+                capture_output=True,
+                text=True,
+                check=True,
+            )
+            result = json.loads(completed.stdout)
+            self.assertEqual(result["report_language"], "en")
+
+            document_xml = read_zip_text(output_docx, "word/document.xml")
+            self.assertIn("Executive Summary", document_xml)
+            self.assertIn("Per-Clause Analysis", document_xml)
+
+
+if __name__ == "__main__":
+    unittest.main()

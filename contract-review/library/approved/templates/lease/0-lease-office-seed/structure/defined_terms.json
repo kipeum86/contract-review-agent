@@ -1,0 +1,18 @@
+[
+  {
+    "term": "임대인",
+    "first_line": 4
+  },
+  {
+    "term": "임차인",
+    "first_line": 4
+  },
+  {
+    "term": "임대목적물",
+    "first_line": 4
+  },
+  {
+    "term": "보증금",
+    "first_line": 7
+  }
+]

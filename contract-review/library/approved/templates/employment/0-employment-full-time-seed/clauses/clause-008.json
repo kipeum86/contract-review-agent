@@ -1,0 +1,17 @@
+{
+  "clause_id": "clause-008",
+  "section_no": "제8조",
+  "heading": "비밀유지",
+  "header": "(비밀유지)",
+  "start_line": 24,
+  "end_line": 25,
+  "clause_type": "confidentiality",
+  "text": "근로자는 재직 중 및 퇴직 후에도 회사의 영업비밀, 고객정보 및 기술자료를 무단으로 사용하거나 제3자에게 누설하지 아니한다.",
+  "defined_terms_used": [
+    "근로자",
+    "회사"
+  ],
+  "cross_refs": [],
+  "paragraph_count": 1,
+  "char_count": 69
+}

@@ -1,8 +1,19 @@
 {
   "clause_id": "clause-012",
+  "section_no": "제10조",
+  "heading": "주주총회 및 이사회 개최 요구",
   "header": "(주주총회 및 이사회 개최 요구)",
   "start_line": 124,
   "end_line": 126,
   "clause_type": "board_composition",
+  "text": "(주주총회 및 이사회 개최 요구)\n투자자가 회사 또는 이해관계인에게 주주총회 개최를 요구하거나, 투자자 지명이사가 회사 또는 이해관계인에게 이사회 개최를 요구하는 경우 회사 및 이해관계인은 즉시 임시주주총회 내지 이사회를 개최하여야 한다.",
+  "defined_terms_used": [
+    "회사",
+    "이해관계인",
+    "투자자",
+    "투자자 지명이사"
+  ],
+  "cross_refs": [],
+  "paragraph_count": 1,
   "char_count": 133
 }

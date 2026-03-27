@@ -1,0 +1,36 @@
+doc_id: 0-license-software-seed
+title: 소프트웨어 라이선스계약서
+title_en: Software License Agreement
+doc_class: template
+paper_role: neutral
+jurisdiction: KR
+governing_law: 대한민국 법률 (Korean law)
+language: ko
+approval_state: approved
+status: active
+classification_confidence: high
+authority_level: acceptable
+external_safe: false
+freshness_sensitive: false
+contract_family: license
+subtype: software_license
+sha256: b5af787c5a4742b261bb4c0b0747e24dd0f0ef4e5330c87914aa27b4cd522242
+source_file: session-h-seed-software-license.md
+created_at: '2026-03-27T17:00:00+00:00'
+updated_at: '2026-03-27T17:00:00+00:00'
+tags:
+- seed-baseline
+- synthetic-seed
+- session-h
+- kr-law
+- license
+notes: Synthetic interim baseline seed package for a zero-coverage family; internal
+  sanity review applied, domain expert calibration pending.
+industry: software
+stats:
+  total_clauses: 11
+  unmapped_clauses: 0
+  unmapped_ratio: 0.0
+  defined_terms: 3
+  sections: 11
+  exhibits: 0

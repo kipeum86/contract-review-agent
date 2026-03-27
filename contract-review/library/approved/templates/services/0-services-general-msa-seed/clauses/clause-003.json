@@ -1,0 +1,17 @@
+{
+  "clause_id": "clause-003",
+  "section_no": "제3조",
+  "heading": "용역범위",
+  "header": "(용역범위)",
+  "start_line": 9,
+  "end_line": 10,
+  "clause_type": "scope_of_services",
+  "text": "수급인은 별도 작업지시서에 따라 개발, 유지보수, 장애 대응 및 운영 지원 용역을 수행한다.",
+  "defined_terms_used": [
+    "수급인",
+    "용역"
+  ],
+  "cross_refs": [],
+  "paragraph_count": 1,
+  "char_count": 51
+}

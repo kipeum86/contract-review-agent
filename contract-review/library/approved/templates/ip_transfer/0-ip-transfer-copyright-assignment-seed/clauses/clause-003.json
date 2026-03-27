@@ -1,0 +1,18 @@
+{
+  "clause_id": "clause-003",
+  "section_no": "제3조",
+  "heading": "권리의 양도",
+  "header": "(권리의 양도)",
+  "start_line": 9,
+  "end_line": 10,
+  "clause_type": "ip_assignment",
+  "text": "양도인은 대상 저작물에 관한 저작재산권 및 계약에서 명시한 범위의 2차적 저작물 작성권을 계약대금 완납과 동시에 양수인에게 양도한다.",
+  "defined_terms_used": [
+    "양도인",
+    "양수인",
+    "대상 저작물"
+  ],
+  "cross_refs": [],
+  "paragraph_count": 1,
+  "char_count": 74
+}

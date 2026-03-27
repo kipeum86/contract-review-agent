@@ -1,0 +1,17 @@
+{
+  "clause_id": "clause-007",
+  "section_no": "제7조",
+  "heading": "점검 및 감사",
+  "header": "(점검 및 감사)",
+  "start_line": 21,
+  "end_line": 22,
+  "clause_type": "audit_rights",
+  "text": "위탁자는 개인정보 보호조치의 이행 여부를 점검하기 위하여 합리적인 범위에서 자료 제출, 현장점검 또는 감사보고를 요청할 수 있으며, 수탁자는 이에 성실히 협조한다.",
+  "defined_terms_used": [
+    "위탁자",
+    "수탁자"
+  ],
+  "cross_refs": [],
+  "paragraph_count": 1,
+  "char_count": 91
+}

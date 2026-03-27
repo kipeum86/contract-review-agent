@@ -1,0 +1,17 @@
+{
+  "clause_id": "clause-009",
+  "section_no": "제9조",
+  "heading": "교착상태 해결",
+  "header": "(교착상태 해결)",
+  "start_line": 27,
+  "end_line": 28,
+  "clause_type": "deadlock_resolution",
+  "text": "주요결의사항에 관하여 일정 기간 내 합의가 이루어지지 않는 경우 경영진 협의, 대표자 협상, 중재적 자문, 최종적으로는 buy-sell 또는 제3자 매각 절차 등 별첨의 단계적 교착상태 해결 메커니즘을 적용한다.",
+  "defined_terms_used": [
+    "당사자",
+    "합작회사"
+  ],
+  "cross_refs": [],
+  "paragraph_count": 1,
+  "char_count": 118
+}

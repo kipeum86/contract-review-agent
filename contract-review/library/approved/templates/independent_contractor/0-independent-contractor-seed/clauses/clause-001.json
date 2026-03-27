@@ -1,0 +1,17 @@
+{
+  "clause_id": "clause-001",
+  "section_no": "제1조",
+  "heading": "목적",
+  "header": "(목적)",
+  "start_line": 3,
+  "end_line": 4,
+  "clause_type": "purpose",
+  "text": "본 계약은 위탁인이 수탁인에게 특정 프로젝트 업무를 위탁하는 조건을 정함을 목적으로 한다.",
+  "defined_terms_used": [
+    "위탁인",
+    "수탁인"
+  ],
+  "cross_refs": [],
+  "paragraph_count": 1,
+  "char_count": 50
+}

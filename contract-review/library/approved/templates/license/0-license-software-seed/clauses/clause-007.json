@@ -1,0 +1,18 @@
+{
+  "clause_id": "clause-007",
+  "section_no": "제7조",
+  "heading": "침해 면책",
+  "header": "(침해 면책)",
+  "start_line": 21,
+  "end_line": 22,
+  "clause_type": "ip_indemnity",
+  "text": "라이선서는 정상적인 사용 범위 내에서 라이선스 제품이 제3자의 지식재산권을 침해한다는 이유로 제기된 청구에 대하여 방어 및 손해배상 책임을 부담한다. 다만 라이선시의 무단 수정 또는 결합으로 인한 침해는 제외한다.",
+  "defined_terms_used": [
+    "라이선서",
+    "라이선시",
+    "라이선스 제품"
+  ],
+  "cross_refs": [],
+  "paragraph_count": 1,
+  "char_count": 119
+}

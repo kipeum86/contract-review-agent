@@ -1,0 +1,18 @@
+{
+  "clause_id": "clause-004",
+  "section_no": "제4조",
+  "heading": "산출물",
+  "header": "(산출물)",
+  "start_line": 12,
+  "end_line": 13,
+  "clause_type": "deliverables",
+  "text": "수급인은 소스코드, 문서, 테스트 결과서 및 운영 매뉴얼을 포함한 산출물을 발주인에게 제공한다.",
+  "defined_terms_used": [
+    "수급인",
+    "발주인",
+    "산출물"
+  ],
+  "cross_refs": [],
+  "paragraph_count": 1,
+  "char_count": 53
+}

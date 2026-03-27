@@ -1,8 +1,18 @@
 {
   "clause_id": "clause-042",
+  "section_no": "제2장",
+  "heading": "제2장 회사에 관한 사항",
   "header": "제2장 회사에 관한 사항",
   "start_line": 395,
   "end_line": 396,
   "clause_type": "recitals",
+  "text": "제2장 회사에 관한 사항",
+  "defined_terms_used": [
+    "회사"
+  ],
+  "cross_refs": [
+    "제2장"
+  ],
+  "paragraph_count": 1,
   "char_count": 13
 }

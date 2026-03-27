@@ -1,0 +1,62 @@
+[
+  {
+    "line": 3,
+    "level": 2,
+    "text": "임대목적물",
+    "section": "art1"
+  },
+  {
+    "line": 6,
+    "level": 2,
+    "text": "차임 및 보증금",
+    "section": "art2"
+  },
+  {
+    "line": 9,
+    "level": 2,
+    "text": "임대차기간",
+    "section": "art3"
+  },
+  {
+    "line": 12,
+    "level": 2,
+    "text": "갱신",
+    "section": "art4"
+  },
+  {
+    "line": 15,
+    "level": 2,
+    "text": "사용용도",
+    "section": "art5"
+  },
+  {
+    "line": 18,
+    "level": 2,
+    "text": "수선의무",
+    "section": "art6"
+  },
+  {
+    "line": 21,
+    "level": 2,
+    "text": "전대 및 양도제한",
+    "section": "art7"
+  },
+  {
+    "line": 24,
+    "level": 2,
+    "text": "원상복구 및 명도",
+    "section": "art8"
+  },
+  {
+    "line": 27,
+    "level": 2,
+    "text": "보증금 반환",
+    "section": "art9"
+  },
+  {
+    "line": 30,
+    "level": 2,
+    "text": "해지",
+    "section": "art10"
+  }
+]

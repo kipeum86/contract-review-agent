@@ -1,0 +1,16 @@
+{
+  "clause_id": "clause-008",
+  "section_no": "제8조",
+  "heading": "법령 또는 기존 계약과의 충돌 부재",
+  "header": "(법령 또는 기존 계약과의 충돌 부재)",
+  "start_line": 24,
+  "end_line": 25,
+  "clause_type": "no_conflict",
+  "text": "양도인은 본 계약의 체결 및 이행이 자신이 부담하는 다른 계약상 의무 또는 법령에 위반되지 아니함을 보증한다.",
+  "defined_terms_used": [
+    "양도인"
+  ],
+  "cross_refs": [],
+  "paragraph_count": 1,
+  "char_count": 61
+}

@@ -1,0 +1,17 @@
+{
+  "clause_id": "clause-003",
+  "section_no": "제3조",
+  "heading": "서비스수준",
+  "header": "(서비스수준)",
+  "start_line": 9,
+  "end_line": 10,
+  "clause_type": "service_levels",
+  "text": "제공자는 월간 99.5% 이상의 가용성을 목표로 서비스를 운영하고, 계획된 점검은 사전에 공지한다.",
+  "defined_terms_used": [
+    "제공자",
+    "서비스"
+  ],
+  "cross_refs": [],
+  "paragraph_count": 1,
+  "char_count": 55
+}

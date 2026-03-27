@@ -1,0 +1,62 @@
+[
+  {
+    "line": 3,
+    "level": 2,
+    "text": "목적",
+    "section": "art1"
+  },
+  {
+    "line": 6,
+    "level": 2,
+    "text": "예정 거래 구조",
+    "section": "art2"
+  },
+  {
+    "line": 9,
+    "level": 2,
+    "text": "실사 및 정보제공",
+    "section": "art3"
+  },
+  {
+    "line": 12,
+    "level": 2,
+    "text": "독점교섭",
+    "section": "art4"
+  },
+  {
+    "line": 15,
+    "level": 2,
+    "text": "비밀유지",
+    "section": "art5"
+  },
+  {
+    "line": 18,
+    "level": 2,
+    "text": "비용",
+    "section": "art6"
+  },
+  {
+    "line": 21,
+    "level": 2,
+    "text": "선행조건",
+    "section": "art7"
+  },
+  {
+    "line": 24,
+    "level": 2,
+    "text": "유효기간",
+    "section": "art8"
+  },
+  {
+    "line": 27,
+    "level": 2,
+    "text": "법적 구속력",
+    "section": "art9"
+  },
+  {
+    "line": 30,
+    "level": 2,
+    "text": "준거법 및 관할",
+    "section": "art10"
+  }
+]

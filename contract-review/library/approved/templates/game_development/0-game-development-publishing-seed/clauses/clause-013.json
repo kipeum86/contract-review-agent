@@ -1,0 +1,18 @@
+{
+  "clause_id": "clause-013",
+  "section_no": "제13조",
+  "heading": "등급분류 및 규제준수",
+  "header": "(등급분류 및 규제준수)",
+  "start_line": 39,
+  "end_line": 40,
+  "clause_type": "ratings_compliance",
+  "text": "당사자는 게임물 등급분류, 청소년보호, 확률형 아이템 고지 및 기타 게임 관련 규제를 준수하여 출시 및 운영을 진행한다.",
+  "defined_terms_used": [
+    "개발사",
+    "퍼블리셔",
+    "게임"
+  ],
+  "cross_refs": [],
+  "paragraph_count": 1,
+  "char_count": 67
+}

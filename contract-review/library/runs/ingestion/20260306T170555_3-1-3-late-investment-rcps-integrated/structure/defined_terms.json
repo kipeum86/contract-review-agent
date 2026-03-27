@@ -1,1 +1,106 @@
-[]
+[
+  {
+    "term": "본 계약(서)",
+    "first_line": 24
+  },
+  {
+    "term": "본 계약 체결일",
+    "first_line": 24
+  },
+  {
+    "term": "투자자1",
+    "first_line": 26
+  },
+  {
+    "term": "투자자2",
+    "first_line": 30
+  },
+  {
+    "term": "회사",
+    "first_line": 35
+  },
+  {
+    "term": "이해관계인",
+    "first_line": 39
+  },
+  {
+    "term": "당사자",
+    "first_line": 43
+  },
+  {
+    "term": "투자자",
+    "first_line": 43
+  },
+  {
+    "term": "당사자들",
+    "first_line": 43
+  },
+  {
+    "term": "본건 신주",
+    "first_line": 50
+  },
+  {
+    "term": "거래완결일",
+    "first_line": 82
+  },
+  {
+    "term": "투자금",
+    "first_line": 99
+  },
+  {
+    "term": "투자자 지명이사",
+    "first_line": 152
+  },
+  {
+    "term": "기업공개",
+    "first_line": 161
+  },
+  {
+    "term": "우선매수권",
+    "first_line": 176
+  },
+  {
+    "term": "공동매도참여권",
+    "first_line": 176
+  },
+  {
+    "term": "회사에 대한 주식매수청구권",
+    "first_line": 186
+  },
+  {
+    "term": "이해관계인에 대한 주식매수청구권",
+    "first_line": 194
+  },
+  {
+    "term": "본질가치",
+    "first_line": 203
+  },
+  {
+    "term": "제3자",
+    "first_line": 247
+  },
+  {
+    "term": "본건 종류주식",
+    "first_line": 333
+  },
+  {
+    "term": "전환비율",
+    "first_line": 367
+  },
+  {
+    "term": "전환가액",
+    "first_line": 367
+  },
+  {
+    "term": "수권주식",
+    "first_line": 373
+  },
+  {
+    "term": "관계회사",
+    "first_line": 471
+  },
+  {
+    "term": "경업금지의무자",
+    "first_line": 568
+  }
+]

@@ -13,7 +13,7 @@ $ARGUMENTS
 2. **Strip internal comments**:
    - Unpack the DOCX into raw XML
    - Remove all comment entries whose text starts with `[INTERNAL]`
-   - Remove corresponding `<w:commentRangeStart>` and `<w:commentRangeEnd>` markers from `document.xml`
+   - Remove corresponding markers from `document.xml`, headers, footers, and related threaded-comment metadata parts
    - Preserve all tracked changes and `[EXTERNAL]` comments
 
 3. **Repack**: Reassemble the DOCX and save as `{original_name}_clean.docx` in `output/`.

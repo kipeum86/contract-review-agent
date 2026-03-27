@@ -1,0 +1,19 @@
+{
+  "clause_id": "clause-001",
+  "section_no": "제1조",
+  "heading": "목적",
+  "header": "(목적)",
+  "start_line": 3,
+  "end_line": 4,
+  "clause_type": "purpose",
+  "text": "본 계약은 매도인이 보유한 대상회사의 대상주식을 매수인에게 양도하는 조건을 정함을 목적으로 한다.",
+  "defined_terms_used": [
+    "매도인",
+    "매수인",
+    "대상회사",
+    "대상주식"
+  ],
+  "cross_refs": [],
+  "paragraph_count": 1,
+  "char_count": 54
+}

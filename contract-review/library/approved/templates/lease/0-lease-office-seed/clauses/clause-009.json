@@ -1,0 +1,18 @@
+{
+  "clause_id": "clause-009",
+  "section_no": "제9조",
+  "heading": "보증금 반환",
+  "header": "(보증금 반환)",
+  "start_line": 27,
+  "end_line": 28,
+  "clause_type": "security_deposit_return",
+  "text": "임대인은 임차인의 명도와 미납금 정산이 완료된 날부터 14일 이내에 공제내역을 서면으로 제시한 후 잔여 보증금을 반환한다.",
+  "defined_terms_used": [
+    "임대인",
+    "임차인",
+    "보증금"
+  ],
+  "cross_refs": [],
+  "paragraph_count": 1,
+  "char_count": 68
+}

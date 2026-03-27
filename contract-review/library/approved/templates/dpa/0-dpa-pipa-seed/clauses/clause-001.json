@@ -1,0 +1,18 @@
+{
+  "clause_id": "clause-001",
+  "section_no": "제1조",
+  "heading": "목적",
+  "header": "(목적)",
+  "start_line": 3,
+  "end_line": 4,
+  "clause_type": "purpose",
+  "text": "본 계약은 위탁자가 수탁자에게 위탁하는 개인정보 처리업무의 범위와 보호조치를 정함을 목적으로 한다.",
+  "defined_terms_used": [
+    "위탁자",
+    "수탁자",
+    "개인정보"
+  ],
+  "cross_refs": [],
+  "paragraph_count": 1,
+  "char_count": 55
+}

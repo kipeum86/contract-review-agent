@@ -7,11 +7,9 @@ Validates that files are supported formats and checks basic integrity.
 import sys
 import os
 import json
-import mimetypes
 
 SUPPORTED_FORMATS = {
     '.docx': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-    '.doc': 'application/msword',
     '.pdf': 'application/pdf',
     '.md': 'text/markdown',
     '.txt': 'text/plain',
@@ -23,7 +21,6 @@ SUPPORTED_FORMATS = {
 MAGIC_BYTES = {
     '.docx': b'PK',      # ZIP archive (OOXML)
     '.pdf': b'%PDF',
-    '.doc': b'\xd0\xcf',  # OLE2 Compound Document
 }
 
 
@@ -65,6 +62,13 @@ def detect_format(file_path: str) -> dict:
     _, ext = os.path.splitext(file_path)
     ext = ext.lower()
     result['extension'] = ext
+
+    if ext == '.doc':
+        result['error'] = (
+            "Unsupported format: .doc. Legacy Word binaries are not normalized in this "
+            "pipeline yet; convert the file to .docx first."
+        )
+        return result
 
     if ext not in SUPPORTED_FORMATS:
         result['error'] = f"Unsupported format: {ext}. Supported: {', '.join(SUPPORTED_FORMATS.keys())}"

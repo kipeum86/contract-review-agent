@@ -1,0 +1,16 @@
+{
+  "clause_id": "clause-003",
+  "section_no": "제3조",
+  "heading": "개발 마일스톤",
+  "header": "(개발 마일스톤)",
+  "start_line": 9,
+  "end_line": 10,
+  "clause_type": "development_milestones",
+  "text": "프로젝트는 프로토타입, 알파, 베타, 소프트런치 및 정식출시 단계의 마일스톤으로 구성되며, 각 단계의 산출 기준은 별첨 일정표에 따른다.",
+  "defined_terms_used": [
+    "게임"
+  ],
+  "cross_refs": [],
+  "paragraph_count": 1,
+  "char_count": 76
+}

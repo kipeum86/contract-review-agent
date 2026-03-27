@@ -1,0 +1,16 @@
+{
+  "clause_id": "clause-009",
+  "section_no": "제9조",
+  "heading": "안전성 확보조치",
+  "header": "(안전성 확보조치)",
+  "start_line": 27,
+  "end_line": 28,
+  "clause_type": "data_security",
+  "text": "회사는 개인정보의 분실, 도난, 유출, 위조, 변조 또는 훼손을 방지하기 위하여 접근통제, 암호화, 접속기록 보관, 내부관리계획 및 교육 등 합리적인 기술적·관리적 조치를 시행한다.",
+  "defined_terms_used": [
+    "개인정보"
+  ],
+  "cross_refs": [],
+  "paragraph_count": 1,
+  "char_count": 101
+}

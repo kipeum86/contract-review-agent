@@ -1,0 +1,18 @@
+{
+  "clause_id": "clause-002",
+  "section_no": "제2조",
+  "heading": "권리 부여",
+  "header": "(권리 부여)",
+  "start_line": 6,
+  "end_line": 7,
+  "clause_type": "grant_of_rights",
+  "text": "저자는 출판사에게 계약기간 동안 저작물을 전자책, 온라인 열람, 주문형 인쇄 및 기타 합의된 매체로 출판할 수 있는 비독점적 권리를 부여한다.",
+  "defined_terms_used": [
+    "저자",
+    "출판사",
+    "저작물"
+  ],
+  "cross_refs": [],
+  "paragraph_count": 1,
+  "char_count": 79
+}

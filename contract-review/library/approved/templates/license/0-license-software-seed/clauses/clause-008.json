@@ -1,0 +1,17 @@
+{
+  "clause_id": "clause-008",
+  "section_no": "제8조",
+  "heading": "보증의 제한",
+  "header": "(보증의 제한)",
+  "start_line": 24,
+  "end_line": 25,
+  "clause_type": "warranty_disclaimer",
+  "text": "라이선서는 라이선스 제품을 현상태로 제공하며, 법률상 강행규정에 따른 경우를 제외하고 특정 목적 적합성 또는 무중단 운용에 대한 묵시적 보증을 하지 아니한다.",
+  "defined_terms_used": [
+    "라이선서",
+    "라이선스 제품"
+  ],
+  "cross_refs": [],
+  "paragraph_count": 1,
+  "char_count": 88
+}

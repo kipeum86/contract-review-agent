@@ -37,10 +37,10 @@ Assess information already provided. If insufficient, interview to gather:
 4. Iterate until confirmed
 
 ### Step 3 — Matter & Context Registration
-**Executor**: Script
-1. Create `matters/{matter_id}/` with `origin: drafting`
-2. Write `matter-context.yaml` with confirmed deal context
-3. Create `round_1/` subfolder
+**Executor**: Human-guided workspace setup
+1. If a drafting matter workspace already exists, reuse it
+2. Otherwise create `matters/{matter_id}/` and `round_1/` only when the operator explicitly wants persistent artifacts
+3. Write `matter-context.yaml` only when the workspace is being persisted
 
 ### Step 4 — Template Lookup & Clause Selection
 **Executor**: Script + LLM
@@ -66,7 +66,8 @@ Assess information already provided. If insufficient, interview to gather:
 **For both modes:**
 - Apply deal-specific language (as confirmed)
 - Ensure internal consistency: defined terms, cross-references, numbering
-- Write structured JSON with section hierarchy to `working/draft.json`
+- When a drafting workspace is active, write structured JSON with section hierarchy to `working/draft.json`
+- Otherwise deliver the draft text directly in the terminal/chat response for operator review
 
 ### Step 6 — Self-Review (Risk Check)
 **Executor**: LLM judgment
@@ -78,30 +79,29 @@ Check the generated draft for:
 5. **Missing protections** — standard clauses that should be present
 
 Auto-fix simple issues. Flag substantive issues for user.
-Write `working/self-review.json`
+When a drafting workspace is active, write `working/self-review.json`
 
-### Step 7 — DOCX Generation
-**Executor**: Script (docx library)
-1. Generate professionally formatted DOCX
-2. Apply: numbered headings, proper margins, signature blocks, page numbers
-3. Bold defined terms on first use
-4. Include self-review flags as `[INTERNAL]` comments
-5. Output: `output/reports/{matter_id}_round_1_draft.docx`
-6. Copy to `matters/{matter_id}/round_1/source/`
+### Step 7 — Packaging / DOCX Export
+**Executor**: Script (`compile-draft.js`)
+1. When a drafting workspace is active, write `working/draft.json` with the full draft data (metadata, sections, defined_terms, contract_text, self_review)
+2. Run `node .claude/skills/report-compiler/scripts/compile-draft.js working/draft.json output/reports/{matter_id}_round_1_draft.docx`
+3. The DOCX includes: section hierarchy with 제N조 / Article N numbering, defined terms bolded, signature blocks, and `[INTERNAL]` self-review notes
+4. Copy the DOCX to `matters/{matter_id}/round_1/source/` as baseline for future re-review
+5. If no workspace is active, deliver draft text in terminal and skip DOCX generation
 
 ### Step 8 — Human Review
 Present in terminal:
 1. Contract summary (type, parties, key terms)
 2. Self-review findings (if any)
-3. File path to the draft
+3. File path to any persisted draft artifacts, if they were created
 
 **Revision** → Incorporate user feedback, re-run Steps 5-7
 
 ## Skills Used
 - index-manager (Step 4)
 - review-domain-knowledge (Steps 5-6 — generation checklists, risk baselines, self-review)
-- report-compiler (Step 7 — DOCX generation)
-- docx-redliner (Step 7 — DOCX formatting)
+- report-compiler (WF2/WF4 reporting + WF5 draft DOCX via `compile-draft.js`)
+- docx-redliner (WF2/WF4 tracked changes)
 - pipeline-state (all steps)
 
 ## Human Review Checkpoints
@@ -111,4 +111,4 @@ Present in terminal:
 ## Post-Drafting Lifecycle
 When the counterparty returns a marked-up version:
 - User can initiate WF2 (review) or WF4 (re-review) against same `matter_id`
-- The draft in `round_1/source/` serves as the baseline for comparison
+- If a baseline draft was manually persisted into `round_1/source/`, that file serves as the comparison baseline

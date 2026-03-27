@@ -1,0 +1,68 @@
+[
+  {
+    "line": 3,
+    "level": 2,
+    "text": "개인정보 처리 목적",
+    "section": "art1"
+  },
+  {
+    "line": 6,
+    "level": 2,
+    "text": "처리 항목 및 방법",
+    "section": "art2"
+  },
+  {
+    "line": 9,
+    "level": 2,
+    "text": "동의 및 처리 근거",
+    "section": "art3"
+  },
+  {
+    "line": 12,
+    "level": 2,
+    "text": "보유기간 및 파기",
+    "section": "art4"
+  },
+  {
+    "line": 15,
+    "level": 2,
+    "text": "제3자 제공",
+    "section": "art5"
+  },
+  {
+    "line": 18,
+    "level": 2,
+    "text": "처리위탁",
+    "section": "art6"
+  },
+  {
+    "line": 21,
+    "level": 2,
+    "text": "국외이전",
+    "section": "art7"
+  },
+  {
+    "line": 24,
+    "level": 2,
+    "text": "정보주체의 권리",
+    "section": "art8"
+  },
+  {
+    "line": 27,
+    "level": 2,
+    "text": "안전성 확보조치",
+    "section": "art9"
+  },
+  {
+    "line": 30,
+    "level": 2,
+    "text": "침해사고 대응",
+    "section": "art10"
+  },
+  {
+    "line": 33,
+    "level": 2,
+    "text": "문의 및 책임자",
+    "section": "art11"
+  }
+]

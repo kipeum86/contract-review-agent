@@ -1,0 +1,18 @@
+{
+  "clause_id": "clause-003",
+  "section_no": "제3조",
+  "heading": "처리지시 및 목적 외 이용 금지",
+  "header": "(처리지시 및 목적 외 이용 금지)",
+  "start_line": 9,
+  "end_line": 10,
+  "clause_type": "data_protection",
+  "text": "수탁자는 위탁자의 문서화된 지시에 따라 개인정보를 처리하여야 하며, 위탁 목적을 초과하거나 제3자 제공 등 임의의 처리를 하여서는 아니 된다.",
+  "defined_terms_used": [
+    "위탁자",
+    "수탁자",
+    "개인정보"
+  ],
+  "cross_refs": [],
+  "paragraph_count": 1,
+  "char_count": 79
+}

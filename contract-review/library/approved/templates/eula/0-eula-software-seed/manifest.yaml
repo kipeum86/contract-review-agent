@@ -1,0 +1,36 @@
+doc_id: 0-eula-software-seed
+title: 최종사용자 사용권계약서
+title_en: End User License Agreement
+doc_class: template
+paper_role: neutral
+jurisdiction: KR
+governing_law: 대한민국 법률 (Korean law)
+language: ko
+approval_state: approved
+status: active
+classification_confidence: high
+authority_level: acceptable
+external_safe: false
+freshness_sensitive: false
+contract_family: eula
+subtype: software_eula
+sha256: fcff8fd0c5c90fca8d4bce4783796355b3fb8bee09de4eeb453f92eefb23ea7d
+source_file: session-i-seed-software-eula.md
+created_at: '2026-03-27T18:20:00+00:00'
+updated_at: '2026-03-27T18:20:00+00:00'
+tags:
+- seed-baseline
+- synthetic-seed
+- session-i
+- kr-law
+- eula
+notes: Synthetic interim baseline seed package for a zero-coverage family; internal
+  sanity review applied, domain expert calibration pending.
+industry: software
+stats:
+  total_clauses: 12
+  unmapped_clauses: 0
+  unmapped_ratio: 0.0
+  defined_terms: 3
+  sections: 12
+  exhibits: 0

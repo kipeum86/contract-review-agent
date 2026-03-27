@@ -1,0 +1,17 @@
+{
+  "clause_id": "clause-003",
+  "section_no": "제3조",
+  "heading": "공급수량 및 최소발주",
+  "header": "(공급수량 및 최소발주)",
+  "start_line": 9,
+  "end_line": 10,
+  "clause_type": "minimum_commitment",
+  "text": "매수인은 월간 예상 수요를 사전에 통지하고, 공급인은 합의된 최소수량을 안정적으로 공급하기 위하여 상업적으로 합리적인 노력을 다한다.",
+  "defined_terms_used": [
+    "매수인",
+    "공급인"
+  ],
+  "cross_refs": [],
+  "paragraph_count": 1,
+  "char_count": 74
+}

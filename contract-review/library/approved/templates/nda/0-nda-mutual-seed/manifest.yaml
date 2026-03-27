@@ -1,0 +1,37 @@
+doc_id: 0-nda-mutual-seed
+title: 비밀유지계약서
+title_en: Mutual Non-Disclosure Agreement
+doc_class: template
+paper_role: neutral
+jurisdiction: KR
+governing_law: 대한민국 법률 (Korean law)
+language: ko
+approval_state: approved
+status: active
+classification_confidence: high
+authority_level: acceptable
+external_safe: false
+freshness_sensitive: false
+contract_family: nda
+subtype: mutual_nda
+sha256: c4aad789bdc76138bf4d66f30873062622fff94158010d9c8b982c289658cfa8
+source_file: session-g-seed-mutual-nda.md
+created_at: '2026-03-27T12:50:00+00:00'
+updated_at: '2026-03-27T16:35:00+00:00'
+tags:
+- seed-baseline
+- synthetic-seed
+- session-g
+- session-h-review
+- kr-law
+- confidentiality
+notes: Synthetic interim baseline seed package for a previously zero-coverage family;
+  internal sanity review applied, domain expert calibration pending.
+industry: general-commercial
+stats:
+  total_clauses: 9
+  unmapped_clauses: 0
+  unmapped_ratio: 0.0
+  defined_terms: 4
+  sections: 9
+  exhibits: 0

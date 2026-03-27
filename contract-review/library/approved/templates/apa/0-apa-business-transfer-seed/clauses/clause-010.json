@@ -1,0 +1,18 @@
+{
+  "clause_id": "clause-010",
+  "section_no": "제10조",
+  "heading": "전환지원",
+  "header": "(전환지원)",
+  "start_line": 30,
+  "end_line": 31,
+  "clause_type": "transition_assistance",
+  "text": "양도인은 종결 후 합의된 기간 동안 거래처 소개, 시스템 이전, 재고·매뉴얼 인수인계 및 기타 운영 안정화를 위한 합리적인 지원을 제공한다.",
+  "defined_terms_used": [
+    "양도인",
+    "양수인",
+    "대상사업"
+  ],
+  "cross_refs": [],
+  "paragraph_count": 1,
+  "char_count": 78
+}

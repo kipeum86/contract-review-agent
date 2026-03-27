@@ -1,0 +1,18 @@
+{
+  "clause_id": "clause-009",
+  "section_no": "제9조",
+  "heading": "국외이전 제한",
+  "header": "(국외이전 제한)",
+  "start_line": 27,
+  "end_line": 28,
+  "clause_type": "cross_border_transfer",
+  "text": "수탁자가 개인정보를 국외에서 처리하거나 국외 제3자에게 이전하려는 경우에는 위탁자의 사전 서면승인과 관련 법령상 요구되는 고지 또는 동의 절차를 충족하여야 한다.",
+  "defined_terms_used": [
+    "수탁자",
+    "위탁자",
+    "개인정보"
+  ],
+  "cross_refs": [],
+  "paragraph_count": 1,
+  "char_count": 90
+}

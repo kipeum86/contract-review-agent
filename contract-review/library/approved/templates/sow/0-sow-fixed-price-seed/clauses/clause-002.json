@@ -1,0 +1,17 @@
+{
+  "clause_id": "clause-002",
+  "section_no": "제2조",
+  "heading": "과업범위",
+  "header": "(과업범위)",
+  "start_line": 6,
+  "end_line": 7,
+  "clause_type": "scope_of_services",
+  "text": "수급인은 별첨 작업범위서에 따라 요구사항 분석, 설계, 개발, 테스트 및 배포 지원 업무를 수행한다.",
+  "defined_terms_used": [
+    "수급인",
+    "과업"
+  ],
+  "cross_refs": [],
+  "paragraph_count": 1,
+  "char_count": 56
+}

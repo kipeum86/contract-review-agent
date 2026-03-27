@@ -1,0 +1,16 @@
+{
+  "clause_id": "clause-007",
+  "section_no": "제7조",
+  "heading": "최소보장금",
+  "header": "(최소보장금)",
+  "start_line": 21,
+  "end_line": 22,
+  "clause_type": "advance_payment",
+  "text": "배급사는 계약 체결 후 15일 이내에 최소보장금을 지급하고, 이는 장래 정산금에서 상계한다.",
+  "defined_terms_used": [
+    "배급사"
+  ],
+  "cross_refs": [],
+  "paragraph_count": 1,
+  "char_count": 51
+}

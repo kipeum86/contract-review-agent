@@ -1,0 +1,17 @@
+{
+  "clause_id": "clause-006",
+  "section_no": "제6조",
+  "heading": "품질보증",
+  "header": "(품질보증)",
+  "start_line": 18,
+  "end_line": 19,
+  "clause_type": "warranty_period",
+  "text": "공급인은 물품이 납품일로부터 12개월 동안 사양서와 관련 법령에 적합함을 보증하며, 하자 발생 시 교환 또는 수리를 신속히 이행한다.",
+  "defined_terms_used": [
+    "공급인",
+    "물품"
+  ],
+  "cross_refs": [],
+  "paragraph_count": 1,
+  "char_count": 74
+}

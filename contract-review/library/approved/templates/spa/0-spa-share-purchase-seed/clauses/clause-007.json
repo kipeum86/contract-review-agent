@@ -1,0 +1,16 @@
+{
+  "clause_id": "clause-007",
+  "section_no": "제7조",
+  "heading": "매수인 진술 및 보증",
+  "header": "(매수인 진술 및 보증)",
+  "start_line": 21,
+  "end_line": 22,
+  "clause_type": "reps_warranties_buyer",
+  "text": "매수인은 본 계약 체결 및 이행 권한, 양수도대금 지급 능력, 필요한 내부 승인 확보 상태를 진술하고 보증한다.",
+  "defined_terms_used": [
+    "매수인"
+  ],
+  "cross_refs": [],
+  "paragraph_count": 1,
+  "char_count": 62
+}

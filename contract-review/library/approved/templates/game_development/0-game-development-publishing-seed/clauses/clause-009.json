@@ -1,0 +1,18 @@
+{
+  "clause_id": "clause-009",
+  "section_no": "제9조",
+  "heading": "운영 및 라이브서비스",
+  "header": "(운영 및 라이브서비스)",
+  "start_line": 27,
+  "end_line": 28,
+  "clause_type": "live_operations",
+  "text": "정식출시 후 패치, 이벤트, 밸런스 조정 및 고객지원 운영 범위는 별첨 운영계획서에 따르며, 비용 분담은 상호 협의한다.",
+  "defined_terms_used": [
+    "게임",
+    "개발사",
+    "퍼블리셔"
+  ],
+  "cross_refs": [],
+  "paragraph_count": 1,
+  "char_count": 67
+}

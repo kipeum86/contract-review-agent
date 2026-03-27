@@ -1,0 +1,38 @@
+doc_id: 0-other-amendment-general-seed
+title: 계약변경합의서
+title_en: General Amendment Agreement
+doc_class: template
+paper_role: neutral
+jurisdiction: KR
+governing_law: 대한민국 법률 (Korean law)
+language: ko
+approval_state: approved
+status: active
+classification_confidence: high
+authority_level: acceptable
+external_safe: false
+freshness_sensitive: false
+contract_family: other
+subtype: amendment
+sha256: 0654fbfdd15c53a2e21a5d2e6ece2dfd0f248dbaccfafa5222f006b4aa0c39a6
+source_file: session-l-seed-general-amendment.md
+created_at: '2026-03-27T21:05:00+00:00'
+updated_at: '2026-03-27T21:05:00+00:00'
+tags:
+- seed-baseline
+- synthetic-seed
+- session-l
+- kr-law
+- other
+- amendment
+notes: Synthetic interim baseline seed package for the catch-all other family; intended
+  to cover common Korean-law amendment / side-letter structure until family-specific
+  documents are classified more precisely.
+industry: general-commercial
+stats:
+  total_clauses: 9
+  unmapped_clauses: 0
+  unmapped_ratio: 0.0
+  defined_terms: 2
+  sections: 9
+  exhibits: 0

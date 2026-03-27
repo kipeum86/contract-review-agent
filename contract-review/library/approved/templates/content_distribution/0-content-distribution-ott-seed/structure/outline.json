@@ -1,0 +1,74 @@
+[
+  {
+    "line": 3,
+    "level": 2,
+    "text": "목적",
+    "section": "art1"
+  },
+  {
+    "line": 6,
+    "level": 2,
+    "text": "권리 부여",
+    "section": "art2"
+  },
+  {
+    "line": 9,
+    "level": 2,
+    "text": "유통지역",
+    "section": "art3"
+  },
+  {
+    "line": 12,
+    "level": 2,
+    "text": "매체 및 형식",
+    "section": "art4"
+  },
+  {
+    "line": 15,
+    "level": 2,
+    "text": "출시일정",
+    "section": "art5"
+  },
+  {
+    "line": 18,
+    "level": 2,
+    "text": "수익배분",
+    "section": "art6"
+  },
+  {
+    "line": 21,
+    "level": 2,
+    "text": "최소보장금",
+    "section": "art7"
+  },
+  {
+    "line": 24,
+    "level": 2,
+    "text": "정산자료 및 감사",
+    "section": "art8"
+  },
+  {
+    "line": 27,
+    "level": 2,
+    "text": "홍보 및 퍼블리시티",
+    "section": "art9"
+  },
+  {
+    "line": 30,
+    "level": 2,
+    "text": "법규준수",
+    "section": "art10"
+  },
+  {
+    "line": 33,
+    "level": 2,
+    "text": "해지",
+    "section": "art11"
+  },
+  {
+    "line": 36,
+    "level": 2,
+    "text": "권리 복귀",
+    "section": "art12"
+  }
+]

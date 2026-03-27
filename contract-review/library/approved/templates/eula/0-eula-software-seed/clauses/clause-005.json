@@ -1,0 +1,17 @@
+{
+  "clause_id": "clause-005",
+  "section_no": "제5조",
+  "heading": "오픈소스 및 제3자 구성요소",
+  "header": "(오픈소스 및 제3자 구성요소)",
+  "start_line": 15,
+  "end_line": 16,
+  "clause_type": "open_source",
+  "text": "소프트웨어에 포함된 오픈소스 또는 제3자 구성요소는 해당 라이선스 조건이 우선 적용되며, 라이선서는 관련 고지사항을 제공한다.",
+  "defined_terms_used": [
+    "소프트웨어",
+    "라이선서"
+  ],
+  "cross_refs": [],
+  "paragraph_count": 1,
+  "char_count": 70
+}

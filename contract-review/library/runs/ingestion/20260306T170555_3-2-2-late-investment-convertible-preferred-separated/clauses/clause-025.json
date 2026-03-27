@@ -1,8 +1,16 @@
 {
   "clause_id": "clause-025",
+  "section_no": "제21조",
+  "heading": "세금, 보험 등에 관한 사항",
   "header": "(세금, 보험 등에 관한 사항)",
   "start_line": 329,
   "end_line": 332,
-  "clause_type": "reps_warranties_seller",
+  "clause_type": "taxes",
+  "text": "(세금, 보험 등에 관한 사항)\n회사는 국세, 지방세 등 고지된 납세 의무를 이행하였고, 납부할 의무가 있는 것으로 미납된 세금은 없음을 진술하고 보장한다.\n회사는 회사 운영과 관련하여 필요한 제반 보험(4대 보험, 기타 영업 관련 필수적으로 가입해야 하거나 해당 업계에서 회사와 유사한 기업들이 통상적으로 가입하고 있는 보험)에 가입되어 있음을 진술하고 보장한다.",
+  "defined_terms_used": [
+    "회사"
+  ],
+  "cross_refs": [],
+  "paragraph_count": 1,
   "char_count": 204
 }

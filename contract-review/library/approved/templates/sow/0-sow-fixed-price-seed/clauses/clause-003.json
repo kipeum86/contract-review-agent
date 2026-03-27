@@ -1,0 +1,17 @@
+{
+  "clause_id": "clause-003",
+  "section_no": "제3조",
+  "heading": "산출물",
+  "header": "(산출물)",
+  "start_line": 9,
+  "end_line": 10,
+  "clause_type": "deliverables",
+  "text": "수급인은 프로젝트 계획서, 기능 명세서, 소스코드, 테스트 결과서 및 운영 인수인계 문서를 산출물로 제출한다.",
+  "defined_terms_used": [
+    "수급인",
+    "산출물"
+  ],
+  "cross_refs": [],
+  "paragraph_count": 1,
+  "char_count": 61
+}

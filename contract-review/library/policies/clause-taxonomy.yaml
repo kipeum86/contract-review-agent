@@ -9,6 +9,8 @@ categories:
     clause_types:
       - id: recitals
         name: Recitals / Whereas Clauses
+      - id: purpose
+        name: Purpose / Objective
       - id: definitions
         name: Definitions
       - id: interpretation
@@ -64,6 +66,23 @@ categories:
       - id: milestones
         name: Milestone Payments
         description: Payment tied to development or delivery milestones
+
+  # ── Employment & Labor ──────────────────────────────
+  - id: employment_labor
+    name: Employment & Labor
+    clause_types:
+      - id: employee_duties
+        name: Employee Duties / Position
+      - id: compensation_benefits
+        name: Compensation / Benefits
+      - id: working_hours_overtime
+        name: Working Hours / Overtime
+      - id: leave_holidays
+        name: Leave / Holidays
+      - id: probation_period
+        name: Probation / Trial Period
+      - id: severance_retirement
+        name: Severance / Retirement Pay
 
   # ── Term & Termination ───────────────────────────────
   - id: term_termination
@@ -190,6 +209,18 @@ categories:
     clause_types:
       - id: purchase_price
         name: Purchase Price / Subscription Price
+      - id: debt_security_issuance
+        name: Debt Security Issuance Terms
+        description: Convertible bond or bond-with-warrants issuance amount, denomination, allocation, and payment mechanics
+      - id: capital_contributions
+        name: Capital Contributions / Funding Obligations
+        description: Initial or follow-on capital contribution obligations in JV or investment structures
+      - id: transferred_assets
+        name: Transferred Assets / Excluded Assets
+        description: Scope of transferred business, assets, and excluded assets in asset deals
+      - id: assumed_liabilities
+        name: Assumed Liabilities / Excluded Liabilities
+        description: Liabilities assumed by buyer/surviving entity and those retained by seller
       - id: price_adjustment_ma
         name: Purchase Price Adjustment
         description: Closing adjustments, earn-out, escrow holdback
@@ -233,6 +264,9 @@ categories:
         name: Board Composition / Governance
       - id: information_rights
         name: Information Rights / Reporting
+      - id: deadlock_resolution
+        name: Deadlock Resolution
+        description: Mechanisms to resolve governance or reserved-matter deadlocks in JV structures
       - id: dividend_distribution
         name: Dividend / Distribution
       - id: liquidation_preference
@@ -250,6 +284,12 @@ categories:
       - id: employee_matters
         name: Employee Matters
         description: Key employee retention, ESOP, severance
+      - id: indebtedness_liens
+        name: Indebtedness / Liens
+        description: Borrowings, guarantees, pledged assets, and encumbrances
+      - id: affiliates_subsidiaries
+        name: Affiliates / Subsidiaries / Related Parties
+        description: Relationship-company disclosure, controlled affiliates, and related-party holdings
 
   # ── Data & Privacy ───────────────────────────────────
   - id: data_privacy
@@ -304,12 +344,33 @@ categories:
         name: No Conflict / No Violation
       - id: compliance_representation
         name: Compliance Representation
+      - id: litigation_regulatory_matters
+        name: Litigation / Regulatory Matters
+      - id: disclosure_accuracy
+        name: Disclosure Accuracy / Due Diligence Materials
       - id: financial_condition
         name: Financial Condition
       - id: warranty_disclaimer
         name: Warranty Disclaimer
       - id: warranty_period
         name: Warranty Period
+
+  # ── Lease & Real Estate ─────────────────────────────
+  - id: lease_real_estate
+    name: Lease & Real Estate
+    clause_types:
+      - id: premises_description
+        name: Premises Description
+      - id: rent_deposit
+        name: Rent / Deposit
+      - id: permitted_use
+        name: Permitted Use
+      - id: maintenance_repairs
+        name: Maintenance / Repairs
+      - id: restoration_surrender
+        name: Restoration / Surrender
+      - id: security_deposit_return
+        name: Security Deposit Return
 
   # ── Compliance & Regulatory ──────────────────────────
   - id: compliance_regulatory
@@ -345,6 +406,18 @@ categories:
         name: Mediation
       - id: dispute_escalation
         name: Dispute Escalation Procedure
+      - id: release_of_claims
+        name: Release of Claims
+        description: Mutual or unilateral release of existing known or unknown claims
+      - id: covenant_not_to_sue
+        name: Covenant Not to Sue
+        description: Agreement not to commence or continue litigation over settled matters
+      - id: no_admission
+        name: No Admission of Liability
+        description: Settlement does not admit fault, liability, or wrongdoing
+      - id: non_disparagement
+        name: Non-Disparagement
+        description: Restrictions on disparaging statements after settlement
       - id: injunctive_relief
         name: Injunctive Relief / Provisional Remedies
 

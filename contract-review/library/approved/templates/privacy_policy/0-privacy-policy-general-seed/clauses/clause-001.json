@@ -1,0 +1,16 @@
+{
+  "clause_id": "clause-001",
+  "section_no": "제1조",
+  "heading": "개인정보 처리 목적",
+  "header": "(개인정보 처리 목적)",
+  "start_line": 3,
+  "end_line": 4,
+  "clause_type": "purpose",
+  "text": "회사는 서비스 제공, 회원관리, 고객문의 대응, 결제처리 및 법령상 의무 이행을 위하여 필요한 범위에서 개인정보를 처리한다.",
+  "defined_terms_used": [
+    "개인정보"
+  ],
+  "cross_refs": [],
+  "paragraph_count": 1,
+  "char_count": 69
+}

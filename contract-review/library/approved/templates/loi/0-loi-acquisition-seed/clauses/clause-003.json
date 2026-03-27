@@ -1,0 +1,18 @@
+{
+  "clause_id": "clause-003",
+  "section_no": "제3조",
+  "heading": "실사 및 정보제공",
+  "header": "(실사 및 정보제공)",
+  "start_line": 9,
+  "end_line": 10,
+  "clause_type": "information_rights",
+  "text": "매도인은 인수인이 법률, 재무, 세무 및 기술 실사를 수행할 수 있도록 합리적인 범위의 자료 접근을 제공한다.",
+  "defined_terms_used": [
+    "매도인",
+    "인수인",
+    "대상회사"
+  ],
+  "cross_refs": [],
+  "paragraph_count": 1,
+  "char_count": 61
+}

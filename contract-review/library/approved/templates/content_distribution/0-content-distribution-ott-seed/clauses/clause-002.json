@@ -1,0 +1,18 @@
+{
+  "clause_id": "clause-002",
+  "section_no": "제2조",
+  "heading": "권리 부여",
+  "header": "(권리 부여)",
+  "start_line": 6,
+  "end_line": 7,
+  "clause_type": "grant_of_rights",
+  "text": "제작사는 배급사에게 계약기간 동안 콘텐츠를 지정 플랫폼에서 스트리밍, 다운로드 판매 또는 VOD 방식으로 유통할 수 있는 비독점적 권리를 부여한다.",
+  "defined_terms_used": [
+    "제작사",
+    "배급사",
+    "콘텐츠"
+  ],
+  "cross_refs": [],
+  "paragraph_count": 1,
+  "char_count": 82
+}

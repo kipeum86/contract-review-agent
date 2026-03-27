@@ -2,8 +2,8 @@
 # during the review pipeline (Workflow 2, Step 5)
 
 priority_order:
-  # Higher priority items are preferred when multiple matches exist
-  # Priority is applied after deterministic filtering
+  # Higher priority items are preferred when multiple matches exist.
+  # Query ranking applies this after deterministic filtering and before LLM judgment.
   1: preferred_template      # Template with authority_level = preferred
   2: acceptable_template     # Template with authority_level = acceptable
   3: fallback_template       # Template with authority_level = fallback
@@ -23,7 +23,7 @@ filter_rules:
       match: exact_or_null
       required: false
     - filter: language
-      match: exact_or_null    # Prefer same-language matches but don't exclude
+      match: soft_preference  # Same-language candidates sort first; null stays eligible
       required: false
     - filter: approval_state
       match: exact
@@ -57,16 +57,17 @@ filter_rules:
 
   # Stage 3 — Bonus scoring for closely related families
   stage_3_affinity:
+    minimum_exact_candidates: 3
     description: >
       When exact contract_family match yields fewer than 3 candidates,
       expand search to related families with a ranking penalty.
     affinity_groups:
       - [license, ip_transfer, content_distribution]
       - [publishing, content_distribution, game_development]
-      - [spa, ssa, sha, safe, apa, merger]
-      - [services, independent_contractor, sow]
+      - [spa, ssa, sha, safe, apa, merger, joint_venture]
+      - [services, independent_contractor, sow, marketing]
       - [mou, loi]
-      - [tos, eula, privacy_policy, saas]
+      - [tos, eula, privacy_policy, dpa, saas]
     penalty: 1  # Shift priority rank down by 1 level
 
 freshness_rules:

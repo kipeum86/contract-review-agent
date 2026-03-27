@@ -1,0 +1,16 @@
+{
+  "clause_id": "clause-012",
+  "section_no": "제12조",
+  "heading": "보증의 배제",
+  "header": "(보증의 배제)",
+  "start_line": 36,
+  "end_line": 37,
+  "clause_type": "warranty_disclaimer",
+  "text": "회사는 천재지변, 시스템 점검, 제3자 통신망 장애 등 회사의 합리적 통제를 벗어난 사유로 인한 서비스 중단에 대해 묵시적 보증을 제공하지 아니한다. 다만 법령상 배제할 수 없는 책임은 제외한다.",
+  "defined_terms_used": [
+    "서비스"
+  ],
+  "cross_refs": [],
+  "paragraph_count": 1,
+  "char_count": 109
+}

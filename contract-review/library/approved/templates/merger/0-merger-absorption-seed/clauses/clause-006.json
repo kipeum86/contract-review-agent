@@ -1,0 +1,17 @@
+{
+  "clause_id": "clause-006",
+  "section_no": "제6조",
+  "heading": "중대한 부정적 변경",
+  "header": "(중대한 부정적 변경)",
+  "start_line": 18,
+  "end_line": 19,
+  "clause_type": "material_adverse_change",
+  "text": "소멸회사 또는 존속회사에 중대한 부정적 변경이 발생한 경우 당사자는 합병 일정 조정, 시정 협의 또는 법령상 허용되는 범위의 후속 조치를 협의한다.",
+  "defined_terms_used": [
+    "존속회사",
+    "소멸회사"
+  ],
+  "cross_refs": [],
+  "paragraph_count": 1,
+  "char_count": 82
+}

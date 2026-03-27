@@ -1,0 +1,18 @@
+{
+  "clause_id": "clause-011",
+  "section_no": "제11조",
+  "heading": "면책",
+  "header": "(면책)",
+  "start_line": 33,
+  "end_line": 34,
+  "clause_type": "indemnification_ma",
+  "text": "매도인은 진술 및 보증 위반, 선행의무 위반 또는 종결 전 원인에 기초한 세금·부채로 인해 매수인 또는 대상회사에 발생한 손해를 면책한다. 다만 basket, cap 및 survival 기간은 별첨에 따른다.",
+  "defined_terms_used": [
+    "매도인",
+    "매수인",
+    "대상회사"
+  ],
+  "cross_refs": [],
+  "paragraph_count": 1,
+  "char_count": 116
+}

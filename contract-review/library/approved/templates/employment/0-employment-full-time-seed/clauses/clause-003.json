@@ -1,0 +1,17 @@
+{
+  "clause_id": "clause-003",
+  "section_no": "제3조",
+  "heading": "보수 및 복리후생",
+  "header": "(보수 및 복리후생)",
+  "start_line": 9,
+  "end_line": 10,
+  "clause_type": "compensation_benefits",
+  "text": "회사는 근로자에게 관련 법령상 최저임금 이상인 월 기본급과 별도 성과급을 지급하고, 4대보험 및 사내 복리후생 제도를 관련 규정에 따라 제공한다.",
+  "defined_terms_used": [
+    "회사",
+    "근로자"
+  ],
+  "cross_refs": [],
+  "paragraph_count": 1,
+  "char_count": 81
+}

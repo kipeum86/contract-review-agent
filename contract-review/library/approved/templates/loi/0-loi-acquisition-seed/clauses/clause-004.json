@@ -1,0 +1,17 @@
+{
+  "clause_id": "clause-004",
+  "section_no": "제4조",
+  "heading": "독점교섭",
+  "header": "(독점교섭)",
+  "start_line": 12,
+  "end_line": 13,
+  "clause_type": "no_shop",
+  "text": "매도인은 본 의향서 유효기간 동안 인수 거래와 실질적으로 경쟁하는 제3자 협상을 진행하지 아니하며, 수령한 제안이 있는 경우 이를 지체 없이 인수인에게 통지한다.",
+  "defined_terms_used": [
+    "매도인",
+    "인수인"
+  ],
+  "cross_refs": [],
+  "paragraph_count": 1,
+  "char_count": 90
+}

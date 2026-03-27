@@ -1,0 +1,19 @@
+{
+  "clause_id": "clause-003",
+  "section_no": "제3조",
+  "heading": "상호 비밀유지의무",
+  "header": "(상호 비밀유지의무)",
+  "start_line": 9,
+  "end_line": 10,
+  "clause_type": "confidentiality",
+  "text": "각 당사자는 상대방으로부터 비밀정보를 수령하는 경우 수령당사자로 간주되며, 본 계약 목적 범위 내에서만 이를 사용하고 개시당사자의 사전 서면동의 없이 제3자에게 공개하거나 누설하지 아니한다.",
+  "defined_terms_used": [
+    "당사자",
+    "비밀정보",
+    "수령당사자",
+    "개시당사자"
+  ],
+  "cross_refs": [],
+  "paragraph_count": 1,
+  "char_count": 106
+}

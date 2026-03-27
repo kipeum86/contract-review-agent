@@ -1,0 +1,17 @@
+{
+  "clause_id": "clause-008",
+  "section_no": "제8조",
+  "heading": "정보주체의 권리",
+  "header": "(정보주체의 권리)",
+  "start_line": 24,
+  "end_line": 25,
+  "clause_type": "data_subject_rights",
+  "text": "정보주체는 자신의 개인정보에 대해 열람, 정정·삭제, 처리정지, 동의 철회 및 관련 민원을 제기할 수 있으며, 회사는 법령상 기한 내에 이에 응답한다.",
+  "defined_terms_used": [
+    "정보주체",
+    "개인정보"
+  ],
+  "cross_refs": [],
+  "paragraph_count": 1,
+  "char_count": 84
+}
