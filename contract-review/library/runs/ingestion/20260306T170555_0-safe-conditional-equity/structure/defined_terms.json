@@ -1,18 +1,62 @@
 [
   {
+    "term": "본 계약(서)",
+    "first_line": 23
+  },
+  {
+    "term": "본 계약 체결일",
+    "first_line": 23
+  },
+  {
+    "term": "투자자",
+    "first_line": 25
+  },
+  {
+    "term": "회사",
+    "first_line": 30
+  },
+  {
+    "term": "이해관계인",
+    "first_line": 34
+  },
+  {
+    "term": "당사자",
+    "first_line": 38
+  },
+  {
+    "term": "당사자들",
+    "first_line": 38
+  },
+  {
+    "term": "후속투자",
+    "first_line": 56
+  },
+  {
+    "term": "경영권 변경",
+    "first_line": 57
+  },
+  {
+    "term": "상장",
+    "first_line": 58
+  },
+  {
+    "term": "별지: 진술과 보장",
+    "first_line": 61
+  },
+  {
+    "term": "전환가격",
+    "first_line": 79
+  },
+  {
+    "term": "전환가액",
+    "first_line": 241
+  },
+  {
     "term": "기발행주식수",
     "first_line": 251
   },
   {
     "term": "시가",
-    "first_line": 251
-  },
-  {
-    "term": "회사",
-    "first_line": 251
-  },
-  {
-    "term": "전환가격",
     "first_line": 251
   }
 ]

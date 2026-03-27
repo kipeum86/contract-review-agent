@@ -1,0 +1,17 @@
+{
+  "clause_id": "clause-003",
+  "section_no": "제3조",
+  "heading": "서비스 내용 및 가입",
+  "header": "(서비스 내용 및 가입)",
+  "start_line": 9,
+  "end_line": 10,
+  "clause_type": "scope_of_services",
+  "text": "회사는 회원에게 계정기반 온라인 서비스, 고객지원, 공지사항 전달 및 기타 부가 기능을 제공하며, 가입 절차는 회사가 정한 방식에 따른다.",
+  "defined_terms_used": [
+    "서비스",
+    "회원"
+  ],
+  "cross_refs": [],
+  "paragraph_count": 1,
+  "char_count": 77
+}

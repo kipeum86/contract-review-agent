@@ -1,0 +1,16 @@
+{
+  "clause_id": "clause-012",
+  "section_no": "제12조",
+  "heading": "이용자 데이터",
+  "header": "(이용자 데이터)",
+  "start_line": 36,
+  "end_line": 37,
+  "clause_type": "user_data",
+  "text": "게임 서비스 과정에서 수집되는 이용자 데이터의 관리 및 활용은 관련 법령, 개인정보처리방침 및 당사자 역할 분담에 따른다.",
+  "defined_terms_used": [
+    "게임"
+  ],
+  "cross_refs": [],
+  "paragraph_count": 1,
+  "char_count": 68
+}

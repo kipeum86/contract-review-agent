@@ -1,0 +1,80 @@
+[
+  {
+    "line": 3,
+    "level": 2,
+    "text": "목적",
+    "section": "art1"
+  },
+  {
+    "line": 6,
+    "level": 2,
+    "text": "정의",
+    "section": "art2"
+  },
+  {
+    "line": 9,
+    "level": 2,
+    "text": "서비스 내용 및 가입",
+    "section": "art3"
+  },
+  {
+    "line": 12,
+    "level": 2,
+    "text": "계정 관리 의무",
+    "section": "art4"
+  },
+  {
+    "line": 15,
+    "level": 2,
+    "text": "유료서비스 및 결제",
+    "section": "art5"
+  },
+  {
+    "line": 18,
+    "level": 2,
+    "text": "이용계약 해지 및 청약철회",
+    "section": "art6"
+  },
+  {
+    "line": 21,
+    "level": 2,
+    "text": "게시물 이용허락",
+    "section": "art7"
+  },
+  {
+    "line": 24,
+    "level": 2,
+    "text": "약관 변경",
+    "section": "art8"
+  },
+  {
+    "line": 27,
+    "level": 2,
+    "text": "개인정보 보호",
+    "section": "art9"
+  },
+  {
+    "line": 30,
+    "level": 2,
+    "text": "이용제한 및 해지",
+    "section": "art10"
+  },
+  {
+    "line": 33,
+    "level": 2,
+    "text": "책임제한",
+    "section": "art11"
+  },
+  {
+    "line": 36,
+    "level": 2,
+    "text": "보증의 배제",
+    "section": "art12"
+  },
+  {
+    "line": 39,
+    "level": 2,
+    "text": "준거법",
+    "section": "art13"
+  }
+]

@@ -1,0 +1,18 @@
+{
+  "clause_id": "clause-003",
+  "section_no": "제3조",
+  "heading": "이용범위 및 제한",
+  "header": "(이용범위 및 제한)",
+  "start_line": 9,
+  "end_line": 10,
+  "clause_type": "license_scope",
+  "text": "사용자는 라이선서의 사전 서면동의 없이 소프트웨어를 재판매, 대여, 재허락, 리버스엔지니어링 또는 우회조작할 수 없다.",
+  "defined_terms_used": [
+    "사용자",
+    "라이선서",
+    "소프트웨어"
+  ],
+  "cross_refs": [],
+  "paragraph_count": 1,
+  "char_count": 66
+}

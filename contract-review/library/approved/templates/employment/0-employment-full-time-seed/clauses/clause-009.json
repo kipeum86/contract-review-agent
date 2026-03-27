@@ -1,0 +1,17 @@
+{
+  "clause_id": "clause-009",
+  "section_no": "제9조",
+  "heading": "경업금지",
+  "header": "(경업금지)",
+  "start_line": 27,
+  "end_line": 28,
+  "clause_type": "non_compete",
+  "text": "근로자는 별도 보상이 제공되는 범위에서만 퇴직 후 1년 이내의 합리적인 기간과 지역 내에서 회사와 직접 경쟁하는 영업활동을 하지 아니한다.",
+  "defined_terms_used": [
+    "근로자",
+    "회사"
+  ],
+  "cross_refs": [],
+  "paragraph_count": 1,
+  "char_count": 77
+}

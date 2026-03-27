@@ -1,0 +1,17 @@
+{
+  "clause_id": "clause-007",
+  "section_no": "제7조",
+  "heading": "당사자 진술 및 보증",
+  "header": "(당사자 진술 및 보증)",
+  "start_line": 21,
+  "end_line": 22,
+  "clause_type": "representations_warranties",
+  "text": "각 당사자는 본 계약 체결 및 이행 권한, 재무정보의 중요성 있는 정확성, 중대한 분쟁·법규 위반 부존재, 합병 절차 수행 능력을 진술하고 보증한다.",
+  "defined_terms_used": [
+    "존속회사",
+    "소멸회사"
+  ],
+  "cross_refs": [],
+  "paragraph_count": 1,
+  "char_count": 83
+}

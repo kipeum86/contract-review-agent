@@ -1,0 +1,16 @@
+{
+  "clause_id": "clause-011",
+  "section_no": "제11조",
+  "heading": "책임제한",
+  "header": "(책임제한)",
+  "start_line": 33,
+  "end_line": 34,
+  "clause_type": "limitation_of_liability",
+  "text": "회사는 무료로 제공되는 서비스와 관련하여 법령상 허용되는 범위 내에서 책임을 제한할 수 있으나, 고의 또는 중과실로 인한 손해에 대해서는 책임을 면하지 아니한다.",
+  "defined_terms_used": [
+    "서비스"
+  ],
+  "cross_refs": [],
+  "paragraph_count": 1,
+  "char_count": 90
+}

@@ -1,0 +1,17 @@
+{
+  "clause_id": "clause-004",
+  "section_no": "제4조",
+  "heading": "안전성 확보조치",
+  "header": "(안전성 확보조치)",
+  "start_line": 12,
+  "end_line": 13,
+  "clause_type": "data_security",
+  "text": "수탁자는 접근권한 관리, 암호화, 접속기록 보관, 내부관리계획 수립, 교육 및 물리적 보호조치 등 관련 법령상 요구되는 기술적·관리적 보호조치를 이행한다.",
+  "defined_terms_used": [
+    "수탁자",
+    "개인정보"
+  ],
+  "cross_refs": [],
+  "paragraph_count": 1,
+  "char_count": 86
+}

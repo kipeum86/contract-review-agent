@@ -1,0 +1,17 @@
+{
+  "clause_id": "clause-004",
+  "section_no": "제4조",
+  "heading": "마일스톤 검수",
+  "header": "(마일스톤 검수)",
+  "start_line": 12,
+  "end_line": 13,
+  "clause_type": "milestone_acceptance",
+  "text": "퍼블리셔는 각 빌드 수령 후 7영업일 이내에 승인 또는 보완사항을 통지하며, 합리적인 중대 하자가 없는 경우 해당 마일스톤은 승인된 것으로 본다.",
+  "defined_terms_used": [
+    "퍼블리셔",
+    "빌드"
+  ],
+  "cross_refs": [],
+  "paragraph_count": 1,
+  "char_count": 81
+}

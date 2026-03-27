@@ -1,0 +1,17 @@
+{
+  "clause_id": "clause-010",
+  "section_no": "제10조",
+  "heading": "경업금지",
+  "header": "(경업금지)",
+  "start_line": 30,
+  "end_line": 31,
+  "clause_type": "non_compete",
+  "text": "각 당사자는 합작회사의 사업영역과 실질적으로 경쟁하는 별도 사업을 합작회사와 사전 협의 없이 수행하지 아니한다. 다만 기존 사업과의 합리적 carve-out은 별첨에 따른다.",
+  "defined_terms_used": [
+    "당사자",
+    "합작회사"
+  ],
+  "cross_refs": [],
+  "paragraph_count": 1,
+  "char_count": 97
+}

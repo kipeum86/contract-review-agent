@@ -1,0 +1,18 @@
+{
+  "clause_id": "clause-001",
+  "section_no": "제1조",
+  "heading": "목적",
+  "header": "(목적)",
+  "start_line": 3,
+  "end_line": 4,
+  "clause_type": "purpose",
+  "text": "본 계약은 양도인이 운영하는 대상사업 관련 자산과 권리를 양수인에게 이전하는 조건을 정함을 목적으로 한다.",
+  "defined_terms_used": [
+    "양도인",
+    "양수인",
+    "대상사업"
+  ],
+  "cross_refs": [],
+  "paragraph_count": 1,
+  "char_count": 59
+}

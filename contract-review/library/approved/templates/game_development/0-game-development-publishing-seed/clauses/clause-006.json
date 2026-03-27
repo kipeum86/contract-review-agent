@@ -1,0 +1,17 @@
+{
+  "clause_id": "clause-006",
+  "section_no": "제6조",
+  "heading": "플랫폼 요구사항",
+  "header": "(플랫폼 요구사항)",
+  "start_line": 18,
+  "end_line": 19,
+  "clause_type": "platform_requirements",
+  "text": "개발사는 대상 플랫폼의 기술 요건, 스토어 정책, 인증 기준 및 운영체제 호환성을 준수하도록 게임을 개발한다.",
+  "defined_terms_used": [
+    "개발사",
+    "게임"
+  ],
+  "cross_refs": [],
+  "paragraph_count": 1,
+  "char_count": 61
+}

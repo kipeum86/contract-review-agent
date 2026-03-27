@@ -1,8 +1,14 @@
 {
   "clause_id": "clause-034",
+  "section_no": "제29조",
+  "heading": "일부 무효",
   "header": "(일부 무효)",
   "start_line": 285,
   "end_line": 287,
   "clause_type": "severability",
+  "text": "(일부 무효)\n본 계약 또는 이와 관련하여 작성된 서류에 명시된 한 개 또는 수개의 조항이 법령에 따라 무효, 위법 또는 집행불능으로 되더라도 본 계약에 명시된 나머지 조항의 효력, 적법성 및 집행가능성은 그로 인하여 아무런 영향을 받지 않는다.",
+  "defined_terms_used": [],
+  "cross_refs": [],
+  "paragraph_count": 1,
   "char_count": 137
 }

@@ -1,0 +1,18 @@
+{
+  "clause_id": "clause-001",
+  "section_no": "제1조",
+  "heading": "목적",
+  "header": "(목적)",
+  "start_line": 3,
+  "end_line": 4,
+  "clause_type": "purpose",
+  "text": "본 의향서는 인수인이 대상회사에 대한 인수를 검토함에 있어 주요 거래 조건과 후속 실사 절차를 정리하기 위한 것이다.",
+  "defined_terms_used": [
+    "인수인",
+    "매도인",
+    "대상회사"
+  ],
+  "cross_refs": [],
+  "paragraph_count": 1,
+  "char_count": 65
+}

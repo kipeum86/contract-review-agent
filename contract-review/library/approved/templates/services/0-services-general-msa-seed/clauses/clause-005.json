@@ -1,0 +1,14 @@
+{
+  "clause_id": "clause-005",
+  "section_no": "제5조",
+  "heading": "서비스수준",
+  "header": "(서비스수준)",
+  "start_line": 15,
+  "end_line": 16,
+  "clause_type": "service_levels",
+  "text": "중대한 장애는 접수 후 4시간 이내에 조치계획을 통지하고, 월간 가용성 목표는 99.5%로 한다.",
+  "defined_terms_used": [],
+  "cross_refs": [],
+  "paragraph_count": 1,
+  "char_count": 54
+}

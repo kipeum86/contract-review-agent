@@ -10,6 +10,10 @@ Detailed domain knowledge is in the `references/` directory:
 - `audience-firewall.md` — External/internal content separation rules
 - `drafting-guide.md` — Contract generation checklists, Korean law baselines, drafting rules
 
+## Safety Utilities
+
+- `scripts/validate-audience-firewall.py` — Batch-validates `[EXTERNAL]` comments and writes `working/comments/firewall-log.json`
+
 ## Classification (WF1 Step 4, WF2 Step 2)
 
 When classifying a document, determine:
@@ -46,6 +50,7 @@ When no playbook exists, use matched template clause as baseline and set `playbo
 - Reuse from `comment-bank/external` when available
 - **MUST NOT** contain internal strategy, fallback positions, or leverage info
 - Must pass audience firewall check (see `audience-firewall.md`)
+- Run `scripts/validate-audience-firewall.py` on the final comment set before DOCX generation
 
 ### Internal Notes (`[INTERNAL]`)
 - For any clause with substantive observations

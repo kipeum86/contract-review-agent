@@ -1,0 +1,17 @@
+{
+  "clause_id": "clause-004",
+  "section_no": "제4조",
+  "heading": "선행조건",
+  "header": "(선행조건)",
+  "start_line": 12,
+  "end_line": 13,
+  "clause_type": "conditions_precedent",
+  "text": "거래종결은 필요한 내부 승인, 제3자 동의, 규제 신고 또는 승인, 실사 결과 확인 및 최종 종결서류 준비 완료를 조건으로 한다.",
+  "defined_terms_used": [
+    "매도인",
+    "매수인"
+  ],
+  "cross_refs": [],
+  "paragraph_count": 1,
+  "char_count": 72
+}

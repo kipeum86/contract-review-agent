@@ -1,0 +1,18 @@
+{
+  "clause_id": "clause-003",
+  "section_no": "제3조",
+  "heading": "청구권의 포기 및 해제",
+  "header": "(청구권의 포기 및 해제)",
+  "start_line": 9,
+  "end_line": 10,
+  "clause_type": "release_of_claims",
+  "text": "각 당사자는 본 합의서에 따른 이행이 완료되는 것을 조건으로 분쟁과 직접 관련하여 현재까지 발생한 상대방에 대한 민사상 청구를 최종적으로 포기하고 해제한다.",
+  "defined_terms_used": [
+    "갑",
+    "을",
+    "분쟁"
+  ],
+  "cross_refs": [],
+  "paragraph_count": 1,
+  "char_count": 87
+}

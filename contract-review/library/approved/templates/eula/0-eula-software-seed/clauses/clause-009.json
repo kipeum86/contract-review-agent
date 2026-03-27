@@ -1,0 +1,17 @@
+{
+  "clause_id": "clause-009",
+  "section_no": "제9조",
+  "heading": "해지",
+  "header": "(해지)",
+  "start_line": 27,
+  "end_line": 28,
+  "clause_type": "termination_for_cause",
+  "text": "사용자가 본 계약의 중대한 제한사항을 위반하고 통지 후 10일 내 시정하지 아니하는 경우 라이선서는 계약을 해지할 수 있다.",
+  "defined_terms_used": [
+    "사용자",
+    "라이선서"
+  ],
+  "cross_refs": [],
+  "paragraph_count": 1,
+  "char_count": 69
+}

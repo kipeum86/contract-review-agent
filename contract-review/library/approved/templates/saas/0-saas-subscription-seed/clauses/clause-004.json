@@ -1,0 +1,18 @@
+{
+  "clause_id": "clause-004",
+  "section_no": "제4조",
+  "heading": "데이터 처리",
+  "header": "(데이터 처리)",
+  "start_line": 12,
+  "end_line": 13,
+  "clause_type": "data_processing",
+  "text": "제공자는 계약 목적 범위 내에서만 고객 데이터를 처리하며, 법령상 요구되는 경우를 제외하고 구독자의 지시 없이 제3자에게 제공하지 아니한다.",
+  "defined_terms_used": [
+    "제공자",
+    "고객 데이터",
+    "구독자"
+  ],
+  "cross_refs": [],
+  "paragraph_count": 1,
+  "char_count": 78
+}

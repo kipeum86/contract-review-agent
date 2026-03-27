@@ -1,0 +1,17 @@
+{
+  "clause_id": "clause-009",
+  "section_no": "제9조",
+  "heading": "법적 구속력",
+  "header": "(법적 구속력)",
+  "start_line": 27,
+  "end_line": 28,
+  "clause_type": "binding_effect",
+  "text": "본 의향서는 원칙적으로 구속력이 없으나, 비밀유지, 독점교섭, 비용 부담, 준거법 및 분쟁해결 관련 조항은 구속력을 가진다.",
+  "defined_terms_used": [
+    "인수인",
+    "매도인"
+  ],
+  "cross_refs": [],
+  "paragraph_count": 1,
+  "char_count": 69
+}

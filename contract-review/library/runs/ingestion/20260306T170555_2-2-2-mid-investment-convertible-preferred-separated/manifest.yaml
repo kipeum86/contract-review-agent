@@ -12,8 +12,8 @@ approval_state: approved
 status: active
 sha256: dab4270ab37a6528ae60493b1ef517bda4139d6b6f7ee4a41cc9c67cdd7c7703
 source_file: 2-2-2. [중기]_투자계약서_전환우선주식(분리형)_2309개정.docx
-created_at: '2026-03-06T17:09:47.744621+00:00'
-updated_at: '2026-03-06T17:09:47.744621+00:00'
+created_at: '2026-03-27T07:01:43.176343+00:00'
+updated_at: '2026-03-27T07:01:43.176343+00:00'
 classification_confidence: high
 authority_level: preferred
 external_safe: false
@@ -29,6 +29,6 @@ stats:
   total_clauses: 17
   unmapped_clauses: 0
   unmapped_ratio: 0.0
-  defined_terms: 0
+  defined_terms: 15
   sections: 15
   exhibits: 2

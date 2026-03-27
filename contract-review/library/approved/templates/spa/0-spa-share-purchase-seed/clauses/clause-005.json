@@ -1,0 +1,19 @@
+{
+  "clause_id": "clause-005",
+  "section_no": "제5조",
+  "heading": "거래종결",
+  "header": "(거래종결)",
+  "start_line": 15,
+  "end_line": 16,
+  "clause_type": "closing_mechanics",
+  "text": "당사자는 선행조건 충족일에 주식양수도대금 잔금지급, 주권 또는 주주명부 변경서류 교부, 이사 및 임원 변경문서 전달 등 종결 절차를 동시에 이행한다.",
+  "defined_terms_used": [
+    "매도인",
+    "매수인",
+    "대상회사",
+    "대상주식"
+  ],
+  "cross_refs": [],
+  "paragraph_count": 1,
+  "char_count": 83
+}

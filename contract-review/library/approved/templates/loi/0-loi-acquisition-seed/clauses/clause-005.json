@@ -1,0 +1,17 @@
+{
+  "clause_id": "clause-005",
+  "section_no": "제5조",
+  "heading": "비밀유지",
+  "header": "(비밀유지)",
+  "start_line": 15,
+  "end_line": 16,
+  "clause_type": "confidentiality",
+  "text": "당사자는 거래 검토 과정에서 취득한 비공개 정보를 본 거래 검토 목적 외로 사용하거나 제3자에게 공개하지 아니한다.",
+  "defined_terms_used": [
+    "인수인",
+    "매도인"
+  ],
+  "cross_refs": [],
+  "paragraph_count": 1,
+  "char_count": 64
+}

@@ -1,0 +1,17 @@
+{
+  "clause_id": "clause-004",
+  "section_no": "제4조",
+  "heading": "양수도대금",
+  "header": "(양수도대금)",
+  "start_line": 12,
+  "end_line": 13,
+  "clause_type": "purchase_price",
+  "text": "양수인은 대상사업 양수도대금으로 합의된 금액을 지급하며, 재고·운전자본 등 가격조정 항목은 종결 후 정산한다.",
+  "defined_terms_used": [
+    "양수인",
+    "대상사업"
+  ],
+  "cross_refs": [],
+  "paragraph_count": 1,
+  "char_count": 61
+}

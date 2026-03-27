@@ -1,0 +1,18 @@
+{
+  "clause_id": "clause-006",
+  "section_no": "제6조",
+  "heading": "자료의 반환 및 파기",
+  "header": "(자료의 반환 및 파기)",
+  "start_line": 18,
+  "end_line": 19,
+  "clause_type": "effects_of_termination",
+  "text": "개시당사자의 요청 또는 계약 종료 시 수령당사자는 비밀정보와 그 복제물을 즉시 반환하거나 파기하고, 그 사실을 서면으로 확인한다.",
+  "defined_terms_used": [
+    "개시당사자",
+    "수령당사자",
+    "비밀정보"
+  ],
+  "cross_refs": [],
+  "paragraph_count": 1,
+  "char_count": 72
+}

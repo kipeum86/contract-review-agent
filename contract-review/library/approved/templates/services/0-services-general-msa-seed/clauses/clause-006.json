@@ -1,0 +1,17 @@
+{
+  "clause_id": "clause-006",
+  "section_no": "제6조",
+  "heading": "대금 및 지급조건",
+  "header": "(대금 및 지급조건)",
+  "start_line": 18,
+  "end_line": 19,
+  "clause_type": "fees_payment",
+  "text": "발주인은 검수 완료 후 30일 이내에 세금계산서에 따라 용역대금을 지급한다.",
+  "defined_terms_used": [
+    "발주인",
+    "용역"
+  ],
+  "cross_refs": [],
+  "paragraph_count": 1,
+  "char_count": 42
+}

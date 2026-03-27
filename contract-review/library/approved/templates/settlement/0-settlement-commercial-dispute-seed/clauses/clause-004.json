@@ -1,0 +1,18 @@
+{
+  "clause_id": "clause-004",
+  "section_no": "제4조",
+  "heading": "부제소 합의",
+  "header": "(부제소 합의)",
+  "start_line": 12,
+  "end_line": 13,
+  "clause_type": "covenant_not_to_sue",
+  "text": "각 당사자는 분쟁과 동일한 사실관계에 기초한 새로운 소송, 중재 또는 행정절차를 제기하지 아니하며, 이미 진행 중인 절차가 있는 경우 필요한 종결 조치를 이행한다.",
+  "defined_terms_used": [
+    "갑",
+    "을",
+    "분쟁"
+  ],
+  "cross_refs": [],
+  "paragraph_count": 1,
+  "char_count": 91
+}

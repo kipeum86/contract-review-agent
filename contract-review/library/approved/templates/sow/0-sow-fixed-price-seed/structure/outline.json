@@ -1,0 +1,74 @@
+[
+  {
+    "line": 3,
+    "level": 2,
+    "text": "목적",
+    "section": "art1"
+  },
+  {
+    "line": 6,
+    "level": 2,
+    "text": "과업범위",
+    "section": "art2"
+  },
+  {
+    "line": 9,
+    "level": 2,
+    "text": "산출물",
+    "section": "art3"
+  },
+  {
+    "line": 12,
+    "level": 2,
+    "text": "마일스톤",
+    "section": "art4"
+  },
+  {
+    "line": 15,
+    "level": 2,
+    "text": "검수",
+    "section": "art5"
+  },
+  {
+    "line": 18,
+    "level": 2,
+    "text": "발주인 협조사항",
+    "section": "art6"
+  },
+  {
+    "line": 21,
+    "level": 2,
+    "text": "변경요청",
+    "section": "art7"
+  },
+  {
+    "line": 24,
+    "level": 2,
+    "text": "대금",
+    "section": "art8"
+  },
+  {
+    "line": 27,
+    "level": 2,
+    "text": "비용",
+    "section": "art9"
+  },
+  {
+    "line": 30,
+    "level": 2,
+    "text": "기존 지식재산",
+    "section": "art10"
+  },
+  {
+    "line": 33,
+    "level": 2,
+    "text": "신규 산출물의 권리",
+    "section": "art11"
+  },
+  {
+    "line": 36,
+    "level": 2,
+    "text": "해지",
+    "section": "art12"
+  }
+]

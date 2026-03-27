@@ -1,0 +1,16 @@
+{
+  "clause_id": "clause-004",
+  "section_no": "제4조",
+  "heading": "대금 및 지급조건",
+  "header": "(대금 및 지급조건)",
+  "start_line": 12,
+  "end_line": 13,
+  "clause_type": "fees_payment",
+  "text": "매수인은 납품월 말일 기준 세금계산서 발행 후 30일 이내에 대금을 지급한다.",
+  "defined_terms_used": [
+    "매수인"
+  ],
+  "cross_refs": [],
+  "paragraph_count": 1,
+  "char_count": 43
+}

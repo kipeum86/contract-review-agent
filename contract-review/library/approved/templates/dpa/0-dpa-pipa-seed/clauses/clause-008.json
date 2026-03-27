@@ -1,0 +1,18 @@
+{
+  "clause_id": "clause-008",
+  "section_no": "제8조",
+  "heading": "정보주체 권리행사 협조",
+  "header": "(정보주체 권리행사 협조)",
+  "start_line": 24,
+  "end_line": 25,
+  "clause_type": "data_subject_rights",
+  "text": "수탁자는 정보주체의 열람, 정정·삭제, 처리정지 또는 민원처리 요청과 관련하여 위탁자가 법령상 의무를 이행할 수 있도록 필요한 자료와 협조를 제공한다.",
+  "defined_terms_used": [
+    "정보주체",
+    "수탁자",
+    "위탁자"
+  ],
+  "cross_refs": [],
+  "paragraph_count": 1,
+  "char_count": 84
+}

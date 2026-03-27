@@ -1,0 +1,18 @@
+{
+  "clause_id": "clause-006",
+  "section_no": "제6조",
+  "heading": "지식재산권 양도",
+  "header": "(지식재산권 양도)",
+  "start_line": 18,
+  "end_line": 19,
+  "clause_type": "ip_assignment",
+  "text": "수탁인이 본 계약에 따라 작성한 산출물에 대한 지식재산권은 업무대금 완납 시점에 위탁인에게 이전된다.",
+  "defined_terms_used": [
+    "수탁인",
+    "산출물",
+    "위탁인"
+  ],
+  "cross_refs": [],
+  "paragraph_count": 1,
+  "char_count": 56
+}

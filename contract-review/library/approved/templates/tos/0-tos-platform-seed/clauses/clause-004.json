@@ -1,0 +1,16 @@
+{
+  "clause_id": "clause-004",
+  "section_no": "제4조",
+  "heading": "계정 관리 의무",
+  "header": "(계정 관리 의무)",
+  "start_line": 12,
+  "end_line": 13,
+  "clause_type": "obligations_general",
+  "text": "회원은 자신의 계정정보를 정확하게 유지하고 제3자에게 양도하거나 대여할 수 없으며, 무단 사용 사실을 인지한 경우 즉시 회사에 통지하여야 한다.",
+  "defined_terms_used": [
+    "회원"
+  ],
+  "cross_refs": [],
+  "paragraph_count": 1,
+  "char_count": 80
+}

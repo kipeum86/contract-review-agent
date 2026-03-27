@@ -1,0 +1,29 @@
+{
+  "doc_id": "0-tos-platform-seed",
+  "package_kind": "synthetic_seed",
+  "contract_family": "tos",
+  "subtype": "platform_tos",
+  "jurisdiction": "KR",
+  "current_authority_level": "acceptable",
+  "internal_review_status": "complete",
+  "external_domain_review_status": "pending",
+  "promotion_recommendation": "keep_acceptable",
+  "promotion_blockers": [
+    "external_domain_expert_review_pending"
+  ],
+  "reviewed_against": [
+    "drafting-guide",
+    "review-guide"
+  ],
+  "internal_review_completed_at": "2026-03-27T18:15:00+00:00",
+  "external_review": {
+    "reviewer_name": null,
+    "reviewer_role": null,
+    "reviewed_at": null,
+    "approval_note": null
+  },
+  "review_notes": [
+    "Synthetic interim baseline generated for retrieval coverage and regression stability.",
+    "External domain expert calibration is required before promotion to preferred authority."
+  ]
+}

@@ -1,0 +1,38 @@
+doc_id: 0-dpa-pipa-seed
+title: 개인정보 처리위탁계약서
+title_en: PIPA Data Processing Agreement
+doc_class: template
+paper_role: neutral
+jurisdiction: KR
+governing_law: 대한민국 법률 (Korean law)
+language: ko
+approval_state: approved
+status: active
+classification_confidence: high
+authority_level: acceptable
+external_safe: false
+freshness_sensitive: false
+contract_family: dpa
+subtype: pipa_dpa
+sha256: 358f968e812c9dd51837111c627fd1cf618c2fdead3e8cbca41806450441715b
+source_file: session-i-seed-pipa-dpa.md
+created_at: '2026-03-27T18:30:00+00:00'
+updated_at: '2026-03-27T18:30:00+00:00'
+tags:
+- seed-baseline
+- synthetic-seed
+- session-i
+- kr-law
+- dpa
+- pipa-informed
+notes: Synthetic interim baseline seed package for a zero-coverage family; internal
+  sanity review applied, domain expert calibration pending. Drafted against PIPA outsourcing-contract
+  baselines.
+industry: data-processing
+stats:
+  total_clauses: 12
+  unmapped_clauses: 0
+  unmapped_ratio: 0.0
+  defined_terms: 4
+  sections: 12
+  exhibits: 0

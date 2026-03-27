@@ -1,0 +1,16 @@
+{
+  "clause_id": "clause-002",
+  "section_no": "제2조",
+  "heading": "정의",
+  "header": "(정의)",
+  "start_line": 6,
+  "end_line": 7,
+  "clause_type": "definitions",
+  "text": "\"대상 저작물\"이란 별첨 목록에 기재된 소프트웨어, 디자인, 문서, 이미지 및 그 수정본을 의미한다.",
+  "defined_terms_used": [
+    "대상 저작물"
+  ],
+  "cross_refs": [],
+  "paragraph_count": 1,
+  "char_count": 56
+}

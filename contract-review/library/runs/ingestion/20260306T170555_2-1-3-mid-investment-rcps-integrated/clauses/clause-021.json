@@ -1,8 +1,16 @@
 {
   "clause_id": "clause-021",
+  "section_no": "제17조",
+  "heading": "지연배상금",
   "header": "(지연배상금)",
   "start_line": 201,
   "end_line": 203,
   "clause_type": "late_payment",
+  "text": "(지연배상금)\n본 계약의 당사자가 본 계약에 따라 정해진 지급기일에 금전지급의무를 부담함에도 이를 지체하는 경우, 해당 지급기일 다음날로부터 실제 지급일까지 미지급 금액에 대하여 연 12%에 해당하는 금액을 지연배상금으로 가산하여 지급해야 한다.",
+  "defined_terms_used": [
+    "당사자"
+  ],
+  "cross_refs": [],
+  "paragraph_count": 1,
   "char_count": 137
 }

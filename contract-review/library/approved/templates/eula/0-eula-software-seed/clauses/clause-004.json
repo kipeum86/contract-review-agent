@@ -1,0 +1,17 @@
+{
+  "clause_id": "clause-004",
+  "section_no": "제4조",
+  "heading": "사용자 의무",
+  "header": "(사용자 의무)",
+  "start_line": 12,
+  "end_line": 13,
+  "clause_type": "obligations_general",
+  "text": "사용자는 사용환경의 적법성 및 접근통제 유지 책임을 부담하며, 불법적이거나 보안에 위해를 주는 방식으로 소프트웨어를 사용해서는 아니 된다.",
+  "defined_terms_used": [
+    "사용자",
+    "소프트웨어"
+  ],
+  "cross_refs": [],
+  "paragraph_count": 1,
+  "char_count": 77
+}

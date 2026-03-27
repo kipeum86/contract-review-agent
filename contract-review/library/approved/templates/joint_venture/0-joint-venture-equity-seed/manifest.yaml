@@ -1,0 +1,38 @@
+doc_id: 0-joint-venture-equity-seed
+title: 합작투자계약서
+title_en: Equity Joint Venture Agreement
+doc_class: template
+paper_role: neutral
+jurisdiction: KR
+governing_law: 대한민국 법률 (Korean law)
+language: ko
+approval_state: approved
+status: active
+classification_confidence: high
+authority_level: acceptable
+external_safe: false
+freshness_sensitive: false
+contract_family: joint_venture
+subtype: equity_jv
+sha256: a23876cacdf17653dbb57d12d368a80355ead323df856d6cc98597798f62bc1a
+source_file: session-k-seed-equity-jv.md
+created_at: '2026-03-27T20:15:00+00:00'
+updated_at: '2026-03-27T20:15:00+00:00'
+tags:
+- seed-baseline
+- synthetic-seed
+- session-k
+- kr-law
+- joint-venture
+- commercial-act-informed
+notes: Synthetic interim baseline seed package for a zero-coverage family; internal
+  sanity review applied, domain expert calibration pending. Drafted against Korean
+  corporate-governance baseline assumptions.
+industry: corporate
+stats:
+  total_clauses: 11
+  unmapped_clauses: 0
+  unmapped_ratio: 0.0
+  defined_terms: 2
+  sections: 11
+  exhibits: 0

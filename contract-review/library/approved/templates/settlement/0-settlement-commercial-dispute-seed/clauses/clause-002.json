@@ -1,0 +1,18 @@
+{
+  "clause_id": "clause-002",
+  "section_no": "제2조",
+  "heading": "합의금",
+  "header": "(합의금)",
+  "start_line": 6,
+  "end_line": 7,
+  "clause_type": "fees_payment",
+  "text": "을은 분쟁의 종결을 위하여 갑에게 합의금을 분할 또는 일시금으로 지급하고, 세부 지급일정은 별첨 지급표에 따른다.",
+  "defined_terms_used": [
+    "갑",
+    "을",
+    "분쟁"
+  ],
+  "cross_refs": [],
+  "paragraph_count": 1,
+  "char_count": 63
+}

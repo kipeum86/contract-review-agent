@@ -1,0 +1,22 @@
+{
+  "doc_id": "0-lease-office-seed",
+  "hard_fails": [],
+  "soft_fails": [],
+  "schema_valid": true,
+  "timestamp": "2026-03-27T16:35:00+00:00",
+  "approval_gate": {
+    "approval_state": "approved",
+    "publication_target": "approved",
+    "reason_file": null,
+    "reasons": [
+      "manual_seed_baseline",
+      "synthetic_seed_package",
+      "domain_expert_review_pending"
+    ],
+    "policy_errors": [],
+    "unmet_conditions": [],
+    "auto_approval_enabled": false,
+    "asset_auto_approvable": false,
+    "doc_class": "template"
+  }
+}

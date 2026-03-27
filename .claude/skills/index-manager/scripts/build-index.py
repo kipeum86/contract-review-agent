@@ -22,6 +22,7 @@ PROJECT_ROOT = os.path.abspath(os.path.join(SCRIPT_DIR, '..', '..', '..', '..'))
 LIBRARY_DIR = os.path.join(PROJECT_ROOT, 'contract-review', 'library')
 APPROVED_DIR = os.path.join(LIBRARY_DIR, 'approved')
 INDEXES_DIR = os.path.join(LIBRARY_DIR, 'indexes')
+INDEX_VERSION = 2
 
 
 def load_yaml(path: str) -> dict | None:
@@ -42,6 +43,61 @@ def save_index(path: str, data: dict):
     os.makedirs(os.path.dirname(path), exist_ok=True)
     with open(path, 'w', encoding='utf-8') as f:
         json.dump(data, f, indent=2, ensure_ascii=False)
+
+
+def to_library_relative_path(abs_path: str) -> str:
+    rel_path = os.path.relpath(abs_path, LIBRARY_DIR)
+    rel_path = rel_path.replace(os.sep, '/')
+    if os.path.isdir(abs_path) and not rel_path.endswith('/'):
+        rel_path += '/'
+    return rel_path
+
+
+def normalize_clause_record(clause_data: dict, manifest: dict, clause_path: str) -> dict | None:
+    """Normalize a clause record for indexing.
+
+    Approved indexes should only contain clause rows with enough metadata to support
+    deterministic retrieval and downstream semantic matching.
+    """
+    if not isinstance(clause_data, dict):
+        return None
+
+    clause_id = clause_data.get('clause_id')
+    clause_type = clause_data.get('clause_type')
+    text = clause_data.get('text')
+    heading = clause_data.get('heading') or clause_data.get('header')
+
+    if not clause_id or not clause_type or not text or not heading:
+        return None
+
+    return {
+        'doc_id': manifest.get('doc_id'),
+        'clause_id': clause_id,
+        'doc_class': manifest.get('doc_class'),
+        'section_no': clause_data.get('section_no'),
+        'heading': heading,
+        'header': clause_data.get('header', heading),
+        'clause_type': clause_type,
+        'text': text,
+        'defined_terms_used': clause_data.get('defined_terms_used', []),
+        'cross_refs': clause_data.get('cross_refs', []),
+        'paragraph_count': clause_data.get('paragraph_count'),
+        'start_line': clause_data.get('start_line'),
+        'end_line': clause_data.get('end_line'),
+        'char_count': clause_data.get('char_count', len(text)),
+        'contract_family': manifest.get('contract_family'),
+        'jurisdiction': manifest.get('jurisdiction'),
+        'governing_law': manifest.get('governing_law'),
+        'language': manifest.get('language'),
+        'authority_level': manifest.get('authority_level'),
+        'approval_state': manifest.get('approval_state', 'approved'),
+        'status': manifest.get('status', 'active'),
+        'external_safe': manifest.get('external_safe', False),
+        'freshness_sensitive': manifest.get('freshness_sensitive', False),
+        'last_legal_refresh_date': manifest.get('last_legal_refresh_date'),
+        'document_path': to_library_relative_path(os.path.dirname(clause_path)),
+        'manifest_path': to_library_relative_path(manifest.get('_manifest_path')),
+    }
 
 
 def find_manifests(base_dir: str) -> list[str]:
@@ -72,24 +128,31 @@ def build_documents_index(manifests: list[dict]) -> dict:
             'last_legal_refresh_date': m.get('last_legal_refresh_date'),
             'sha256': m.get('sha256'),
             'source_file': m.get('source_file'),
+            'path': to_library_relative_path(os.path.dirname(m.get('_manifest_path'))),
             'supersedes': m.get('supersedes'),
             'superseded_by': m.get('superseded_by'),
             'created_at': m.get('created_at'),
             'updated_at': m.get('updated_at'),
-            'manifest_path': m.get('_manifest_path'),
+            'manifest_path': to_library_relative_path(m.get('_manifest_path')),
         }
         documents.append(doc_entry)
 
     return {
-        'version': 1,
+        'version': INDEX_VERSION,
         'updated_at': datetime.now(timezone.utc).isoformat(),
         'documents': documents,
     }
 
 
-def build_clauses_index(manifests: list[dict]) -> dict:
-    """Build clauses.json by collecting all clause records from approved documents."""
+def build_clauses_index(manifests: list[dict]) -> tuple[dict, dict]:
+    """Build clauses.json (metadata only) and clause-texts.json (text lookup).
+
+    Returns a tuple of (clauses_index, clause_texts_index).
+    clauses_index contains all clause metadata without the 'text' field.
+    clause_texts_index maps 'doc_id::clause_id' to the clause text for lazy loading.
+    """
     clauses = []
+    texts = {}
     for m in manifests:
         doc_id = m.get('doc_id')
         manifest_path = m.get('_manifest_path')
@@ -104,24 +167,25 @@ def build_clauses_index(manifests: list[dict]) -> dict:
                 continue
             clause_path = os.path.join(clauses_dir, clause_file)
             clause_data = load_json(clause_path)
-            if clause_data:
-                clause_data['doc_id'] = doc_id
-                clause_data['contract_family'] = m.get('contract_family')
-                clause_data['jurisdiction'] = m.get('jurisdiction')
-                clause_data['governing_law'] = m.get('governing_law')
-                clause_data['approval_state'] = m.get('approval_state', 'approved')
-                clause_data['status'] = m.get('status', 'active')
-                clause_data['authority_level'] = m.get('authority_level')
-                clause_data['external_safe'] = m.get('external_safe', False)
-                clause_data['freshness_sensitive'] = m.get('freshness_sensitive', False)
-                clause_data['last_legal_refresh_date'] = m.get('last_legal_refresh_date')
-                clauses.append(clause_data)
+            normalized = normalize_clause_record(clause_data, m, clause_path)
+            if normalized:
+                text = normalized.pop('text', '')
+                text_key = f"{normalized['doc_id']}::{normalized['clause_id']}"
+                texts[text_key] = text
+                clauses.append(normalized)
 
-    return {
-        'version': 1,
-        'updated_at': datetime.now(timezone.utc).isoformat(),
+    now = datetime.now(timezone.utc).isoformat()
+    clauses_index = {
+        'version': INDEX_VERSION,
+        'updated_at': now,
         'clauses': clauses,
     }
+    clause_texts_index = {
+        'version': INDEX_VERSION,
+        'updated_at': now,
+        'texts': texts,
+    }
+    return clauses_index, clause_texts_index
 
 
 def build_terms_index(manifests: list[dict]) -> dict:
@@ -137,11 +201,12 @@ def build_terms_index(manifests: list[dict]) -> dict:
         terms_data = load_json(terms_path)
         if terms_data and isinstance(terms_data, list):
             for term in terms_data:
+                term = dict(term)
                 term['doc_id'] = doc_id
                 terms.append(term)
 
     return {
-        'version': 1,
+        'version': INDEX_VERSION,
         'updated_at': datetime.now(timezone.utc).isoformat(),
         'terms': terms,
     }
@@ -165,7 +230,7 @@ def build_retrieval_map(clauses_index: dict) -> dict:
         })
 
     return {
-        'version': 1,
+        'version': INDEX_VERSION,
         'updated_at': datetime.now(timezone.utc).isoformat(),
         'mappings': [
             {'key': k, 'clauses': v} for k, v in sorted(mappings.items())
@@ -186,7 +251,7 @@ def build_supersession_index(manifests: list[dict]) -> dict:
             })
 
     return {
-        'version': 1,
+        'version': INDEX_VERSION,
         'updated_at': datetime.now(timezone.utc).isoformat(),
         'chains': chains,
     }
@@ -205,7 +270,7 @@ def register_document(manifest_path: str) -> dict:
 
     # Load existing indexes
     docs_index = load_json(os.path.join(INDEXES_DIR, 'documents.json')) or {
-        'version': 1, 'updated_at': None, 'documents': []
+        'version': INDEX_VERSION, 'updated_at': None, 'documents': []
     }
 
     # Check if already registered
@@ -229,13 +294,14 @@ def rebuild_all() -> dict:
             manifests.append(m)
 
     docs_index = build_documents_index(manifests)
-    clauses_index = build_clauses_index(manifests)
+    clauses_index, clause_texts_index = build_clauses_index(manifests)
     terms_index = build_terms_index(manifests)
     retrieval_map = build_retrieval_map(clauses_index)
     supersession_index = build_supersession_index(manifests)
 
     save_index(os.path.join(INDEXES_DIR, 'documents.json'), docs_index)
     save_index(os.path.join(INDEXES_DIR, 'clauses.json'), clauses_index)
+    save_index(os.path.join(INDEXES_DIR, 'clause-texts.json'), clause_texts_index)
     save_index(os.path.join(INDEXES_DIR, 'terms.json'), terms_index)
     save_index(os.path.join(INDEXES_DIR, 'retrieval-map.json'), retrieval_map)
     save_index(os.path.join(INDEXES_DIR, 'supersession.json'), supersession_index)
@@ -244,6 +310,7 @@ def rebuild_all() -> dict:
         'success': True,
         'documents_count': len(docs_index['documents']),
         'clauses_count': len(clauses_index['clauses']),
+        'clause_texts_count': len(clause_texts_index['texts']),
         'terms_count': len(terms_index['terms']),
         'retrieval_mappings': len(retrieval_map['mappings']),
         'supersession_chains': len(supersession_index['chains']),

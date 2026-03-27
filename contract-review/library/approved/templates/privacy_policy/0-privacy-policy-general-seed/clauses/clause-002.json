@@ -1,0 +1,16 @@
+{
+  "clause_id": "clause-002",
+  "section_no": "제2조",
+  "heading": "처리 항목 및 방법",
+  "header": "(처리 항목 및 방법)",
+  "start_line": 6,
+  "end_line": 7,
+  "clause_type": "data_processing",
+  "text": "회사는 회원가입, 서비스 이용, 고객문의 및 이벤트 참여 과정에서 이름, 연락처, 계정식별자, 결제정보 및 서비스 이용기록 등 필요한 개인정보를 수집·이용한다.",
+  "defined_terms_used": [
+    "개인정보"
+  ],
+  "cross_refs": [],
+  "paragraph_count": 1,
+  "char_count": 89
+}

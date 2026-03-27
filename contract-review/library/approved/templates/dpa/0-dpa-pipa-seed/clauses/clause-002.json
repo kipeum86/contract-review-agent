@@ -1,0 +1,17 @@
+{
+  "clause_id": "clause-002",
+  "section_no": "제2조",
+  "heading": "위탁업무 범위",
+  "header": "(위탁업무 범위)",
+  "start_line": 6,
+  "end_line": 7,
+  "clause_type": "data_processing",
+  "text": "수탁자는 고객응대, 시스템 운영, 결제처리 또는 기타 별첨 업무명세서에 기재된 범위 내에서만 개인정보를 처리할 수 있다.",
+  "defined_terms_used": [
+    "수탁자",
+    "개인정보"
+  ],
+  "cross_refs": [],
+  "paragraph_count": 1,
+  "char_count": 67
+}

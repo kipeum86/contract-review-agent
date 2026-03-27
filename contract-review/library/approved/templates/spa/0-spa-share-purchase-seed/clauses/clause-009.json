@@ -1,0 +1,17 @@
+{
+  "clause_id": "clause-009",
+  "section_no": "제9조",
+  "heading": "중대한 부정적 변경",
+  "header": "(중대한 부정적 변경)",
+  "start_line": 27,
+  "end_line": 28,
+  "clause_type": "material_adverse_change",
+  "text": "대상회사에 중대한 부정적 변경이 발생한 경우 매수인은 종결 연기, 시정 요구 또는 계약 해제를 요청할 수 있다.",
+  "defined_terms_used": [
+    "매수인",
+    "대상회사"
+  ],
+  "cross_refs": [],
+  "paragraph_count": 1,
+  "char_count": 62
+}

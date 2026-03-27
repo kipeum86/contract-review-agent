@@ -1,0 +1,18 @@
+{
+  "clause_id": "clause-007",
+  "section_no": "제7조",
+  "heading": "재위탁 제한",
+  "header": "(재위탁 제한)",
+  "start_line": 21,
+  "end_line": 22,
+  "clause_type": "subcontracting",
+  "text": "수탁인은 위탁인의 사전 서면동의 없이 본 계약상 핵심 업무를 제3자에게 재위탁할 수 없다.",
+  "defined_terms_used": [
+    "수탁인",
+    "위탁인",
+    "업무"
+  ],
+  "cross_refs": [],
+  "paragraph_count": 1,
+  "char_count": 50
+}

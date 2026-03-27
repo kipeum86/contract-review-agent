@@ -4,7 +4,7 @@ Document normalization: Convert DOCX/PDF/HTML/TXT/MD to clean.md and plain.txt.
 
 Conversion strategies:
   - DOCX: unzip and parse document.xml, preserving headings, lists, and tables
-  - PDF: try pdftotext; fallback to basic text extraction
+  - PDF: try pdftotext; fallback to basic text extraction, and flag OCR-only PDFs
   - MD: copy as-is for clean.md, strip markdown for plain.txt
   - TXT: copy as-is for plain.txt, wrap in markdown for clean.md
   - HTML: strip tags, preserve structure
@@ -18,7 +18,6 @@ import zipfile
 import html
 import subprocess
 import xml.etree.ElementTree as ET
-from datetime import datetime, timezone
 
 # OOXML namespaces
 NSMAP = {
@@ -128,6 +127,72 @@ def _process_table(tbl_elem) -> list[str]:
     return ['', *lines, '']
 
 
+def analyze_pdf(file_path: str) -> dict:
+    """Inspect whether a PDF appears text-based or image-only."""
+    analysis = {
+        'page_count': None,
+        'has_extractable_text': False,
+        'likely_image_only': False,
+        'analysis_engine': None,
+    }
+
+    try:
+        import fitz  # PyMuPDF
+        doc = fitz.open(file_path)
+        analysis['page_count'] = doc.page_count
+        pages_with_text = 0
+        pages_with_images = 0
+        for page in doc:
+            if page.get_text().strip():
+                pages_with_text += 1
+            if page.get_images(full=True):
+                pages_with_images += 1
+        doc.close()
+        analysis['has_extractable_text'] = pages_with_text > 0
+        analysis['likely_image_only'] = pages_with_text == 0 and pages_with_images > 0
+        analysis['analysis_engine'] = 'pymupdf'
+        return analysis
+    except ImportError:
+        pass
+    except Exception:
+        pass
+
+    try:
+        from pypdf import PdfReader
+        reader = PdfReader(file_path)
+        analysis['page_count'] = len(reader.pages)
+        pages_with_text = 0
+        pages_with_images = 0
+        for page in reader.pages:
+            if (page.extract_text() or '').strip():
+                pages_with_text += 1
+            resources = page.get('/Resources')
+            if resources and '/XObject' in resources:
+                xobjects = resources['/XObject'].get_object()
+                if any(
+                    getattr(obj.get_object(), 'get', lambda *_: None)('/Subtype') == '/Image'
+                    for obj in xobjects.values()
+                ):
+                    pages_with_images += 1
+        analysis['has_extractable_text'] = pages_with_text > 0
+        analysis['likely_image_only'] = pages_with_text == 0 and pages_with_images > 0
+        analysis['analysis_engine'] = 'pypdf'
+        return analysis
+    except ImportError:
+        pass
+    except Exception:
+        pass
+
+    try:
+        with open(file_path, 'rb') as f:
+            raw = f.read()
+        analysis['likely_image_only'] = b'/Image' in raw and b'/Font' not in raw
+        analysis['analysis_engine'] = 'byte_heuristic'
+        return analysis
+    except OSError:
+        return analysis
+
+
 def extract_pdf_text(file_path: str) -> str | None:
     """Extract text from PDF using pdftotext or fallback."""
     # Try pdftotext first
@@ -149,7 +214,9 @@ def extract_pdf_text(file_path: str) -> str | None:
         for page in doc:
             text_parts.append(page.get_text())
         doc.close()
-        return '\n'.join(text_parts)
+        text = '\n'.join(text_parts)
+        if text.strip():
+            return text
     except ImportError:
         pass
 
@@ -160,7 +227,9 @@ def extract_pdf_text(file_path: str) -> str | None:
         text_parts = []
         for page in reader.pages:
             text_parts.append(page.extract_text() or '')
-        return '\n'.join(text_parts)
+        text = '\n'.join(text_parts)
+        if text.strip():
+            return text
     except ImportError:
         pass
 
@@ -223,6 +292,8 @@ def normalize(file_path: str, output_dir: str) -> dict:
         'output_length': 0,
         'heading_count': 0,
         'success': False,
+        'needs_ocr': False,
+        'pdf_analysis': None,
         'error': None,
     }
 
@@ -245,10 +316,29 @@ def normalize(file_path: str, output_dir: str) -> dict:
             result['error'] = "Failed to extract text from DOCX"
             return result
 
+    elif ext == '.doc':
+        result['error'] = (
+            "Unsupported extension: .doc. Legacy Word binaries are not normalized in this "
+            "pipeline yet; convert the file to .docx first."
+        )
+        return result
+
     elif ext == '.pdf':
         raw_text = extract_pdf_text(file_path)
         if raw_text is None:
-            result['error'] = "Failed to extract text from PDF. Install pdftotext, pymupdf, or pypdf."
+            pdf_analysis = analyze_pdf(file_path)
+            result['pdf_analysis'] = pdf_analysis
+            if pdf_analysis.get('likely_image_only'):
+                result['needs_ocr'] = True
+                result['error'] = (
+                    "Failed to extract text from PDF. The file appears to be image-only or "
+                    "scanner-produced, so OCR is required before normalization."
+                )
+            else:
+                result['error'] = (
+                    "Failed to extract text from PDF. Install pdftotext, pymupdf, or pypdf, "
+                    "or OCR the source PDF if it contains only scanned images."
+                )
             return result
         md_text = raw_text
         plain_text = raw_text

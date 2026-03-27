@@ -1,0 +1,18 @@
+{
+  "clause_id": "clause-007",
+  "section_no": "제7조",
+  "heading": "전대 및 양도제한",
+  "header": "(전대 및 양도제한)",
+  "start_line": 21,
+  "end_line": 22,
+  "clause_type": "assignment",
+  "text": "임차인은 임대인의 사전 서면동의 없이 임대목적물을 제3자에게 전대하거나 본 계약상 지위를 양도할 수 없다.",
+  "defined_terms_used": [
+    "임차인",
+    "임대인",
+    "임대목적물"
+  ],
+  "cross_refs": [],
+  "paragraph_count": 1,
+  "char_count": 59
+}

@@ -1,0 +1,18 @@
+{
+  "clause_id": "clause-005",
+  "section_no": "제5조",
+  "heading": "침해사고 통지",
+  "header": "(침해사고 통지)",
+  "start_line": 15,
+  "end_line": 16,
+  "clause_type": "data_breach_notification",
+  "text": "수탁자는 개인정보 유출, 분실, 훼손 또는 무단 접근 사실을 인지한 경우 지체 없이 위탁자에게 통지하고, 원인분석 및 대응조치에 협력한다.",
+  "defined_terms_used": [
+    "수탁자",
+    "위탁자",
+    "개인정보"
+  ],
+  "cross_refs": [],
+  "paragraph_count": 1,
+  "char_count": 77
+}

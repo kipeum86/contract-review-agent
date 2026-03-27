@@ -1,0 +1,17 @@
+{
+  "clause_id": "clause-010",
+  "section_no": "제10조",
+  "heading": "독점",
+  "header": "(독점)",
+  "start_line": 30,
+  "end_line": 31,
+  "clause_type": "exclusivity",
+  "text": "크리에이터는 캠페인 기간 및 종료 후 30일 동안 광고주와 경쟁하는 동일 카테고리 브랜드의 광고를 수행하지 아니한다. 다만 서면 승인된 경우는 예외로 한다.",
+  "defined_terms_used": [
+    "크리에이터",
+    "광고주"
+  ],
+  "cross_refs": [],
+  "paragraph_count": 1,
+  "char_count": 87
+}

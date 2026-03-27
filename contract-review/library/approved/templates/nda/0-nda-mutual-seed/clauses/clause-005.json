@@ -1,0 +1,14 @@
+{
+  "clause_id": "clause-005",
+  "section_no": "제5조",
+  "heading": "비밀유지기간",
+  "header": "(비밀유지기간)",
+  "start_line": 15,
+  "end_line": 16,
+  "clause_type": "confidentiality_duration",
+  "text": "비밀유지의무는 계약 체결일로부터 시작되며 계약 종료 후 3년간 유효하다.",
+  "defined_terms_used": [],
+  "cross_refs": [],
+  "paragraph_count": 1,
+  "char_count": 40
+}

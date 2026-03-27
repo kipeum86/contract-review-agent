@@ -1,8 +1,20 @@
 {
   "clause_id": "clause-001",
+  "section_no": "제1조",
+  "heading": "이하 개별적으로 “당사자”, 통칭할 경우 “당사자들”",
   "header": "(이하 개별적으로 “당사자”, 통칭할 경우 “당사자들”)",
   "start_line": 38,
   "end_line": 53,
   "clause_type": "exhibits_schedules",
+  "text": "(이하 개별적으로 “당사자”, 통칭할 경우 “당사자들”)\n\n다 음\n\n[전환대상 지분의 할인율]\n\n| 할 인 율 | [  ]% |\n| --- | --- |\n\n\n[제3조에 따라 발행할 지분의 종류 및 내용]\n\n| □ 전환사채 | □ 발행 조건 부록 기재 |\n| --- | --- |",
+  "defined_terms_used": [
+    "당사자",
+    "당사자들"
+  ],
+  "cross_refs": [
+    "제3조",
+    "부록"
+  ],
+  "paragraph_count": 6,
   "char_count": 155
 }

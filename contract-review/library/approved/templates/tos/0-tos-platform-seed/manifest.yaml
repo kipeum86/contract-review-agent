@@ -1,0 +1,36 @@
+doc_id: 0-tos-platform-seed
+title: 서비스 이용약관
+title_en: Platform Terms of Service
+doc_class: template
+paper_role: neutral
+jurisdiction: KR
+governing_law: 대한민국 법률 (Korean law)
+language: ko
+approval_state: approved
+status: active
+classification_confidence: high
+authority_level: acceptable
+external_safe: false
+freshness_sensitive: false
+contract_family: tos
+subtype: platform_tos
+sha256: a2b3f8d9aab3353d843c92e7cc52a67f15ffc671eb76f29b44738eb4335e88f2
+source_file: session-i-seed-platform-tos.md
+created_at: '2026-03-27T18:15:00+00:00'
+updated_at: '2026-03-27T18:15:00+00:00'
+tags:
+- seed-baseline
+- synthetic-seed
+- session-i
+- kr-law
+- tos
+notes: Synthetic interim baseline seed package for a zero-coverage family; internal
+  sanity review applied, domain expert calibration pending.
+industry: online-platform
+stats:
+  total_clauses: 13
+  unmapped_clauses: 0
+  unmapped_ratio: 0.0
+  defined_terms: 4
+  sections: 13
+  exhibits: 0

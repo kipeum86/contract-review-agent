@@ -1,0 +1,17 @@
+{
+  "clause_id": "clause-008",
+  "section_no": "제8조",
+  "heading": "종결 전 의무",
+  "header": "(종결 전 의무)",
+  "start_line": 24,
+  "end_line": 25,
+  "clause_type": "covenants_pre_closing",
+  "text": "양도인은 종결 전까지 대상사업을 통상적으로 운영하고, 양수인의 사전 동의 없이 핵심 자산 처분, 중요 계약 해지 또는 비정상적 비용 지출을 하지 아니한다.",
+  "defined_terms_used": [
+    "양도인",
+    "대상사업"
+  ],
+  "cross_refs": [],
+  "paragraph_count": 1,
+  "char_count": 86
+}

@@ -1,1 +1,66 @@
-[]
+[
+  {
+    "term": "본 계약(서)",
+    "first_line": 24
+  },
+  {
+    "term": "본 계약 체결일",
+    "first_line": 24
+  },
+  {
+    "term": "투자자1",
+    "first_line": 26
+  },
+  {
+    "term": "투자자2",
+    "first_line": 30
+  },
+  {
+    "term": "회사",
+    "first_line": 35
+  },
+  {
+    "term": "이해관계인",
+    "first_line": 39
+  },
+  {
+    "term": "당사자",
+    "first_line": 43
+  },
+  {
+    "term": "투자자",
+    "first_line": 43
+  },
+  {
+    "term": "당사자들",
+    "first_line": 43
+  },
+  {
+    "term": "본건 신주",
+    "first_line": 49
+  },
+  {
+    "term": "거래완결일",
+    "first_line": 81
+  },
+  {
+    "term": "본건 종류주식",
+    "first_line": 184
+  },
+  {
+    "term": "전환비율",
+    "first_line": 218
+  },
+  {
+    "term": "전환가액",
+    "first_line": 218
+  },
+  {
+    "term": "수권주식",
+    "first_line": 224
+  },
+  {
+    "term": "관계회사",
+    "first_line": 322
+  }
+]

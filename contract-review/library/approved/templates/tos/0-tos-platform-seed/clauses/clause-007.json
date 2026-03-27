@@ -1,0 +1,18 @@
+{
+  "clause_id": "clause-007",
+  "section_no": "제7조",
+  "heading": "게시물 이용허락",
+  "header": "(게시물 이용허락)",
+  "start_line": 21,
+  "end_line": 22,
+  "clause_type": "grant_of_rights",
+  "text": "회원이 서비스에 게시한 게시물에 대하여 회원은 저작권을 보유하며, 회사는 서비스 운영, 전시, 백업 및 고객지원 목적 범위 내에서 비독점적으로 이를 이용할 수 있다.",
+  "defined_terms_used": [
+    "회원",
+    "게시물",
+    "서비스"
+  ],
+  "cross_refs": [],
+  "paragraph_count": 1,
+  "char_count": 92
+}

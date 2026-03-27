@@ -1,8 +1,16 @@
 {
   "clause_id": "clause-015",
-  "header": "부록.",
+  "section_no": "부록",
+  "heading": "부록",
+  "header": "부록",
   "start_line": 170,
   "end_line": 176,
   "clause_type": "exhibits_schedules",
+  "text": "부록.\n\n\n전환사채 발행조건\n\n[상술(예시)]",
+  "defined_terms_used": [],
+  "cross_refs": [
+    "부록."
+  ],
+  "paragraph_count": 3,
   "char_count": 25
 }

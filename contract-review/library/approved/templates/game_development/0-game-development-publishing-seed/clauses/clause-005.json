@@ -1,0 +1,18 @@
+{
+  "clause_id": "clause-005",
+  "section_no": "제5조",
+  "heading": "크리에이티브 승인",
+  "header": "(크리에이티브 승인)",
+  "start_line": 15,
+  "end_line": 16,
+  "clause_type": "creative_control",
+  "text": "퍼블리셔는 게임의 상업적 출시 가능성과 플랫폼 적합성을 위하여 합리적인 승인권을 갖되, 핵심 게임성의 본질적 변경은 개발사와 협의하여 결정한다.",
+  "defined_terms_used": [
+    "퍼블리셔",
+    "개발사",
+    "게임"
+  ],
+  "cross_refs": [],
+  "paragraph_count": 1,
+  "char_count": 80
+}

@@ -1,0 +1,38 @@
+doc_id: 0-marketing-influencer-seed
+title: 인플루언서 마케팅계약서
+title_en: Influencer Marketing Agreement
+doc_class: template
+paper_role: neutral
+jurisdiction: KR
+governing_law: 대한민국 법률 (Korean law)
+language: ko
+approval_state: approved
+status: active
+classification_confidence: high
+authority_level: acceptable
+external_safe: false
+freshness_sensitive: false
+contract_family: marketing
+subtype: influencer
+sha256: 1b1a2d5ec037064284150bdff1b7f50a90ac1f45545c752afb67f5bf813bd1c3
+source_file: session-j-seed-influencer-marketing.md
+created_at: '2026-03-27T19:20:00+00:00'
+updated_at: '2026-03-27T19:20:00+00:00'
+tags:
+- seed-baseline
+- synthetic-seed
+- session-j
+- kr-law
+- marketing
+- advertising-law-informed
+notes: Synthetic interim baseline seed package for a zero-coverage family; internal
+  sanity review applied, domain expert calibration pending. Drafted against Korean
+  advertising-disclosure baselines.
+industry: marketing
+stats:
+  total_clauses: 12
+  unmapped_clauses: 0
+  unmapped_ratio: 0.0
+  defined_terms: 3
+  sections: 12
+  exhibits: 0

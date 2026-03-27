@@ -1,7 +1,9 @@
 #!/usr/bin/env node
 /**
  * Compile analysis results into a DOCX report.
- * Generates: Executive Summary (1 page) + Full per-clause analysis.
+ *
+ * - Generic renderer: Executive Summary + per-clause analysis
+ * - Korean renderer: Memorandum-style opinion aligned to the local style guide
  *
  * Usage: node compile-report.js <review_data.json> <output.docx>
  */
@@ -9,12 +11,23 @@
 const fs = require('fs');
 const path = require('path');
 const {
-  Document, Packer, Paragraph, TextRun, HeadingLevel,
-  AlignmentType, BorderStyle, Table, TableRow, TableCell,
-  WidthType, ShadingType, PageBreak
+  Document,
+  Packer,
+  Paragraph,
+  TextRun,
+  HeadingLevel,
+  AlignmentType,
+  BorderStyle,
+  Table,
+  TableRow,
+  TableCell,
+  WidthType,
+  ShadingType,
+  PageBreak,
+  convertMillimetersToTwip,
+  PageOrientation,
 } = require('docx');
 
-// Risk level colors
 const RISK_COLORS = {
   critical: 'CC0000',
   high: 'FF6600',
@@ -31,13 +44,127 @@ const RISK_LABELS = {
   acceptable: 'ACCEPTABLE',
 };
 
+const KOREAN_RISK_LABELS = {
+  critical: '매우 높음',
+  high: '높음',
+  medium: '보통',
+  low: '낮음',
+  acceptable: '수용 가능',
+};
+
+const LATIN_FONT = 'Times New Roman';
+const CJK_FONT = 'Malgun Gothic';
+const DEFAULT_FONT = {
+  ascii: LATIN_FONT,
+  hAnsi: LATIN_FONT,
+  eastAsia: CJK_FONT,
+};
+const DEFAULT_TEXT_COLOR = '000000';
+const DEFAULT_FONT_SIZE = 22; // 11pt in half-points
+const DEFAULT_PARAGRAPH_SPACING = {
+  line: 276, // 1.15
+  after: 120, // 6pt
+};
+const A4_PAGE_SIZE = {
+  width: convertMillimetersToTwip(210),
+  height: convertMillimetersToTwip(297),
+  orientation: PageOrientation.PORTRAIT,
+};
+const PAGE_MARGINS = {
+  top: 1440,
+  right: 1440,
+  bottom: 1440,
+  left: 1440,
+};
+
+
+function containsHangul(value) {
+  return /[\u3131-\uD79D]/.test(value || '');
+}
+
+function firstNonEmpty(...values) {
+  for (const value of values) {
+    if (typeof value === 'string' && value.trim()) {
+      return value.trim();
+    }
+  }
+  return '';
+}
+
+function normalizeList(value) {
+  if (!value) {
+    return [];
+  }
+  if (Array.isArray(value)) {
+    return value.flatMap((item) => normalizeList(item));
+  }
+  if (typeof value === 'string') {
+    const trimmed = value.trim();
+    return trimmed ? [trimmed] : [];
+  }
+  if (typeof value === 'object') {
+    return Object.values(value).flatMap((item) => normalizeList(item));
+  }
+  return [];
+}
+
+function resolveReportLanguage(data) {
+  const explicitLanguage = firstNonEmpty(
+    data.report_language,
+    data.language,
+    data.contract_info?.language,
+    data.memo_metadata?.language,
+  ).toLowerCase();
+
+  if (explicitLanguage.startsWith('ko')) {
+    return 'ko';
+  }
+  if (explicitLanguage.startsWith('en')) {
+    return 'en';
+  }
+
+  const samples = [
+    data.contract_info?.title,
+    data.executive_summary?.recommendation,
+    ...(data.executive_summary?.key_issues || []),
+  ].filter(Boolean);
+
+  return samples.some(containsHangul) ? 'ko' : 'en';
+}
+
+function styledRun(text, options = {}) {
+  return new TextRun({
+    text,
+    bold: options.bold ?? false,
+    color: options.color ?? DEFAULT_TEXT_COLOR,
+    size: options.size ?? DEFAULT_FONT_SIZE,
+    font: options.font ?? DEFAULT_FONT,
+    break: options.break,
+  });
+}
+
+function createParagraph(children, options = {}) {
+  return new Paragraph({
+    children: Array.isArray(children) ? children : [children],
+    alignment: options.alignment,
+    heading: options.heading,
+    indent: options.indent,
+    shading: options.shading,
+    border: options.border,
+    spacing: {
+      ...DEFAULT_PARAGRAPH_SPACING,
+      ...(options.spacing || {}),
+    },
+  });
+}
+
 function createRiskBadge(riskLevel) {
   const color = RISK_COLORS[riskLevel] || '666666';
-  const label = RISK_LABELS[riskLevel] || riskLevel.toUpperCase();
+  const label = RISK_LABELS[riskLevel] || (riskLevel || 'UNKNOWN').toUpperCase();
   return new TextRun({
     text: ` [${label}] `,
     bold: true,
-    color: color,
+    color,
     size: 20,
   });
 }
@@ -47,121 +174,93 @@ function createExecutiveSummary(data) {
   const summary = data.executive_summary || {};
 
   sections.push(
-    new Paragraph({
+    createParagraph([styledRun('Executive Summary', { bold: true })], {
       heading: HeadingLevel.HEADING_1,
-      children: [new TextRun({ text: 'Executive Summary', bold: true })],
-    })
+    }),
   );
 
-  // Overall risk profile
   const overallRisk = summary.overall_risk || 'Not assessed';
   sections.push(
-    new Paragraph({
-      spacing: { before: 200, after: 100 },
-      children: [
-        new TextRun({ text: 'Overall Risk Profile: ', bold: true, size: 24 }),
+    createParagraph(
+      [
+        styledRun('Overall Risk Profile: ', { bold: true, size: 24 }),
         createRiskBadge(overallRisk.toLowerCase()),
       ],
-    })
+      { spacing: { before: 200, after: 100 } },
+    ),
   );
 
-  // Review mode
   if (data.review_mode) {
     sections.push(
-      new Paragraph({
-        children: [
-          new TextRun({ text: 'Review Mode: ', bold: true }),
-          new TextRun({ text: data.review_mode }),
-        ],
-      })
+      createParagraph([
+        styledRun('Review Mode: ', { bold: true }),
+        styledRun(data.review_mode),
+      ]),
     );
   }
 
-  // Contract info
   if (data.contract_info) {
     const info = data.contract_info;
     sections.push(
-      new Paragraph({
-        spacing: { before: 200 },
-        children: [
-          new TextRun({ text: 'Contract: ', bold: true }),
-          new TextRun({ text: info.title || 'Untitled' }),
-        ],
-      })
+      createParagraph(
+        [styledRun('Contract: ', { bold: true }), styledRun(info.title || 'Untitled')],
+        { spacing: { before: 200 } },
+      ),
     );
+
     if (info.contract_family) {
       sections.push(
-        new Paragraph({
-          children: [
-            new TextRun({ text: 'Type: ', bold: true }),
-            new TextRun({ text: info.contract_family }),
-          ],
-        })
+        createParagraph([
+          styledRun('Type: ', { bold: true }),
+          styledRun(info.contract_family),
+        ]),
       );
     }
   }
 
-  // Key issues
   const keyIssues = summary.key_issues || [];
   if (keyIssues.length > 0) {
     sections.push(
-      new Paragraph({
+      createParagraph([styledRun('Key Issues', { bold: true })], {
         heading: HeadingLevel.HEADING_2,
         spacing: { before: 300 },
-        children: [new TextRun({ text: 'Key Issues', bold: true })],
-      })
+      }),
     );
     for (const issue of keyIssues) {
-      sections.push(
-        new Paragraph({
-          bullet: { level: 0 },
-          children: [new TextRun({ text: issue })],
-        })
-      );
+      sections.push(new Paragraph({
+        bullet: { level: 0 },
+        spacing: DEFAULT_PARAGRAPH_SPACING,
+        children: [styledRun(issue)],
+      }));
     }
   }
 
-  // Recommendation
   if (summary.recommendation) {
     sections.push(
-      new Paragraph({
+      createParagraph([styledRun('Recommendation', { bold: true })], {
         heading: HeadingLevel.HEADING_2,
         spacing: { before: 300 },
-        children: [new TextRun({ text: 'Recommendation', bold: true })],
-      })
+      }),
     );
-    sections.push(
-      new Paragraph({
-        children: [new TextRun({ text: summary.recommendation })],
-      })
-    );
+    sections.push(createParagraph([styledRun(summary.recommendation)]));
   }
 
-  // Risk distribution
   const stats = summary.risk_distribution || {};
   if (Object.keys(stats).length > 0) {
     sections.push(
-      new Paragraph({
+      createParagraph([styledRun('Risk Distribution', { bold: true })], {
         heading: HeadingLevel.HEADING_2,
         spacing: { before: 300 },
-        children: [new TextRun({ text: 'Risk Distribution', bold: true })],
-      })
+      }),
     );
     for (const [level, count] of Object.entries(stats)) {
       sections.push(
-        new Paragraph({
-          children: [
-            createRiskBadge(level),
-            new TextRun({ text: `: ${count} clause(s)` }),
-          ],
-        })
+        createParagraph([createRiskBadge(level), styledRun(`: ${count} clause(s)`)]),
       );
     }
   }
 
-  // Page break after executive summary
   sections.push(new Paragraph({ children: [new PageBreak()] }));
-
   return sections;
 }
 
@@ -169,117 +268,76 @@ function createClauseAnalysis(clauses) {
   const sections = [];
 
   sections.push(
-    new Paragraph({
+    createParagraph([styledRun('Per-Clause Analysis', { bold: true })], {
       heading: HeadingLevel.HEADING_1,
-      children: [new TextRun({ text: 'Per-Clause Analysis', bold: true })],
-    })
+    }),
   );
 
   for (const clause of clauses) {
-    // Clause heading
     const heading = clause.heading || clause.clause_type || 'Unnamed Clause';
     const sectionNo = clause.section_no ? `${clause.section_no} ` : '';
 
     sections.push(
-      new Paragraph({
-        heading: HeadingLevel.HEADING_2,
-        spacing: { before: 400 },
-        children: [
-          new TextRun({ text: `${sectionNo}${heading}` }),
-          new TextRun({ text: '  ' }),
+      createParagraph(
+        [
+          styledRun(`${sectionNo}${heading}`),
+          styledRun('  '),
           createRiskBadge(clause.risk_level || 'acceptable'),
         ],
-      })
+        {
+          heading: HeadingLevel.HEADING_2,
+          spacing: { before: 400 },
+        },
+      ),
     );
 
-    // Clause type
     if (clause.clause_type) {
       sections.push(
-        new Paragraph({
-          children: [
-            new TextRun({ text: 'Clause Type: ', bold: true, size: 20, color: '666666' }),
-            new TextRun({ text: clause.clause_type, size: 20, color: '666666' }),
-          ],
-        })
+        createParagraph([
+          styledRun('Clause Type: ', { bold: true, size: 20, color: '666666' }),
+          styledRun(clause.clause_type, { size: 20, color: '666666' }),
+        ]),
       );
     }
 
-    // Risk assessment
     if (clause.risk_rationale) {
-      sections.push(
-        new Paragraph({
-          spacing: { before: 100 },
-          children: [
-            new TextRun({ text: 'Risk Assessment: ', bold: true }),
-          ],
-        })
-      );
-      sections.push(
-        new Paragraph({
-          children: [new TextRun({ text: clause.risk_rationale })],
-        })
-      );
+      sections.push(createParagraph([styledRun('Risk Assessment: ', { bold: true })], { spacing: { before: 100 } }));
+      sections.push(createParagraph([styledRun(clause.risk_rationale)]));
     }
 
-    // Divergence from house position
     if (clause.divergence) {
-      sections.push(
-        new Paragraph({
-          spacing: { before: 100 },
-          children: [
-            new TextRun({ text: 'Divergence: ', bold: true }),
-          ],
-        })
-      );
-      sections.push(
-        new Paragraph({
-          children: [new TextRun({ text: clause.divergence })],
-        })
-      );
+      sections.push(createParagraph([styledRun('Divergence: ', { bold: true })], { spacing: { before: 100 } }));
+      sections.push(createParagraph([styledRun(clause.divergence)]));
     }
 
-    // Playbook tier
     if (clause.playbook_tier) {
+      const tierText = clause.playbook_missing
+        ? `${clause.playbook_tier} (playbook missing)`
+        : clause.playbook_tier;
       sections.push(
-        new Paragraph({
-          children: [
-            new TextRun({ text: 'Playbook Tier: ', bold: true }),
-            new TextRun({ text: clause.playbook_tier }),
-            clause.playbook_missing ? new TextRun({ text: ' (playbook missing)', italics: true, color: 'FF6600' }) : new TextRun({ text: '' }),
-          ],
-        })
+        createParagraph([
+          styledRun('Playbook Tier: ', { bold: true }),
+          styledRun(tierText),
+        ]),
       );
     }
 
-    // Suggested redline
     if (clause.suggested_redline) {
+      sections.push(createParagraph([styledRun('Suggested Redline:', { bold: true })], { spacing: { before: 100 } }));
       sections.push(
-        new Paragraph({
-          spacing: { before: 100 },
-          children: [
-            new TextRun({ text: 'Suggested Redline:', bold: true }),
-          ],
-        })
-      );
-      sections.push(
-        new Paragraph({
+        createParagraph([styledRun(clause.suggested_redline)], {
           indent: { left: 400 },
           shading: { type: ShadingType.CLEAR, fill: 'F5F5F5' },
-          children: [new TextRun({ text: clause.suggested_redline, italics: true })],
-        })
+        }),
       );
     }
 
-    // Internal note
     if (clause.internal_note) {
       sections.push(
-        new Paragraph({
-          spacing: { before: 100 },
-          children: [
-            new TextRun({ text: '[INTERNAL] ', bold: true, color: '0066CC' }),
-            new TextRun({ text: clause.internal_note }),
-          ],
-        })
+        createParagraph([
+          styledRun('[INTERNAL] ', { bold: true, color: '0066CC' }),
+          styledRun(clause.internal_note),
+        ], { spacing: { before: 100 } }),
       );
     }
   }
@@ -287,46 +345,364 @@ function createClauseAnalysis(clauses) {
   return sections;
 }
 
-async function compileReport(inputPath, outputPath) {
-  const rawData = fs.readFileSync(inputPath, 'utf-8');
-  const data = JSON.parse(rawData);
+function formatKoreanDate(rawValue) {
+  if (!rawValue) {
+    return formatKoreanDate(new Date());
+  }
+  if (rawValue instanceof Date) {
+    return `${rawValue.getFullYear()}. ${rawValue.getMonth() + 1}. ${rawValue.getDate()}.`;
+  }
 
+  const parsed = new Date(rawValue);
+  if (!Number.isNaN(parsed.getTime())) {
+    return formatKoreanDate(parsed);
+  }
+
+  return String(rawValue);
+}
+
+function koreanLetter(index) {
+  const letters = ['가', '나', '다', '라', '마', '바', '사', '아', '자', '차', '카', '타', '파', '하'];
+  return letters[index] || `${index + 1}`;
+}
+
+function koreanRiskLabel(level) {
+  return KOREAN_RISK_LABELS[(level || '').toLowerCase()] || '검토 필요';
+}
+
+function resolveMemoMetadata(data) {
+  const meta = data.memo_metadata || {};
+  const contractInfo = data.contract_info || {};
+
+  return {
+    date: formatKoreanDate(meta.date || data.report_date || contractInfo.date),
+    recipient: firstNonEmpty(meta.recipient, contractInfo.client_name, contractInfo.recipient, '의뢰인 귀중'),
+    reference: firstNonEmpty(meta.reference, contractInfo.reference),
+    sender: firstNonEmpty(meta.sender, contractInfo.sender, '법무법인 [작성 주체 확인 필요]'),
+    subject: firstNonEmpty(
+      meta.subject,
+      contractInfo.subject,
+      contractInfo.title ? `${contractInfo.title} 관련 법률 검토 의견서` : '',
+      '계약 검토 의견서',
+    ),
+    signer: firstNonEmpty(meta.signer, contractInfo.signer, '[담당자 확인 필요]'),
+  };
+}
+
+function createInfoBlockTable(metadata) {
+  const rows = [
+    ['수 신', metadata.recipient],
+    metadata.reference ? ['참 조', metadata.reference] : null,
+    ['발 신', metadata.sender],
+    ['제 목', metadata.subject],
+  ].filter(Boolean);
+
+  return new Table({
+    width: { size: 100, type: WidthType.PERCENTAGE },
+    rows: rows.map(([label, value]) => new TableRow({
+      children: [
+        new TableCell({
+          width: { size: 1800, type: WidthType.DXA },
+          children: [
+            createParagraph([styledRun(`${label} :`, { bold: true })], {
+              spacing: { after: 60, before: 0, line: 240 },
+            }),
+          ],
+        }),
+        new TableCell({
+          width: { size: 7200, type: WidthType.DXA },
+          children: [
+            createParagraph([styledRun(value)], {
+              spacing: { after: 60, before: 0, line: 240 },
+            }),
+          ],
+        }),
+      ],
+    })),
+    borders: {
+      top: { style: BorderStyle.SINGLE, size: 4, color: '000000' },
+      bottom: { style: BorderStyle.SINGLE, size: 4, color: '000000' },
+      left: { style: BorderStyle.SINGLE, size: 4, color: '000000' },
+      right: { style: BorderStyle.SINGLE, size: 4, color: '000000' },
+      insideHorizontal: { style: BorderStyle.SINGLE, size: 2, color: '000000' },
+      insideVertical: { style: BorderStyle.SINGLE, size: 2, color: '000000' },
+    },
+  });
+}
+
+function createMemoSectionTitle(text) {
+  return createParagraph([styledRun(text, { bold: true })], {
+    spacing: { before: 240, after: 120 },
+  });
+}
+
+function createMemoBodyParagraph(text, options = {}) {
+  return createParagraph([styledRun(text)], options);
+}
+
+function createMemoLabelValueParagraph(label, value) {
+  return createParagraph([
+    styledRun(`${label} `, { bold: true }),
+    styledRun(value),
+  ]);
+}
+
+function resolveBackgroundFacts(data) {
+  const facts = normalizeList(
+    data.background_facts
+    || data.memo_metadata?.background_facts
+    || data.contract_info?.background_facts,
+  );
+
+  if (facts.length > 0) {
+    return facts;
+  }
+
+  const fallback = firstNonEmpty(
+    data.contract_info?.title && `본 의견서는 ${data.contract_info.title}에 대한 검토를 전제로 작성되었습니다.`,
+    data.general_review_mode && '본 검토는 라이브러리 비교 근거 없이 일반 계약 검토 모드로 수행되었습니다.',
+  );
+
+  return fallback ? [fallback] : ['검토의 전제가 되는 배경 사실은 제공된 계약서 및 입력 정보에 한정됩니다.'];
+}
+
+function resolveQuestionsPresented(data) {
+  const questions = normalizeList(
+    data.questions_presented
+    || data.questions
+    || data.memo_metadata?.questions_presented
+    || data.executive_summary?.key_issues,
+  );
+
+  if (questions.length > 0) {
+    return questions;
+  }
+
+  return ['본 계약의 주요 위험 요소와 수정 필요 사항'];
+}
+
+function resolveLimitationsDisclaimer(data) {
+  return firstNonEmpty(
+    data.limitations_disclaimer,
+    data.memo_metadata?.limitations_disclaimer,
+    '아래 의견은 귀사가 제공한 자료 및 정보만을 전제로 귀사가 문의한 사항에 국한된 법률검토임을 말씀드립니다. 제공된 자료 및 정보 이외에 다른 특별한 사정이 있는 경우 그 법률적 판단이 달라질 수 있습니다.',
+  );
+}
+
+function resolveConclusionText(data) {
+  const summary = data.executive_summary || {};
+  return firstNonEmpty(
+    summary.recommendation,
+    data.conclusion,
+    (() => {
+      const level = (summary.overall_risk || '').toLowerCase();
+      if (level === 'critical' || level === 'high') {
+        return '검토 결과, 본 계약은 중요한 위험 조항이 포함되어 있어 주요 조항의 수정 및 협의가 필요할 것으로 사료됩니다.';
+      }
+      if (level === 'medium') {
+        return '검토 결과, 본 계약은 일부 유의가 필요한 조항이 존재하므로 핵심 쟁점 위주로 수정 여부를 검토할 필요가 있습니다.';
+      }
+      return '검토 결과, 본 계약은 전반적으로 수용 가능한 범위에 있으나 구체적 사실관계에 따라 추가 확인이 필요할 수 있습니다.';
+    })(),
+  );
+}
+
+function resolveClosingDisclaimer(data) {
+  return firstNonEmpty(
+    data.closing_disclaimer,
+    data.memo_metadata?.closing_disclaimer,
+    '이상은 제공된 자료와 현 시점의 법령 및 통상적 해석을 기초로 한 의견이며, 추가 사실관계 또는 관련 법령의 변경이 있는 경우 결론이 달라질 수 있습니다.',
+  );
+}
+
+function createMemoCallout(text) {
+  return createParagraph([styledRun(text, { bold: true })], {
+    border: {
+      top: { style: BorderStyle.SINGLE, size: 4, color: '000000' },
+      bottom: { style: BorderStyle.SINGLE, size: 4, color: '000000' },
+      left: { style: BorderStyle.SINGLE, size: 4, color: '000000' },
+      right: { style: BorderStyle.SINGLE, size: 4, color: '000000' },
+    },
+    spacing: { before: 120, after: 120 },
+  });
+}
+
+function createKoreanClauseAnalysis(clauses) {
+  const sections = [];
+
+  if (!clauses.length) {
+    sections.push(createMemoBodyParagraph('검토 대상 조항 정보가 별도로 제공되지 않았습니다.'));
+    return sections;
+  }
+
+  clauses.forEach((clause, index) => {
+    const heading = clause.heading || clause.clause_type || `쟁점 ${index + 1}`;
+    const sectionNo = clause.section_no ? `${clause.section_no} ` : '';
+
+    sections.push(
+      createParagraph(
+        [styledRun(`${koreanLetter(index)}. ${sectionNo}${heading}`, { bold: true })],
+        { spacing: { before: 240, after: 80 } },
+      ),
+    );
+
+    sections.push(
+      createMemoLabelValueParagraph('위험도:', koreanRiskLabel(clause.risk_level || 'acceptable')),
+    );
+
+    if (clause.clause_type) {
+      sections.push(createMemoLabelValueParagraph('조항 유형:', clause.clause_type));
+    }
+
+    if (clause.risk_rationale) {
+      sections.push(createMemoLabelValueParagraph('검토 의견:', clause.risk_rationale));
+    }
+
+    if (clause.divergence) {
+      sections.push(createMemoLabelValueParagraph('기준 대비 차이:', clause.divergence));
+    }
+
+    if (clause.playbook_tier) {
+      const tierText = clause.playbook_missing
+        ? `${clause.playbook_tier} (playbook 부재)`
+        : clause.playbook_tier;
+      sections.push(createMemoLabelValueParagraph('검토 기준 등급:', tierText));
+    }
+
+    if (clause.suggested_redline) {
+      sections.push(createParagraph([styledRun('권고 수정 문안', { bold: true })], { spacing: { before: 100, after: 60 } }));
+      sections.push(
+        createParagraph([styledRun(clause.suggested_redline)], {
+          border: {
+            top: { style: BorderStyle.SINGLE, size: 2, color: '000000' },
+            bottom: { style: BorderStyle.SINGLE, size: 2, color: '000000' },
+            left: { style: BorderStyle.SINGLE, size: 2, color: '000000' },
+            right: { style: BorderStyle.SINGLE, size: 2, color: '000000' },
+          },
+          spacing: { before: 60, after: 120 },
+        }),
+      );
+    }
+
+    if (clause.internal_note) {
+      sections.push(createMemoLabelValueParagraph('내부 검토 메모:', clause.internal_note));
+    }
+  });
+
+  return sections;
+}
+
+function createKoreanMemorandum(data) {
+  const sections = [];
+  const metadata = resolveMemoMetadata(data);
+  const backgroundFacts = resolveBackgroundFacts(data);
+  const questions = resolveQuestionsPresented(data);
   const clauses = data.clauses || data.analysis || [];
+
+  sections.push(
+    createParagraph([styledRun('MEMORANDUM', { bold: true, size: 28 })], {
+      alignment: AlignmentType.CENTER,
+      spacing: { after: 120 },
+    }),
+  );
+  sections.push(
+    createParagraph([styledRun(metadata.date)], {
+      alignment: AlignmentType.CENTER,
+      spacing: { after: 180 },
+    }),
+  );
+  sections.push(createInfoBlockTable(metadata));
+
+  sections.push(createMemoSectionTitle('1. 질의의 배경'));
+  backgroundFacts.forEach((fact) => {
+    sections.push(
+      new Paragraph({
+        spacing: DEFAULT_PARAGRAPH_SPACING,
+        bullet: { level: 0 },
+        children: [styledRun(fact)],
+      }),
+    );
+  });
+
+  sections.push(createMemoSectionTitle('2. 질의 사항'));
+  questions.forEach((question, index) => {
+    sections.push(createMemoBodyParagraph(`${index + 1}. ${question}`));
+  });
+
+  sections.push(createMemoSectionTitle('3. 법률 의견의 한계'));
+  sections.push(createMemoBodyParagraph(resolveLimitationsDisclaimer(data)));
+
+  if (data.general_review_mode) {
+    sections.push(
+      createMemoCallout('본 의견서는 library-backed house position 비교 없이 일반 계약 검토 기준에 따라 작성되었습니다.'),
+    );
+  }
+
+  sections.push(createMemoSectionTitle('4. 검토의견'));
+  sections.push(...createKoreanClauseAnalysis(clauses));
+
+  sections.push(createMemoSectionTitle('5. 결론'));
+  sections.push(createMemoBodyParagraph(resolveConclusionText(data)));
+
+  sections.push(createParagraph([styledRun(resolveClosingDisclaimer(data))], {
+    spacing: { before: 240, after: 180 },
+  }));
+
+  sections.push(createParagraph([styledRun(metadata.sender, { bold: true })], {
+    alignment: AlignmentType.RIGHT,
+    spacing: { after: 60 },
+  }));
+  sections.push(createParagraph([styledRun(metadata.signer)], {
+    alignment: AlignmentType.RIGHT,
+  }));
+
+  return sections;
+}
+
+function buildChildren(data) {
+  const clauses = data.clauses || data.analysis || [];
+  if (resolveReportLanguage(data) === 'ko') {
+    return createKoreanMemorandum(data);
+  }
 
   const children = [
     ...createExecutiveSummary(data),
     ...createClauseAnalysis(clauses),
   ];
 
-  // General review mode notice
   if (data.general_review_mode) {
     children.unshift(
-      new Paragraph({
-        spacing: { before: 200, after: 200 },
-        shading: { type: ShadingType.CLEAR, fill: 'FFF3CD' },
-        children: [
-          new TextRun({
-            text: 'NOTICE: This report was produced in General Review Mode without library-backed house position comparison.',
-            bold: true,
-            color: '856404',
-          }),
-        ],
-      })
+      createParagraph(
+        [styledRun('NOTICE: This report was produced in General Review Mode without library-backed house position comparison.', {
+          bold: true,
+          color: '856404',
+        })],
+        {
+          spacing: { before: 200, after: 200 },
+          shading: { type: ShadingType.CLEAR, fill: 'FFF3CD' },
+        },
+      ),
     );
   }
 
+  return children;
+}
+
+async function compileReport(inputPath, outputPath) {
+  const rawData = fs.readFileSync(inputPath, 'utf-8');
+  const data = JSON.parse(rawData);
+  const children = buildChildren(data);
+
   const doc = new Document({
     creator: 'Contract Review Agent',
-    description: 'Contract Review Analysis Report',
+    description: resolveReportLanguage(data) === 'ko'
+      ? 'Korean Memorandum-Style Contract Review Report'
+      : 'Contract Review Analysis Report',
     sections: [{
       properties: {
         page: {
-          margin: {
-            top: 1440,    // 1 inch
-            right: 1440,
-            bottom: 1440,
-            left: 1440,
-          },
+          margin: PAGE_MARGINS,
+          size: A4_PAGE_SIZE,
         },
       },
       children,
@@ -340,18 +716,20 @@ async function compileReport(inputPath, outputPath) {
   }
   fs.writeFileSync(outputPath, buffer);
 
+  const clauses = data.clauses || data.analysis || [];
   return {
     success: true,
     output_path: outputPath,
     clauses_count: clauses.length,
     file_size: buffer.length,
+    report_language: resolveReportLanguage(data),
   };
 }
 
 async function main() {
   if (process.argv.length < 4) {
     console.log(JSON.stringify({
-      error: 'Usage: compile-report.js <review_data.json> <output.docx>'
+      error: 'Usage: compile-report.js <review_data.json> <output.docx>',
     }));
     process.exit(1);
   }
@@ -365,4 +743,12 @@ async function main() {
   }
 }
 
-main();
+if (require.main === module) {
+  main();
+}
+
+module.exports = {
+  compileReport,
+  buildChildren,
+  resolveReportLanguage,
+};

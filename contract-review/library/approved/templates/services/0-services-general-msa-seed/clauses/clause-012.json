@@ -1,0 +1,16 @@
+{
+  "clause_id": "clause-012",
+  "section_no": "제12조",
+  "heading": "책임한도",
+  "header": "(책임한도)",
+  "start_line": 36,
+  "end_line": 37,
+  "clause_type": "liability_cap",
+  "text": "각 당사자의 총 손해배상책임은 최근 12개월간 지급된 용역대금 총액을 한도로 한다. 다만 고의, 중과실, 비밀유지의무 위반은 제외한다.",
+  "defined_terms_used": [
+    "용역"
+  ],
+  "cross_refs": [],
+  "paragraph_count": 1,
+  "char_count": 75
+}

@@ -1,0 +1,17 @@
+{
+  "clause_id": "clause-007",
+  "section_no": "제7조",
+  "heading": "검수",
+  "header": "(검수)",
+  "start_line": 21,
+  "end_line": 22,
+  "clause_type": "acceptance",
+  "text": "발주인은 산출물 수령 후 7영업일 이내에 검수 결과를 통지하며, 통지가 없으면 검수 완료로 본다.",
+  "defined_terms_used": [
+    "발주인",
+    "산출물"
+  ],
+  "cross_refs": [],
+  "paragraph_count": 1,
+  "char_count": 54
+}

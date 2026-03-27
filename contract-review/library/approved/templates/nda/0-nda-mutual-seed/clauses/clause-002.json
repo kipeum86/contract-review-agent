@@ -1,0 +1,17 @@
+{
+  "clause_id": "clause-002",
+  "section_no": "제2조",
+  "heading": "정의",
+  "header": "(정의)",
+  "start_line": 6,
+  "end_line": 7,
+  "clause_type": "definitions",
+  "text": "\"비밀정보\"란 당사자 일방이 상대방에게 제공하는 기술상, 영업상, 재무상, 인사상 또는 기타 비공개 정보를 의미한다.",
+  "defined_terms_used": [
+    "당사자",
+    "비밀정보"
+  ],
+  "cross_refs": [],
+  "paragraph_count": 1,
+  "char_count": 65
+}

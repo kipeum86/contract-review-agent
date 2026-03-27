@@ -1,5 +1,81 @@
 [
   {
+    "term": "본 계약(서)",
+    "first_line": 24
+  },
+  {
+    "term": "본 계약 체결일",
+    "first_line": 24
+  },
+  {
+    "term": "투자자1",
+    "first_line": 26
+  },
+  {
+    "term": "투자자2",
+    "first_line": 30
+  },
+  {
+    "term": "회사",
+    "first_line": 35
+  },
+  {
+    "term": "이해관계인",
+    "first_line": 39
+  },
+  {
+    "term": "당사자",
+    "first_line": 43
+  },
+  {
+    "term": "투자자",
+    "first_line": 43
+  },
+  {
+    "term": "당사자들",
+    "first_line": 43
+  },
+  {
+    "term": "본건 전환사채",
+    "first_line": 51
+  },
+  {
+    "term": "거래완결일",
+    "first_line": 88
+  },
+  {
+    "term": "투자금",
+    "first_line": 104
+  },
+  {
+    "term": "지분",
+    "first_line": 157
+  },
+  {
+    "term": "우선매수권",
+    "first_line": 165
+  },
+  {
+    "term": "공동매도참여권",
+    "first_line": 165
+  },
+  {
+    "term": "본질가치",
+    "first_line": 193
+  },
+  {
+    "term": "제3자",
+    "first_line": 232
+  },
+  {
+    "term": "전문보육",
+    "first_line": 284
+  },
+  {
+    "term": "전환가액",
+    "first_line": 367
+  },
+  {
     "term": "기발행주식수",
     "first_line": 377
   },
@@ -8,11 +84,11 @@
     "first_line": 377
   },
   {
-    "term": "회사",
+    "term": "전환가격",
     "first_line": 377
   },
   {
-    "term": "전환가격",
-    "first_line": 377
+    "term": "경업금지의무자",
+    "first_line": 480
   }
 ]

@@ -1,0 +1,18 @@
+{
+  "clause_id": "clause-001",
+  "section_no": "제1조",
+  "heading": "목적",
+  "header": "(목적)",
+  "start_line": 3,
+  "end_line": 4,
+  "clause_type": "purpose",
+  "text": "본 계약은 라이선서가 제공하는 소프트웨어에 대한 최종사용자의 이용조건을 정함을 목적으로 한다.",
+  "defined_terms_used": [
+    "소프트웨어",
+    "사용자",
+    "라이선서"
+  ],
+  "cross_refs": [],
+  "paragraph_count": 1,
+  "char_count": 52
+}

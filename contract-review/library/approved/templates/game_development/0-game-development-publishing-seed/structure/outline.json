@@ -1,0 +1,86 @@
+[
+  {
+    "line": 3,
+    "level": 2,
+    "text": "목적",
+    "section": "art1"
+  },
+  {
+    "line": 6,
+    "level": 2,
+    "text": "개발 범위",
+    "section": "art2"
+  },
+  {
+    "line": 9,
+    "level": 2,
+    "text": "개발 마일스톤",
+    "section": "art3"
+  },
+  {
+    "line": 12,
+    "level": 2,
+    "text": "마일스톤 검수",
+    "section": "art4"
+  },
+  {
+    "line": 15,
+    "level": 2,
+    "text": "크리에이티브 승인",
+    "section": "art5"
+  },
+  {
+    "line": 18,
+    "level": 2,
+    "text": "플랫폼 요구사항",
+    "section": "art6"
+  },
+  {
+    "line": 21,
+    "level": 2,
+    "text": "지식재산권",
+    "section": "art7"
+  },
+  {
+    "line": 24,
+    "level": 2,
+    "text": "수익배분",
+    "section": "art8"
+  },
+  {
+    "line": 27,
+    "level": 2,
+    "text": "운영 및 라이브서비스",
+    "section": "art9"
+  },
+  {
+    "line": 30,
+    "level": 2,
+    "text": "소스코드 에스크로",
+    "section": "art10"
+  },
+  {
+    "line": 33,
+    "level": 2,
+    "text": "현지화",
+    "section": "art11"
+  },
+  {
+    "line": 36,
+    "level": 2,
+    "text": "이용자 데이터",
+    "section": "art12"
+  },
+  {
+    "line": 39,
+    "level": 2,
+    "text": "등급분류 및 규제준수",
+    "section": "art13"
+  },
+  {
+    "line": 42,
+    "level": 2,
+    "text": "해지",
+    "section": "art14"
+  }
+]

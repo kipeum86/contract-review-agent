@@ -1,0 +1,17 @@
+{
+  "clause_id": "clause-008",
+  "section_no": "제8조",
+  "heading": "정산자료 및 감사",
+  "header": "(정산자료 및 감사)",
+  "start_line": 24,
+  "end_line": 25,
+  "clause_type": "audit_rights",
+  "text": "배급사는 분기별 이용실적과 정산명세를 제공하며, 제작사는 연 1회 합리적인 범위 내에서 관련 장부를 감사할 수 있다.",
+  "defined_terms_used": [
+    "배급사",
+    "제작사"
+  ],
+  "cross_refs": [],
+  "paragraph_count": 1,
+  "char_count": 65
+}

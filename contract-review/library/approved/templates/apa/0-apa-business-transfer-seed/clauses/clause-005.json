@@ -1,0 +1,17 @@
+{
+  "clause_id": "clause-005",
+  "section_no": "제5조",
+  "heading": "선행조건",
+  "header": "(선행조건)",
+  "start_line": 15,
+  "end_line": 16,
+  "clause_type": "conditions_precedent",
+  "text": "거래종결은 필요한 주주총회 또는 이사회 승인, 주요 계약상 양도 동의, 인허가 이전 가능성 확인, 실사 결과 만족 및 종결서류 준비를 조건으로 한다.",
+  "defined_terms_used": [
+    "양도인",
+    "양수인"
+  ],
+  "cross_refs": [],
+  "paragraph_count": 1,
+  "char_count": 83
+}

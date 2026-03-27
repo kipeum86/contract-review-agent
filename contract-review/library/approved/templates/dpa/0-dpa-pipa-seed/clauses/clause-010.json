@@ -1,0 +1,18 @@
+{
+  "clause_id": "clause-010",
+  "section_no": "제10조",
+  "heading": "반환 및 삭제",
+  "header": "(반환 및 삭제)",
+  "start_line": 30,
+  "end_line": 31,
+  "clause_type": "data_retention",
+  "text": "수탁자는 위탁업무 종료 또는 계약 해지 시 위탁자의 선택에 따라 개인정보와 그 복제물을 반환하거나 복구 불가능한 방법으로 삭제하고 그 결과를 서면으로 확인한다.",
+  "defined_terms_used": [
+    "수탁자",
+    "위탁자",
+    "개인정보"
+  ],
+  "cross_refs": [],
+  "paragraph_count": 1,
+  "char_count": 89
+}

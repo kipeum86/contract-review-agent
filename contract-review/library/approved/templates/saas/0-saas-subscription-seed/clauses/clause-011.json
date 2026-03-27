@@ -1,0 +1,14 @@
+{
+  "clause_id": "clause-011",
+  "section_no": "제11조",
+  "heading": "이용정지 및 해지",
+  "header": "(이용정지 및 해지)",
+  "start_line": 33,
+  "end_line": 34,
+  "clause_type": "termination_for_cause",
+  "text": "제공자는 보안위협이나 이용약관의 중대한 위반이 있는 경우 합리적 범위 내에서 서비스를 일시 정지할 수 있으며, 시정 요구 후에도 위반이 계속되면 계약을 해지할 수 있다.",
+  "defined_terms_used": [],
+  "cross_refs": [],
+  "paragraph_count": 1,
+  "char_count": 94
+}

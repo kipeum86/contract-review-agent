@@ -1,0 +1,17 @@
+{
+  "clause_id": "clause-004",
+  "section_no": "제4조",
+  "heading": "보수 및 비용",
+  "header": "(보수 및 비용)",
+  "start_line": 12,
+  "end_line": 13,
+  "clause_type": "fees_payment",
+  "text": "위탁인은 검수 완료 후 30일 이내에 합의된 업무대금을 지급하며, 사전 승인된 실비만 별도로 정산한다.",
+  "defined_terms_used": [
+    "위탁인",
+    "업무"
+  ],
+  "cross_refs": [],
+  "paragraph_count": 1,
+  "char_count": 57
+}

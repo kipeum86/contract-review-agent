@@ -1,0 +1,17 @@
+{
+  "clause_id": "clause-001",
+  "section_no": "제1조",
+  "heading": "직위 및 업무",
+  "header": "(직위 및 업무)",
+  "start_line": 3,
+  "end_line": 4,
+  "clause_type": "employee_duties",
+  "text": "회사는 근로자를 프로덕트 매니저로 채용하며, 근로자는 회사가 정하는 합리적인 범위 내에서 제품기획, 운영관리 및 협업 조정 업무를 수행한다.",
+  "defined_terms_used": [
+    "회사",
+    "근로자"
+  ],
+  "cross_refs": [],
+  "paragraph_count": 1,
+  "char_count": 78
+}

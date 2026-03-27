@@ -1,0 +1,16 @@
+{
+  "clause_id": "clause-006",
+  "section_no": "제6조",
+  "heading": "충돌 시 우선순위",
+  "header": "(충돌 시 우선순위)",
+  "start_line": 18,
+  "end_line": 19,
+  "clause_type": "interpretation",
+  "text": "본 계약과 원계약 사이에 상충이 있는 경우 해당 범위에서는 본 계약이 우선한다. 다만 본 계약에 규정되지 않은 사항은 원계약에 따른다.",
+  "defined_terms_used": [
+    "원계약"
+  ],
+  "cross_refs": [],
+  "paragraph_count": 1,
+  "char_count": 75
+}

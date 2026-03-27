@@ -1,0 +1,17 @@
+{
+  "clause_id": "clause-005",
+  "section_no": "제5조",
+  "heading": "데이터 보안",
+  "header": "(데이터 보안)",
+  "start_line": 15,
+  "end_line": 16,
+  "clause_type": "data_security",
+  "text": "제공자는 고객 데이터의 무단 접근, 유출, 위조 또는 훼손을 방지하기 위한 합리적인 기술적 및 관리적 보호조치를 유지한다.",
+  "defined_terms_used": [
+    "제공자",
+    "고객 데이터"
+  ],
+  "cross_refs": [],
+  "paragraph_count": 1,
+  "char_count": 68
+}

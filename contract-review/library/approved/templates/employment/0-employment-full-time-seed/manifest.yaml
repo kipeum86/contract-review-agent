@@ -1,0 +1,37 @@
+doc_id: 0-employment-full-time-seed
+title: 근로계약서
+title_en: Full-Time Employment Agreement
+doc_class: template
+paper_role: neutral
+jurisdiction: KR
+governing_law: 대한민국 법률 (Korean law)
+language: ko
+approval_state: approved
+status: active
+classification_confidence: high
+authority_level: acceptable
+external_safe: false
+freshness_sensitive: false
+contract_family: employment
+subtype: full_time
+sha256: 3088d3661f000f478e60dace5c800eb778245cbe10a7e5a9b81ffc147198e325
+source_file: session-g-seed-employment.md
+created_at: '2026-03-27T13:00:00+00:00'
+updated_at: '2026-03-27T16:35:00+00:00'
+tags:
+- seed-baseline
+- synthetic-seed
+- session-g
+- session-h-review
+- kr-law
+- employment
+notes: Synthetic interim baseline seed package for a previously zero-coverage family;
+  internal sanity review applied, domain expert calibration pending.
+industry: employment
+stats:
+  total_clauses: 11
+  unmapped_clauses: 0
+  unmapped_ratio: 0.0
+  defined_terms: 3
+  sections: 11
+  exhibits: 0

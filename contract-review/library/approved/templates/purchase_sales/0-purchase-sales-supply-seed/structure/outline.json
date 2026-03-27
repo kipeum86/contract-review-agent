@@ -1,0 +1,68 @@
+[
+  {
+    "line": 3,
+    "level": 2,
+    "text": "목적",
+    "section": "art1"
+  },
+  {
+    "line": 6,
+    "level": 2,
+    "text": "공급물품 및 규격",
+    "section": "art2"
+  },
+  {
+    "line": 9,
+    "level": 2,
+    "text": "공급수량 및 최소발주",
+    "section": "art3"
+  },
+  {
+    "line": 12,
+    "level": 2,
+    "text": "대금 및 지급조건",
+    "section": "art4"
+  },
+  {
+    "line": 15,
+    "level": 2,
+    "text": "납품 및 검수",
+    "section": "art5"
+  },
+  {
+    "line": 18,
+    "level": 2,
+    "text": "품질보증",
+    "section": "art6"
+  },
+  {
+    "line": 21,
+    "level": 2,
+    "text": "법규준수",
+    "section": "art7"
+  },
+  {
+    "line": 24,
+    "level": 2,
+    "text": "손해배상 및 면책",
+    "section": "art8"
+  },
+  {
+    "line": 27,
+    "level": 2,
+    "text": "불가항력",
+    "section": "art9"
+  },
+  {
+    "line": 30,
+    "level": 2,
+    "text": "계약기간",
+    "section": "art10"
+  },
+  {
+    "line": 33,
+    "level": 2,
+    "text": "해지",
+    "section": "art11"
+  }
+]

@@ -1,0 +1,17 @@
+{
+  "clause_id": "clause-003",
+  "section_no": "제3조",
+  "heading": "선행조건",
+  "header": "(선행조건)",
+  "start_line": 9,
+  "end_line": 10,
+  "clause_type": "conditions_precedent",
+  "text": "합병의 효력 발생은 필요한 이사회 및 주주총회 승인, 채권자 보호절차, 규제 승인 또는 신고, 반대주주 처리 및 기타 법령상 절차 이행을 조건으로 한다.",
+  "defined_terms_used": [
+    "존속회사",
+    "소멸회사"
+  ],
+  "cross_refs": [],
+  "paragraph_count": 1,
+  "char_count": 85
+}

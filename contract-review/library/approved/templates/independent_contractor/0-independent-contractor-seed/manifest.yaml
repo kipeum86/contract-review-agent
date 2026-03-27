@@ -1,0 +1,36 @@
+doc_id: 0-independent-contractor-seed
+title: 업무위탁계약서
+title_en: Independent Contractor Agreement
+doc_class: template
+paper_role: neutral
+jurisdiction: KR
+governing_law: 대한민국 법률 (Korean law)
+language: ko
+approval_state: approved
+status: active
+classification_confidence: high
+authority_level: acceptable
+external_safe: false
+freshness_sensitive: false
+contract_family: independent_contractor
+subtype: general_contractor
+sha256: 9838b85a8811f9b27037fcdebdce45ec61cb92cd9f3eb9a3efed7cc91586b8fa
+source_file: session-h-seed-independent-contractor.md
+created_at: '2026-03-27T17:05:00+00:00'
+updated_at: '2026-03-27T17:05:00+00:00'
+tags:
+- seed-baseline
+- synthetic-seed
+- session-h
+- kr-law
+- independent-contractor
+notes: Synthetic interim baseline seed package for a zero-coverage family; internal
+  sanity review applied, domain expert calibration pending.
+industry: professional-services
+stats:
+  total_clauses: 11
+  unmapped_clauses: 0
+  unmapped_ratio: 0.0
+  defined_terms: 4
+  sections: 11
+  exhibits: 0

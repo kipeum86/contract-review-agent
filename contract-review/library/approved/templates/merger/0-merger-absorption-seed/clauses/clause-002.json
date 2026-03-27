@@ -1,0 +1,17 @@
+{
+  "clause_id": "clause-002",
+  "section_no": "제2조",
+  "heading": "합병 구조 및 대가",
+  "header": "(합병 구조 및 대가)",
+  "start_line": 6,
+  "end_line": 7,
+  "clause_type": "purchase_price",
+  "text": "존속회사는 합병의 대가로 소멸회사 주주에게 합의된 비율에 따른 존속회사 주식 또는 기타 합법적인 대가를 교부한다.",
+  "defined_terms_used": [
+    "존속회사",
+    "소멸회사"
+  ],
+  "cross_refs": [],
+  "paragraph_count": 1,
+  "char_count": 63
+}

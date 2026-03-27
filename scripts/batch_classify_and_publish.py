@@ -3,6 +3,7 @@ import json
 import os
 import re
 import shutil
+import subprocess
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -11,10 +12,18 @@ import yaml
 BASE = Path(__file__).resolve().parent.parent
 RUNS_DIR = BASE / "contract-review" / "library" / "runs" / "ingestion"
 APPROVED_DIR = BASE / "contract-review" / "library" / "approved"
+STAGING_DIR = BASE / "contract-review" / "library" / "staging"
+QUARANTINE_DIR = BASE / "contract-review" / "library" / "quarantine"
 INDEXES_DIR = BASE / "contract-review" / "library" / "indexes"
+APPROVAL_RULES_PATH = BASE / "contract-review" / "library" / "policies" / "approval-rules.yaml"
 SUMMARY_FILE = sorted(RUNS_DIR.glob("*_batch-summary.json"))[-1]
 
 NOW = datetime.now(timezone.utc)
+
+QUOTED_TERM_RE = re.compile(r'[“"]([^“”"]{2,50})[”"]')
+SECTION_REF_RE = re.compile(r'(제\s*\d+\s*(?:장|조)(?:의\s*\d+)?|별지[\s.]*(?:\d+)?|부록[\s.]*(?:\d+)?|첨부[\s.]*(?:\d+)?)')
+PACKAGE_FILES = ("manifest.yaml", "classification.json")
+PACKAGE_DIRS = ("normalized", "structure", "clauses", "quality")
 
 # ── Step 4: Classification rules based on doc_id patterns ──
 
@@ -107,7 +116,6 @@ def parse_structure(md_path: Path) -> dict:
     heading_re = re.compile(r"^(#{1,4})\s+(.+)")
     chapter_re = re.compile(r"^제(\d+)장\s+(.+)")
     article_re = re.compile(r"^\((.+?)\)")
-    term_re = re.compile(r'"([^"]{2,30})"')
     ref_re = re.compile(r"제(\d+)조")
     exhibit_re = re.compile(r"^(별지|부록|첨부)[\s.]*(\d*)")
 
@@ -137,8 +145,8 @@ def parse_structure(md_path: Path) -> dict:
             section_num += 1
             outline.append({"line": i, "level": 2, "text": am.group(1), "section": f"art{section_num}"})
 
-        # Defined terms ("...")
-        for tm in term_re.finditer(text):
+        # Defined terms ("..." or “...”)
+        for tm in QUOTED_TERM_RE.finditer(text):
             term = tm.group(1)
             if term not in [t["term"] for t in defined_terms]:
                 defined_terms.append({"term": term, "first_line": i})
@@ -165,18 +173,20 @@ def parse_structure(md_path: Path) -> dict:
 
 CLAUSE_PATTERNS = {
     "recitals": ["본 계약서는", "본 투자계약서", "아래 당사자들 사이에서"],
+    "purpose": ["목적"],
     "definitions": ["용어의 뜻은 다음과 같다", "정의"],
     "purchase_price": ["신주의 발행 사항", "발행가액", "인수가액", "투자금의 지급"],
+    "debt_security_issuance": ["사채의 발행 사항", "전환사채의 발행 사항", "신주인수권부사채의 발행 사항"],
     "conditions_precedent": ["선행조건", "투자의 선행조건"],
     "reps_warranties_seller": ["진술과 보장", "진술하고 보장한다"],
     "closing_mechanics": ["거래의 완결", "거래완결일"],
     "termination_for_cause": ["거래완결일 전 해제", "해제"],
-    "obligations_general": ["투자금의 용도", "사용용도"],
+    "obligations_general": ["투자금의 용도", "사용용도", "구조조정", "M&A에 관한 사항", "이해관계인의 책임", "회사 등의 의무"],
     "non_compete": ["기술의 이전", "겸업", "경업금지", "신회사 설립 제한"],
     "information_rights": ["보고 및 자료 제출", "경영사항에 대한"],
     "audit_rights": ["회계 및 업무감사", "시정조치"],
     "lock_up": ["이해관계인의 주식 처분", "주식처분"],
-    "right_of_first_refusal": ["우선매수권", "공동매도참여권"],
+    "right_of_first_refusal": ["우선매수권", "매수우선권"],
     "tag_along": ["공동매도참여권"],
     "put_call_option": ["주식매수청구권"],
     "liquidated_damages": ["손해배상 및 위약벌", "위약벌"],
@@ -194,14 +204,54 @@ CLAUSE_PATTERNS = {
     "liquidation_preference": ["잔여재산 분배"],
     "dividend_distribution": ["배당에 있어서 우선권"],
     "preemptive_rights": ["신주인수권"],
-    "board_composition": ["이사 선임", "관찰자"],
+    "board_composition": ["임원의 선임", "이사 선임", "관찰자", "관찰자 파견", "이사회 구성"],
     "employee_matters": ["주식매수선택권의 부여"],
     "exhibits_schedules": ["별지", "부록", "첨부"],
     "signature_block": ["서명 또는 날인", "서명날인"],
-    "board_composition": ["임원의 선임", "이사 선임", "관찰자 파견", "이사회 구성"],
     "drag_along": ["동반매도청구권", "동반매각청구권"],
-    "obligations_general": ["투자금의 용도", "사용용도", "구조조정", "M&A에 관한 사항", "이해관계인의 책임"],
-    "definitions": ["용어의 뜻은 다음과 같다", "정의"],
+    "indebtedness_liens": ["부채에 관한 사항", "담보제공 및 입보", "차입금", "담보종류"],
+    "affiliates_subsidiaries": ["관계회사에 관한 사항", "관계회사"],
+    "litigation_regulatory_matters": ["법령 위반, 소송 등에 관한 사항", "소송 등에 관한 사항", "법령 위반", "인허가", "행정처분"],
+    "disclosure_accuracy": ["실사관련 자문사", "제공한 주주명부", "모든 면에서 진실되고 거짓이 없", "중요한 사항을 생략하지 않았"],
+}
+
+FAMILY_SPECIFIC_CLAUSE_PATTERNS = {
+    "employment": {
+        "employee_duties": ["직무", "업무내용", "담당업무", "근무장소"],
+        "compensation_benefits": ["급여", "보수", "상여", "복리후생"],
+        "working_hours_overtime": ["근로시간", "연장근로", "초과근로", "휴게시간"],
+        "leave_holidays": ["휴가", "휴일", "연차"],
+        "probation_period": ["수습", "시용기간"],
+        "severance_retirement": ["퇴직금", "퇴직급여"],
+        "confidentiality": ["비밀유지"],
+        "non_compete": ["경업금지"],
+        "termination_for_cause": ["해고", "계약 해지", "징계"],
+    },
+    "lease": {
+        "premises_description": ["임대차 목적물", "임차목적물", "목적물의 표시"],
+        "security_deposit_return": ["보증금 반환"],
+        "rent_deposit": ["차임", "보증금", "임대료"],
+        "permitted_use": ["사용 목적", "임대 목적", "용도"],
+        "maintenance_repairs": ["수선의무", "유지보수", "수리"],
+        "restoration_surrender": ["원상복구", "명도", "반환"],
+        "term_duration": ["임대차 기간", "존속기간", "계약기간"],
+    },
+    "nda": {
+        "confidentiality": ["비밀정보", "비밀유지의무"],
+        "confidentiality_exceptions": ["예외사항", "허용된 공개", "비밀유지의 예외"],
+        "confidentiality_duration": ["비밀유지 기간", "존속기간"],
+        "effects_of_termination": ["반환 또는 파기", "자료의 반환", "파기 의무"],
+        "injunctive_relief": ["가처분", "금지명령", "구제수단"],
+    },
+    "services": {
+        "scope_of_services": ["용역의 범위", "업무 범위", "서비스 범위"],
+        "deliverables": ["산출물", "결과물"],
+        "fees_payment": ["대금", "수수료", "보수"],
+        "service_levels": ["서비스 수준", "SLA", "가용성"],
+        "acceptance": ["검수", "승인 기준"],
+        "subcontracting": ["재위탁", "하도급"],
+        "ip_ownership": ["결과물의 귀속", "지식재산권의 귀속"],
+    },
 }
 
 # Chapter headings (제N장) map to a generic structural marker, not unmapped
@@ -209,7 +259,60 @@ CHAPTER_PATTERN = re.compile(r"^제\d+장")
 GOVERNANCE_PATTERNS = ["주주총회", "이사회 의결 요구", "이사회 결의 요구"]
 
 
-def segment_clauses(md_path: Path) -> list:
+def _dedupe_preserve_order(values: list[str]) -> list[str]:
+    seen = set()
+    ordered = []
+    for value in values:
+        if value in seen:
+            continue
+        seen.add(value)
+        ordered.append(value)
+    return ordered
+
+
+def _normalize_heading_text(raw_heading: str) -> str:
+    stripped = raw_heading.strip()
+    if stripped.startswith("(") and stripped.endswith(")"):
+        return stripped[1:-1].strip()
+    return stripped
+
+
+def _extract_defined_terms_used(segment_text: str, known_terms: list[str]) -> list[str]:
+    used_terms = []
+
+    for term in known_terms:
+        if term and term in segment_text:
+            used_terms.append(term)
+
+    for match in QUOTED_TERM_RE.finditer(segment_text):
+        used_terms.append(match.group(1))
+
+    return _dedupe_preserve_order(used_terms)
+
+
+def _extract_cross_refs(segment_text: str) -> list[str]:
+    return _dedupe_preserve_order([match.group(1).strip() for match in SECTION_REF_RE.finditer(segment_text)])
+
+
+def _count_paragraphs(segment_text: str) -> int:
+    paragraphs = [block for block in re.split(r"\n\s*\n", segment_text) if block.strip()]
+    return len(paragraphs)
+
+
+def _iter_clause_patterns(contract_family: str | None = None):
+    merged: dict[str, list[str]] = {}
+
+    if contract_family:
+        for ctype, patterns in FAMILY_SPECIFIC_CLAUSE_PATTERNS.get(contract_family, {}).items():
+            merged.setdefault(ctype, []).extend(patterns)
+
+    for ctype, patterns in CLAUSE_PATTERNS.items():
+        merged.setdefault(ctype, []).extend(patterns)
+
+    return merged.items()
+
+
+def segment_clauses(md_path: Path, structure: dict | None = None, contract_family: str | None = None) -> list:
     """Segment document into clause units by matching patterns."""
     with open(md_path, "r", encoding="utf-8") as f:
         content = f.read()
@@ -217,55 +320,186 @@ def segment_clauses(md_path: Path) -> list:
 
     clauses = []
     article_re = re.compile(r"^\((.+?)\)")
+    numbered_article_re = re.compile(r"^제\s*(\d+)\s*조(?:의\s*(\d+))?\s*(?:\((.+?)\))?$")
     chapter_re = re.compile(r"^제(\d+)장\s+(.+)")
     exhibit_re = re.compile(r"^(별지|부록|첨부)")
+    known_terms = []
 
-    # Find article boundaries
+    if structure and isinstance(structure.get("defined_terms"), list):
+        known_terms = [
+            term["term"]
+            for term in structure["defined_terms"]
+            if isinstance(term, dict) and isinstance(term.get("term"), str)
+        ]
+
+    # Find article boundaries. Prefer the parsed outline so segmentation stays aligned
+    # with the structural parse and does not misclassify parenthetical preamble text.
     boundaries = []
-    for i, line in enumerate(lines):
-        text = line.strip()
-        if not text:
-            continue
-        if article_re.match(text) and len(text) < 40:
-            boundaries.append((i, text))
-        elif chapter_re.match(text):
-            boundaries.append((i, text))
-        elif exhibit_re.match(text):
-            boundaries.append((i, text))
+
+    if structure and isinstance(structure.get("outline"), list) and structure["outline"]:
+        next_article_number = 1
+
+        for entry in structure["outline"]:
+            if not isinstance(entry, dict):
+                continue
+
+            line_value = entry.get("line")
+            heading_text = str(entry.get("text", "")).strip()
+            if not heading_text or not isinstance(line_value, int):
+                continue
+
+            if CHAPTER_PATTERN.match(heading_text):
+                chapter_match = chapter_re.match(heading_text)
+                section_no = f"제{chapter_match.group(1)}장" if chapter_match else heading_text
+                boundaries.append({
+                    "line_index": max(line_value - 1, 0),
+                    "raw_header": heading_text,
+                    "heading": heading_text,
+                    "section_no": section_no,
+                    "kind": "chapter",
+                })
+                continue
+
+            boundaries.append({
+                "line_index": max(line_value - 1, 0),
+                "raw_header": f"({heading_text})",
+                "heading": heading_text,
+                "section_no": f"제{next_article_number}조",
+                "kind": "article",
+            })
+            next_article_number += 1
+
+        for exhibit in structure.get("exhibits", []):
+            if not isinstance(exhibit, dict):
+                continue
+            line_value = exhibit.get("line")
+            label = str(exhibit.get("label", "")).strip()
+            if not label or not isinstance(line_value, int):
+                continue
+            boundaries.append({
+                "line_index": max(line_value - 1, 0),
+                "raw_header": label,
+                "heading": label,
+                "section_no": label,
+                "kind": "exhibit",
+            })
+
+        boundaries.sort(key=lambda item: item["line_index"])
+
+    if not boundaries:
+        next_article_number = 1
+        for i, line in enumerate(lines):
+            text = line.strip()
+            if not text:
+                continue
+
+            numbered_article = numbered_article_re.match(text)
+            if numbered_article:
+                article_no = numbered_article.group(1)
+                sub_no = numbered_article.group(2)
+                next_article_number = max(next_article_number, int(article_no) + 1)
+                section_no = f"제{article_no}조"
+                if sub_no:
+                    section_no = f"{section_no}의{sub_no}"
+                heading = numbered_article.group(3).strip() if numbered_article.group(3) else text
+                boundaries.append({
+                    "line_index": i,
+                    "raw_header": text,
+                    "heading": heading,
+                    "section_no": section_no,
+                    "kind": "article",
+                })
+                continue
+
+            article_match = article_re.match(text)
+            if article_match and len(text) < 80:
+                section_no = f"제{next_article_number}조"
+                next_article_number += 1
+                boundaries.append({
+                    "line_index": i,
+                    "raw_header": text,
+                    "heading": article_match.group(1).strip(),
+                    "section_no": section_no,
+                    "kind": "article",
+                })
+                continue
+
+            chapter_match = chapter_re.match(text)
+            if chapter_match:
+                boundaries.append({
+                    "line_index": i,
+                    "raw_header": text,
+                    "heading": text,
+                    "section_no": f"제{chapter_match.group(1)}장",
+                    "kind": "chapter",
+                })
+                continue
+
+            exhibit_match = exhibit_re.match(text)
+            if exhibit_match:
+                label = text
+                boundaries.append({
+                    "line_index": i,
+                    "raw_header": text,
+                    "heading": label,
+                    "section_no": label,
+                    "kind": "exhibit",
+                })
 
     # Create clause segments
-    for idx, (line_num, header) in enumerate(boundaries):
-        end_line = boundaries[idx + 1][0] if idx + 1 < len(boundaries) else len(lines)
+    for idx, boundary in enumerate(boundaries):
+        line_num = boundary["line_index"]
+        raw_header = boundary["raw_header"]
+        heading = boundary["heading"]
+        section_no = boundary["section_no"]
+        end_line = boundaries[idx + 1]["line_index"] if idx + 1 < len(boundaries) else len(lines)
         segment_text = "\n".join(lines[line_num:end_line]).strip()
 
         # Classify clause type
         clause_type = "unmapped"
 
         # Chapter headings are structural markers, not unmapped
-        if CHAPTER_PATTERN.match(header.strip()):
+        if CHAPTER_PATTERN.match(raw_header.strip()):
             clause_type = "recitals"  # chapter header → structural
         else:
             # Check governance patterns first
             for gpat in GOVERNANCE_PATTERNS:
-                if gpat in header or gpat in segment_text[:200]:
+                if gpat in raw_header or gpat in segment_text[:200]:
                     clause_type = "board_composition"
                     break
 
             if clause_type == "unmapped":
-                for ctype, patterns in CLAUSE_PATTERNS.items():
+                pattern_items = list(_iter_clause_patterns(contract_family))
+
+                for ctype, patterns in pattern_items:
                     for pat in patterns:
-                        if pat in header or pat in segment_text[:200]:
+                        if pat in raw_header:
                             clause_type = ctype
                             break
                     if clause_type != "unmapped":
                         break
 
+                if clause_type == "unmapped":
+                    for ctype, patterns in pattern_items:
+                        for pat in patterns:
+                            if pat in segment_text[:200]:
+                                clause_type = ctype
+                                break
+                        if clause_type != "unmapped":
+                            break
+
         clauses.append({
             "clause_id": f"clause-{idx+1:03d}",
-            "header": header,
+            "section_no": section_no,
+            "heading": _normalize_heading_text(heading),
+            "header": raw_header,
             "start_line": line_num + 1,
             "end_line": end_line,
             "clause_type": clause_type,
+            "text": segment_text,
+            "defined_terms_used": _extract_defined_terms_used(segment_text, known_terms),
+            "cross_refs": _extract_cross_refs(segment_text),
+            "paragraph_count": _count_paragraphs(segment_text),
             "char_count": len(segment_text),
         })
 
@@ -349,19 +583,320 @@ def validate_manifest(manifest: dict) -> tuple:
     return hard_fails, soft_fails
 
 
+def load_yaml_file(path: Path) -> dict | None:
+    if not path.exists():
+        return None
+    with open(path, "r", encoding="utf-8") as handle:
+        return yaml.safe_load(handle)
+
+
+def write_json_file(path: Path, payload: dict) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with open(path, "w", encoding="utf-8") as handle:
+        json.dump(payload, handle, ensure_ascii=False, indent=2)
+
+
+def write_yaml_file(path: Path, payload: dict) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with open(path, "w", encoding="utf-8") as handle:
+        yaml.dump(payload, handle, allow_unicode=True, default_flow_style=False, sort_keys=False)
+
+
+def load_approval_rules() -> dict:
+    """Load approval policy. Fail safe to manual review if the policy is missing or malformed."""
+    rules = {
+        "auto_approval": {
+            "enabled": False,
+            "conditions": [],
+        },
+        "per_asset_type": {},
+        "approval_decisions": {"valid_values": []},
+        "staging_retention": {},
+        "_policy_errors": [],
+    }
+
+    try:
+        raw = load_yaml_file(APPROVAL_RULES_PATH)
+    except yaml.YAMLError as exc:
+        rules["_policy_errors"].append(f"approval_rules_yaml_error:{exc}")
+        return rules
+    except OSError as exc:
+        rules["_policy_errors"].append(f"approval_rules_io_error:{exc}")
+        return rules
+
+    if raw is None:
+        rules["_policy_errors"].append("approval_rules_missing")
+        return rules
+
+    if not isinstance(raw, dict):
+        rules["_policy_errors"].append("approval_rules_invalid_shape")
+        return rules
+
+    for key in ("auto_approval", "per_asset_type", "approval_decisions", "staging_retention"):
+        value = raw.get(key)
+        if isinstance(value, dict):
+            rules[key] = value
+
+    auto_approval = rules.get("auto_approval", {})
+    if not isinstance(auto_approval.get("conditions"), list):
+        auto_approval["conditions"] = []
+        rules["_policy_errors"].append("approval_rules_conditions_invalid_shape")
+
+    return rules
+
+
+def get_asset_policy(approval_rules: dict, doc_class: str) -> dict:
+    per_asset_type = approval_rules.get("per_asset_type", {})
+    if not isinstance(per_asset_type, dict):
+        return {}
+    asset_policy = per_asset_type.get(doc_class, {})
+    return asset_policy if isinstance(asset_policy, dict) else {}
+
+
+def apply_asset_policy_defaults(manifest: dict, asset_policy: dict) -> None:
+    default_authority = asset_policy.get("default_authority_level")
+    if default_authority is not None:
+        manifest["authority_level"] = default_authority
+
+    if "default_external_safe" in asset_policy:
+        manifest["external_safe"] = bool(asset_policy["default_external_safe"])
+
+
+def evaluate_auto_approval_conditions(manifest: dict, validation_report: dict, approval_rules: dict) -> list[str]:
+    unmet_conditions = []
+    conditions = approval_rules.get("auto_approval", {}).get("conditions", [])
+
+    for condition in conditions:
+        if not isinstance(condition, dict) or len(condition) != 1:
+            unmet_conditions.append("invalid_policy_condition")
+            continue
+
+        field, expected_value = next(iter(condition.items()))
+        if field == "classification_confidence":
+            actual_value = manifest.get("classification_confidence")
+        elif field == "soft_fail_count":
+            actual_value = len(validation_report.get("soft_fails", []))
+        elif field == "hard_fail_count":
+            actual_value = len(validation_report.get("hard_fails", []))
+        elif field == "schema_validation":
+            actual_value = "passed" if validation_report.get("schema_valid") else "failed"
+        else:
+            actual_value = manifest.get(field)
+
+        if actual_value != expected_value:
+            unmet_conditions.append(
+                f"auto_approval_condition_failed:{field}:expected={expected_value}:actual={actual_value}"
+            )
+
+    return unmet_conditions
+
+
+def resolve_approved_destination(manifest: dict) -> Path | None:
+    doc_id = manifest.get("doc_id")
+    doc_class = manifest.get("doc_class")
+
+    if not doc_id or not doc_class:
+        return None
+
+    if doc_class == "template":
+        contract_family = manifest.get("contract_family")
+        if not contract_family:
+            return None
+        return APPROVED_DIR / "templates" / contract_family / doc_id
+
+    if doc_class == "precedent":
+        if manifest.get("authority_level") == "reference_only":
+            return APPROVED_DIR / "precedents" / "reference-only" / doc_id
+        return APPROVED_DIR / "precedents" / doc_id
+
+    return None
+
+
+def resolve_publication_destination(manifest: dict, publication_target: str) -> Path | None:
+    doc_id = manifest.get("doc_id")
+    if not doc_id:
+        return None
+
+    if publication_target == "approved":
+        return resolve_approved_destination(manifest)
+    if publication_target == "staging":
+        return STAGING_DIR / doc_id
+    if publication_target == "quarantine":
+        return QUARANTINE_DIR / doc_id
+    return None
+
+
+def determine_publication_target(manifest: dict, validation_report: dict, approval_rules: dict) -> dict:
+    asset_policy = get_asset_policy(approval_rules, manifest.get("doc_class", ""))
+    apply_asset_policy_defaults(manifest, asset_policy)
+
+    publication = {
+        "approval_state": "staging",
+        "publication_target": "staging",
+        "reason_file": "staging-reason.json",
+        "reasons": _dedupe_preserve_order(validation_report.get("soft_fails", [])),
+        "policy_errors": approval_rules.get("_policy_errors", []),
+        "unmet_conditions": [],
+        "auto_approval_enabled": bool(approval_rules.get("auto_approval", {}).get("enabled", False)),
+        "asset_auto_approvable": bool(asset_policy.get("auto_approvable", False)),
+        "doc_class": manifest.get("doc_class"),
+    }
+
+    if validation_report.get("hard_fails"):
+        publication["approval_state"] = "quarantined"
+        publication["publication_target"] = "quarantine"
+        publication["reason_file"] = "quarantine-reason.json"
+        publication["reasons"] = _dedupe_preserve_order(validation_report["hard_fails"])
+        return publication
+
+    if not asset_policy:
+        publication["reasons"] = _dedupe_preserve_order(
+            publication["reasons"] + [f"missing_asset_policy:{manifest.get('doc_class', 'unknown')}"]
+        )
+        return publication
+
+    if approval_rules.get("_policy_errors"):
+        publication["reasons"] = _dedupe_preserve_order(
+            publication["reasons"] + approval_rules["_policy_errors"]
+        )
+        return publication
+
+    if not publication["auto_approval_enabled"]:
+        publication["reasons"] = _dedupe_preserve_order(publication["reasons"] + ["auto_approval_disabled"])
+        return publication
+
+    if not publication["asset_auto_approvable"]:
+        publication["reasons"] = _dedupe_preserve_order(
+            publication["reasons"] + [f"manual_review_required_for_doc_class:{manifest.get('doc_class')}"]
+        )
+        return publication
+
+    approved_destination = resolve_approved_destination(manifest)
+    if approved_destination is None:
+        publication["reasons"] = _dedupe_preserve_order(
+            publication["reasons"] + [f"unsupported_publish_target:{manifest.get('doc_class')}"]
+        )
+        return publication
+
+    publication["unmet_conditions"] = evaluate_auto_approval_conditions(
+        manifest,
+        validation_report,
+        approval_rules,
+    )
+    if publication["unmet_conditions"]:
+        publication["reasons"] = _dedupe_preserve_order(
+            publication["reasons"] + publication["unmet_conditions"]
+        )
+        return publication
+
+    publication["approval_state"] = "approved"
+    publication["publication_target"] = "approved"
+    publication["reason_file"] = None
+    publication["reasons"] = []
+    return publication
+
+
+def find_existing_package_dirs(doc_id: str) -> list[Path]:
+    found_paths = []
+    seen_paths = set()
+
+    for root in (APPROVED_DIR, STAGING_DIR, QUARANTINE_DIR):
+        if not root.exists():
+            continue
+        for candidate in root.glob(f"**/{doc_id}"):
+            resolved = candidate.resolve()
+            if candidate.is_dir() and resolved not in seen_paths:
+                found_paths.append(candidate)
+                seen_paths.add(resolved)
+
+    return found_paths
+
+
+def copy_package_artifacts(run_dir: Path, dest_dir: Path) -> None:
+    if dest_dir.exists():
+        shutil.rmtree(dest_dir)
+
+    dest_dir.parent.mkdir(parents=True, exist_ok=True)
+    dest_dir.mkdir(parents=True, exist_ok=True)
+
+    for file_name in PACKAGE_FILES:
+        source_path = run_dir / file_name
+        if source_path.exists():
+            shutil.copy2(source_path, dest_dir / file_name)
+
+    for dir_name in PACKAGE_DIRS:
+        source_dir = run_dir / dir_name
+        if source_dir.exists():
+            shutil.copytree(source_dir, dest_dir / dir_name, dirs_exist_ok=True)
+
+
+def sync_package_to_publication_target(
+    run_dir: Path,
+    manifest: dict,
+    validation_report: dict,
+    publication: dict,
+) -> Path:
+    doc_id = manifest["doc_id"]
+    destination = resolve_publication_destination(manifest, publication["publication_target"])
+    if destination is None:
+        raise RuntimeError(f"Cannot resolve destination for {doc_id}: {publication['publication_target']}")
+
+    destination_resolved = destination.resolve()
+    for existing_dir in find_existing_package_dirs(doc_id):
+        if existing_dir.resolve() != destination_resolved:
+            shutil.rmtree(existing_dir)
+
+    copy_package_artifacts(run_dir, destination)
+
+    if publication.get("reason_file"):
+        reason_payload = {
+            "doc_id": doc_id,
+            "approval_state": publication["approval_state"],
+            "publication_target": publication["publication_target"],
+            "reasons": publication.get("reasons", []),
+            "hard_fails": validation_report.get("hard_fails", []),
+            "soft_fails": validation_report.get("soft_fails", []),
+            "unmet_conditions": publication.get("unmet_conditions", []),
+            "policy_errors": publication.get("policy_errors", []),
+            "auto_approval_enabled": publication.get("auto_approval_enabled", False),
+            "asset_auto_approvable": publication.get("asset_auto_approvable", False),
+            "timestamp": datetime.now(timezone.utc).isoformat(),
+        }
+        write_json_file(destination / publication["reason_file"], reason_payload)
+
+    return destination
+
+
+def rebuild_indexes_from_approved() -> dict:
+    """Rebuild indexes from approved/ to keep retrieval state aligned with published artifacts."""
+    build_index_script = BASE / ".claude" / "skills" / "index-manager" / "scripts" / "build-index.py"
+    completed = subprocess.run(
+        ["python3", str(build_index_script), "rebuild"],
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+
+    if completed.returncode != 0:
+        raise RuntimeError(
+            f"Index rebuild failed with code {completed.returncode}: "
+            f"{completed.stderr.strip() or completed.stdout.strip()}"
+        )
+
+    return json.loads(completed.stdout)
+
+
 # ── Main pipeline ──
 
 def main():
+    approval_rules = load_approval_rules()
+
     with open(SUMMARY_FILE, "r", encoding="utf-8") as f:
         summary = json.load(f)
 
     results = [r for r in summary["results"] if r["status"] == "normalized"]
     print(f"Processing {len(results)} documents through Steps 4-10.\n")
 
-    all_manifests = []
-    all_clauses_index = []
-    all_terms_index = []
-    all_documents_index = []
     quarantined = []
     staged = []
     approved_list = []
@@ -387,15 +922,13 @@ def main():
                 json.dump(structure[key], f, ensure_ascii=False, indent=2)
 
         # Step 6: Clause segmentation
-        clauses = segment_clauses(md_path)
+        clauses = segment_clauses(md_path, structure, classification["contract_family"])
         for ci, clause in enumerate(clauses):
             with open(run_dir / "clauses" / f"{clause['clause_id']}.json", "w", encoding="utf-8") as f:
                 json.dump(clause, f, ensure_ascii=False, indent=2)
 
         # Step 7: Metadata enrichment
         manifest = generate_manifest(doc_id, r["file"], r["sha256"], classification, clauses, structure)
-        with open(run_dir / "manifest.yaml", "w", encoding="utf-8") as f:
-            yaml.dump(manifest, f, allow_unicode=True, default_flow_style=False, sort_keys=False)
 
         # Step 8: Validation
         hard_fails, soft_fails = validate_manifest(manifest)
@@ -406,133 +939,32 @@ def main():
             "schema_valid": len(hard_fails) == 0,
             "timestamp": NOW.isoformat(),
         }
-        (run_dir / "quality").mkdir(exist_ok=True)
-        with open(run_dir / "quality" / "validation-report.json", "w", encoding="utf-8") as f:
-            json.dump(validation_report, f, ensure_ascii=False, indent=2)
 
         # Step 9: Approval gate
-        if hard_fails:
-            manifest["approval_state"] = "quarantined"
-            quarantined.append({"doc_id": doc_id, "reasons": hard_fails})
-            print(f"  QUARANTINED: {hard_fails}")
-        elif soft_fails:
-            manifest["approval_state"] = "staging"
-            staged.append({"doc_id": doc_id, "reasons": soft_fails})
-            print(f"  STAGED: {soft_fails}")
-        else:
-            # Auto-approval: template + high confidence + 0 soft fails
-            manifest["approval_state"] = "approved"
+        publication = determine_publication_target(manifest, validation_report, approval_rules)
+        manifest["approval_state"] = publication["approval_state"]
+        manifest["updated_at"] = NOW.isoformat()
+        validation_report["approval_gate"] = publication
+
+        # Update manifest with approval state
+        write_yaml_file(run_dir / "manifest.yaml", manifest)
+        write_json_file(run_dir / "quality" / "validation-report.json", validation_report)
+
+        # Step 10: Publish approved
+        destination = sync_package_to_publication_target(run_dir, manifest, validation_report, publication)
+        if manifest["approval_state"] == "approved":
             approved_list.append(doc_id)
             print(f"  AUTO-APPROVED ({manifest['stats']['total_clauses']} clauses, "
                   f"{manifest['stats']['defined_terms']} terms, "
-                  f"{manifest['stats']['unmapped_ratio']:.0%} unmapped)")
+                  f"{manifest['stats']['unmapped_ratio']:.0%} unmapped) -> {destination}")
+        elif manifest["approval_state"] == "staging":
+            staged.append({"doc_id": doc_id, "reasons": publication["reasons"]})
+            print(f"  STAGED -> {destination}: {publication['reasons']}")
+        else:
+            quarantined.append({"doc_id": doc_id, "reasons": publication["reasons"]})
+            print(f"  QUARANTINED -> {destination}: {publication['reasons']}")
 
-        # Update manifest with approval state
-        with open(run_dir / "manifest.yaml", "w", encoding="utf-8") as f:
-            yaml.dump(manifest, f, allow_unicode=True, default_flow_style=False, sort_keys=False)
-
-        all_manifests.append(manifest)
-
-        # Step 10: Publish approved
-        if manifest["approval_state"] == "approved":
-            family = manifest["contract_family"]
-            dest = APPROVED_DIR / "templates" / family / doc_id
-            dest.mkdir(parents=True, exist_ok=True)
-
-            # Copy normalized files
-            shutil.copy2(md_path, dest / "clean.md")
-            txt_path = run_dir / "normalized" / "plain.txt"
-            if txt_path.exists():
-                shutil.copy2(txt_path, dest / "plain.txt")
-            shutil.copy2(run_dir / "manifest.yaml", dest / "manifest.yaml")
-
-            # Copy structure
-            (dest / "structure").mkdir(exist_ok=True)
-            for sfile in (run_dir / "structure").glob("*.json"):
-                shutil.copy2(sfile, dest / "structure" / sfile.name)
-
-            # Copy clauses
-            (dest / "clauses").mkdir(exist_ok=True)
-            for cfile in (run_dir / "clauses").glob("*.json"):
-                shutil.copy2(cfile, dest / "clauses" / cfile.name)
-
-            # Build index entries
-            all_documents_index.append({
-                "doc_id": doc_id,
-                "title": manifest["title"],
-                "doc_class": manifest["doc_class"],
-                "contract_family": family,
-                "subtype": manifest.get("subtype", ""),
-                "paper_role": manifest["paper_role"],
-                "jurisdiction": manifest["jurisdiction"],
-                "language": manifest["language"],
-                "authority_level": manifest.get("authority_level", "preferred"),
-                "approval_state": "approved",
-                "status": "active",
-                "sha256": manifest["sha256"],
-                "source_file": manifest["source_file"],
-                "path": f"approved/templates/{family}/{doc_id}/",
-                "created_at": manifest["created_at"],
-            })
-
-            for clause in clauses:
-                all_clauses_index.append({
-                    "doc_id": doc_id,
-                    "clause_id": clause["clause_id"],
-                    "clause_type": clause["clause_type"],
-                    "header": clause["header"],
-                    "contract_family": family,
-                })
-
-            for term in structure["defined_terms"]:
-                all_terms_index.append({
-                    "doc_id": doc_id,
-                    "term": term["term"],
-                    "first_line": term["first_line"],
-                })
-
-    # Write indexes
-    docs_index = {
-        "version": 1,
-        "updated_at": NOW.isoformat(),
-        "documents": all_documents_index,
-    }
-    with open(INDEXES_DIR / "documents.json", "w", encoding="utf-8") as f:
-        json.dump(docs_index, f, ensure_ascii=False, indent=2)
-
-    clauses_index = {
-        "version": 1,
-        "updated_at": NOW.isoformat(),
-        "clauses": all_clauses_index,
-    }
-    with open(INDEXES_DIR / "clauses.json", "w", encoding="utf-8") as f:
-        json.dump(clauses_index, f, ensure_ascii=False, indent=2)
-
-    terms_index = {
-        "version": 1,
-        "updated_at": NOW.isoformat(),
-        "terms": all_terms_index,
-    }
-    with open(INDEXES_DIR / "terms.json", "w", encoding="utf-8") as f:
-        json.dump(terms_index, f, ensure_ascii=False, indent=2)
-
-    # Retrieval map
-    retrieval_map = {"version": 1, "updated_at": NOW.isoformat(), "entries": []}
-    for doc in all_documents_index:
-        retrieval_map["entries"].append({
-            "doc_id": doc["doc_id"],
-            "contract_family": doc["contract_family"],
-            "subtype": doc.get("subtype", ""),
-            "authority_level": doc.get("authority_level", "preferred"),
-            "path": doc["path"],
-        })
-    with open(INDEXES_DIR / "retrieval-map.json", "w", encoding="utf-8") as f:
-        json.dump(retrieval_map, f, ensure_ascii=False, indent=2)
-
-    # Supersession (empty — all new)
-    supersession = {"version": 1, "updated_at": NOW.isoformat(), "entries": []}
-    with open(INDEXES_DIR / "supersession.json", "w", encoding="utf-8") as f:
-        json.dump(supersession, f, ensure_ascii=False, indent=2)
+    rebuild_result = rebuild_indexes_from_approved()
 
     # Summary
     print(f"\n{'='*60}")
@@ -542,6 +974,10 @@ def main():
     print(f"  Approved:    {len(approved_list)}")
     print(f"  Staged:      {len(staged)}")
     print(f"  Quarantined: {len(quarantined)}")
+    print(
+        f"  Indexed:     {rebuild_result.get('documents_count', 0)} docs / "
+        f"{rebuild_result.get('clauses_count', 0)} clauses"
+    )
     print(f"{'='*60}")
 
     if staged:

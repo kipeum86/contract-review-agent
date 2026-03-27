@@ -1,0 +1,17 @@
+{
+  "clause_id": "clause-008",
+  "section_no": "제8조",
+  "heading": "책임제한",
+  "header": "(책임제한)",
+  "start_line": 24,
+  "end_line": 25,
+  "clause_type": "limitation_of_liability",
+  "text": "라이선서의 총 책임은 사용자가 최근 12개월간 지급한 이용대금을 한도로 하며, 고의 또는 중과실에 따른 손해는 제외한다.",
+  "defined_terms_used": [
+    "라이선서",
+    "사용자"
+  ],
+  "cross_refs": [],
+  "paragraph_count": 1,
+  "char_count": 67
+}

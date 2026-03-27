@@ -1,0 +1,17 @@
+{
+  "clause_id": "clause-010",
+  "section_no": "제10조",
+  "heading": "합병 후 협력",
+  "header": "(합병 후 협력)",
+  "start_line": 30,
+  "end_line": 31,
+  "clause_type": "covenants_post_closing",
+  "text": "당사자는 합병 후 자산·계약 통합, 인허가 명의변경, 시스템 이전, 고객 및 거래처 통지 등 후속 절차에 상호 협력한다.",
+  "defined_terms_used": [
+    "존속회사",
+    "소멸회사"
+  ],
+  "cross_refs": [],
+  "paragraph_count": 1,
+  "char_count": 67
+}

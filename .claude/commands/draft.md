@@ -123,13 +123,13 @@ Auto-fix simple issues. Flag substantive issues with `[REVIEW NOTE]` annotations
 
 Produce in the `output/` folder:
 
-### 1. Contract Draft (DOCX)
+### 1. Contract Draft
 
-- Professional formatting: numbered headings, proper margins, signature blocks, page numbers
-- Bold defined terms on first use
-- Self-review flags as `[INTERNAL]` comments in the DOCX
-- Filename: `{matter_id}_round_1_draft.docx`
-- Copy to `matters/{matter_id}/round_1/source/` (serves as baseline for future re-review)
+- Deliver the full draft text in the response
+- Persist `working/draft.json` with the complete draft data (metadata, sections, defined_terms, contract_text, self_review)
+- Generate DOCX: `node .claude/skills/report-compiler/scripts/compile-draft.js working/draft.json output/reports/{matter_id}_round_1_draft.docx`
+- Copy DOCX to `matters/{matter_id}/round_1/source/` as baseline for future re-review
+- Features: section hierarchy (제N조 / Article N), defined terms bolded, signature blocks, `[INTERNAL]` self-review annotations
 
 ### 2. Self-Review Summary
 
@@ -143,6 +143,7 @@ Include drafting notes:
 - Template-based or scratch mode
 - Key assumptions made
 - Recommended next steps
+- Whether any draft artifacts were persisted locally
 
 ### Revision
 

@@ -1,0 +1,17 @@
+{
+  "clause_id": "clause-011",
+  "section_no": "제11조",
+  "heading": "수출통제 및 법규준수",
+  "header": "(수출통제 및 법규준수)",
+  "start_line": 33,
+  "end_line": 34,
+  "clause_type": "export_control",
+  "text": "사용자는 적용되는 수출통제, 제재 및 기술규제 법령을 준수하여야 하며, 금지된 국가나 개인에게 소프트웨어를 이전하거나 접근을 제공해서는 아니 된다.",
+  "defined_terms_used": [
+    "사용자",
+    "소프트웨어"
+  ],
+  "cross_refs": [],
+  "paragraph_count": 1,
+  "char_count": 82
+}

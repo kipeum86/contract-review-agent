@@ -1,0 +1,18 @@
+{
+  "clause_id": "clause-008",
+  "section_no": "제8조",
+  "heading": "손해배상 및 면책",
+  "header": "(손해배상 및 면책)",
+  "start_line": 24,
+  "end_line": 25,
+  "clause_type": "indemnification",
+  "text": "공급인은 물품의 하자, 제3자 권리 침해 또는 법규 위반으로 인하여 발생한 제3자 청구에 대해 매수인을 면책한다.",
+  "defined_terms_used": [
+    "공급인",
+    "물품",
+    "매수인"
+  ],
+  "cross_refs": [],
+  "paragraph_count": 1,
+  "char_count": 63
+}

@@ -1,0 +1,17 @@
+{
+  "clause_id": "clause-003",
+  "section_no": "제3조",
+  "heading": "승계 채무",
+  "header": "(승계 채무)",
+  "start_line": 9,
+  "end_line": 10,
+  "clause_type": "assumed_liabilities",
+  "text": "양수인은 별첨 승계채무 목록에 명시된 채무만 승계하며, 그 외 종결 전 원인에 기초한 미지급 세금, 소송, 벌금 및 기타 부채는 양도인이 부담한다.",
+  "defined_terms_used": [
+    "양도인",
+    "양수인"
+  ],
+  "cross_refs": [],
+  "paragraph_count": 1,
+  "char_count": 82
+}

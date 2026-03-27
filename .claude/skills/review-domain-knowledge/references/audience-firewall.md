@@ -50,9 +50,10 @@ After all `[EXTERNAL]` comments for the contract are written, re-read every comm
    - Multiple comments each narrowing or expanding a definition in ways that collectively reveal our interpretation of scope
    - A series of comments that, read in sequence, makes our negotiation priority order obvious
 
-2. **If distributed leakage is found**: Revise or remove the comments that contribute to the pattern; ensure each comment is defensible in isolation and as part of the full set
+2. **Run** `review-domain-knowledge/scripts/validate-audience-firewall.py` **on the final external-comment payload** so the batch check leaves a machine-readable log
+3. **If distributed leakage is found**: Revise or remove the comments that contribute to the pattern; ensure each comment is defensible in isolation and as part of the full set
 
-3. **Log any `[MANUAL_REQUIRED]` outcomes** to `working/comments/firewall-log.json` with `clause_id` and reason
+4. **Log any `[MANUAL_REQUIRED]` outcomes** to `working/comments/firewall-log.json` with `clause_id` and reason
 
 ## Failure Protocol
 
@@ -71,4 +72,4 @@ After all `[EXTERNAL]` comments for the contract are written, re-read every comm
 ## External-Clean DOCX
 
 The `strip-internal-comments.py` script removes all `[INTERNAL]` comments.
-This is a **safety-critical** automated step. Both DOCX versions (internal + external-clean) are always generated together. The user should always review the external-clean version before sending to counterparty.
+This is a **safety-critical** automated step. The external-clean DOCX is generated only when output 2 is requested, and the user should always review it before sending to counterparty.

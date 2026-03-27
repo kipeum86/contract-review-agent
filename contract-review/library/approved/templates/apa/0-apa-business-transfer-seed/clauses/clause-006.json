@@ -1,0 +1,18 @@
+{
+  "clause_id": "clause-006",
+  "section_no": "제6조",
+  "heading": "거래종결",
+  "header": "(거래종결)",
+  "start_line": 18,
+  "end_line": 19,
+  "clause_type": "closing_mechanics",
+  "text": "당사자는 종결일에 자산 인도, 주요 계약 이전서류, 인허가 이전 협조문서, 대금지급 및 운영 인수인계 문서를 동시에 교부한다.",
+  "defined_terms_used": [
+    "양도인",
+    "양수인",
+    "대상사업"
+  ],
+  "cross_refs": [],
+  "paragraph_count": 1,
+  "char_count": 70
+}

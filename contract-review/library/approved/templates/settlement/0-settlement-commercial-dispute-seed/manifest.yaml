@@ -1,0 +1,36 @@
+doc_id: 0-settlement-commercial-dispute-seed
+title: 상사분쟁 합의서
+title_en: Commercial Settlement Agreement
+doc_class: template
+paper_role: neutral
+jurisdiction: KR
+governing_law: 대한민국 법률 (Korean law)
+language: ko
+approval_state: approved
+status: active
+classification_confidence: high
+authority_level: acceptable
+external_safe: false
+freshness_sensitive: false
+contract_family: settlement
+subtype: commercial_settlement
+sha256: f4b3d4f1722eca3db4fe79be09ff166444df99dd785a0837890906f3049f8b90
+source_file: session-j-seed-commercial-settlement.md
+created_at: '2026-03-27T19:35:00+00:00'
+updated_at: '2026-03-27T19:35:00+00:00'
+tags:
+- seed-baseline
+- synthetic-seed
+- session-j
+- kr-law
+- settlement
+notes: Synthetic interim baseline seed package for a zero-coverage family; internal
+  sanity review applied, domain expert calibration pending.
+industry: dispute-resolution
+stats:
+  total_clauses: 10
+  unmapped_clauses: 0
+  unmapped_ratio: 0.0
+  defined_terms: 3
+  sections: 10
+  exhibits: 0

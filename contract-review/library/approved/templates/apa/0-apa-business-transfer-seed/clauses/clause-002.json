@@ -1,0 +1,18 @@
+{
+  "clause_id": "clause-002",
+  "section_no": "제2조",
+  "heading": "대상사업 및 양수 자산",
+  "header": "(대상사업 및 양수 자산)",
+  "start_line": 6,
+  "end_line": 7,
+  "clause_type": "transferred_assets",
+  "text": "양도 대상에는 별첨 자산목록에 기재된 영업재산, 계약상 지위, 지식재산권, 설비, 재고 및 사업 운영에 필수적인 기타 자산이 포함되며, 제외 자산은 별도로 명시한다.",
+  "defined_terms_used": [
+    "양도인",
+    "양수인",
+    "대상사업"
+  ],
+  "cross_refs": [],
+  "paragraph_count": 1,
+  "char_count": 92
+}

@@ -1,8 +1,21 @@
 {
   "clause_id": "clause-016",
-  "header": "부록 별지를 참조하여 기재",
+  "section_no": "부록",
+  "heading": "부록",
+  "header": "부록",
   "start_line": 177,
   "end_line": 184,
   "clause_type": "exhibits_schedules",
+  "text": "부록 별지를 참조하여 기재\n\n\n\n\n기타 위 조건에 기재되지 않은 사항은 투자자의 선택에 따라 후속투자의 발행조건에 따르며, 회사는 투자자가 요청하는 위 발행조건과 후속투자의 발행조건을 병행하여 반영한 조건으로 전환사채를 발행하여야 한다.",
+  "defined_terms_used": [
+    "투자자",
+    "회사",
+    "후속투자"
+  ],
+  "cross_refs": [
+    "부록",
+    "별지"
+  ],
+  "paragraph_count": 2,
   "char_count": 132
 }

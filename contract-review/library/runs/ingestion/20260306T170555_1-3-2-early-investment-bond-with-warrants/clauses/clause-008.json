@@ -1,8 +1,20 @@
 {
   "clause_id": "clause-008",
+  "section_no": "제6조",
+  "heading": "투자금의 용도 및 제한",
   "header": "(투자금의 용도 및 제한)",
   "start_line": 102,
   "end_line": 104,
-  "clause_type": "purchase_price",
+  "clause_type": "obligations_general",
+  "text": "(투자금의 용도 및 제한)\n회사는 본 계약에 의하여 투자자로부터 받은 본건 신주인수권부사채의 인수가액(이하 “투자금”)을 회사의 운영자금으로만 사용하여야 하며, 특히 투자금으로 제3자에게 자금의 대여 또는 제3자의 주식을 매입 하여서는 아니된다.",
+  "defined_terms_used": [
+    "회사",
+    "투자자",
+    "본건 신주인수권부사채",
+    "투자금",
+    "제3자"
+  ],
+  "cross_refs": [],
+  "paragraph_count": 1,
   "char_count": 137
 }

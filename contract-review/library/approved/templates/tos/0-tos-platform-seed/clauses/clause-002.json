@@ -1,0 +1,18 @@
+{
+  "clause_id": "clause-002",
+  "section_no": "제2조",
+  "heading": "정의",
+  "header": "(정의)",
+  "start_line": 6,
+  "end_line": 7,
+  "clause_type": "definitions",
+  "text": "\"회원\"이란 본 약관에 동의하고 서비스 이용계약을 체결한 자를 의미하며, \"유료서비스\"란 별도 대가를 지급하고 이용하는 서비스를 의미한다.",
+  "defined_terms_used": [
+    "회원",
+    "유료서비스",
+    "서비스"
+  ],
+  "cross_refs": [],
+  "paragraph_count": 1,
+  "char_count": 77
+}

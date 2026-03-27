@@ -1,0 +1,18 @@
+{
+  "clause_id": "clause-007",
+  "section_no": "제7조",
+  "heading": "지식재산권",
+  "header": "(지식재산권)",
+  "start_line": 21,
+  "end_line": 22,
+  "clause_type": "ip_ownership",
+  "text": "게임 코드, 아트, 스토리 및 기타 산출물에 대한 기초 지식재산권은 별도 합의 없는 한 개발사에게 귀속되며, 퍼블리셔는 계약 목적 범위의 퍼블리싱 이용권을 가진다.",
+  "defined_terms_used": [
+    "개발사",
+    "퍼블리셔",
+    "게임"
+  ],
+  "cross_refs": [],
+  "paragraph_count": 1,
+  "char_count": 91
+}

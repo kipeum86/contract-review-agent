@@ -1,0 +1,16 @@
+{
+  "clause_id": "clause-009",
+  "section_no": "제9조",
+  "heading": "개인정보 보호",
+  "header": "(개인정보 보호)",
+  "start_line": 27,
+  "end_line": 28,
+  "clause_type": "data_protection",
+  "text": "회사는 회원의 개인정보를 관련 법령과 개인정보처리방침에 따라 처리하며, 회원의 동의 없이 법령상 근거 없는 제3자 제공을 하지 아니한다.",
+  "defined_terms_used": [
+    "회원"
+  ],
+  "cross_refs": [],
+  "paragraph_count": 1,
+  "char_count": 76
+}

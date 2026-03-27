@@ -1,0 +1,18 @@
+{
+  "clause_id": "clause-006",
+  "section_no": "제6조",
+  "heading": "재위탁 제한",
+  "header": "(재위탁 제한)",
+  "start_line": 18,
+  "end_line": 19,
+  "clause_type": "sub_processor",
+  "text": "수탁자는 위탁자의 사전 서면승인 없이 개인정보 처리업무를 재위탁할 수 없으며, 적법한 재위탁 시에도 동일 수준의 보호의무를 하위 수탁자에게 부과하고 그 이행에 책임을 진다.",
+  "defined_terms_used": [
+    "수탁자",
+    "위탁자",
+    "개인정보"
+  ],
+  "cross_refs": [],
+  "paragraph_count": 1,
+  "char_count": 96
+}

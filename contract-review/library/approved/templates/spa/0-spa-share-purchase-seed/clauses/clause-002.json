@@ -1,0 +1,17 @@
+{
+  "clause_id": "clause-002",
+  "section_no": "제2조",
+  "heading": "거래 대상",
+  "header": "(거래 대상)",
+  "start_line": 6,
+  "end_line": 7,
+  "clause_type": "definitions",
+  "text": "\"대상주식\"이란 대상회사 발행주식 총수의 100% 또는 별첨에 기재된 지분을 의미한다.",
+  "defined_terms_used": [
+    "대상회사",
+    "대상주식"
+  ],
+  "cross_refs": [],
+  "paragraph_count": 1,
+  "char_count": 48
+}

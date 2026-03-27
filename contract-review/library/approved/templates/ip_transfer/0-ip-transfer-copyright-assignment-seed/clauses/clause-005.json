@@ -1,0 +1,16 @@
+{
+  "clause_id": "clause-005",
+  "section_no": "제5조",
+  "heading": "대금",
+  "header": "(대금)",
+  "start_line": 15,
+  "end_line": 16,
+  "clause_type": "fees_payment",
+  "text": "양수인은 계약 체결 후 15일 이내에 합의된 양도대금을 지급하며, 별도 합의 없는 한 지급 완료 후에는 환급을 청구할 수 없다.",
+  "defined_terms_used": [
+    "양수인"
+  ],
+  "cross_refs": [],
+  "paragraph_count": 1,
+  "char_count": 71
+}

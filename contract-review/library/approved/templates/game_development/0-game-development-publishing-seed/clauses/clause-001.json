@@ -1,0 +1,18 @@
+{
+  "clause_id": "clause-001",
+  "section_no": "제1조",
+  "heading": "목적",
+  "header": "(목적)",
+  "start_line": 3,
+  "end_line": 4,
+  "clause_type": "purpose",
+  "text": "본 계약은 개발사가 개발하는 게임을 퍼블리셔가 국내외 플랫폼에서 출시하고 운영하는 조건을 정함을 목적으로 한다.",
+  "defined_terms_used": [
+    "개발사",
+    "퍼블리셔",
+    "게임"
+  ],
+  "cross_refs": [],
+  "paragraph_count": 1,
+  "char_count": 62
+}

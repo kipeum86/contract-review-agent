@@ -1,0 +1,17 @@
+{
+  "clause_id": "clause-005",
+  "section_no": "제5조",
+  "heading": "제3자 제공",
+  "header": "(제3자 제공)",
+  "start_line": 15,
+  "end_line": 16,
+  "clause_type": "data_protection",
+  "text": "회사는 정보주체의 동의 또는 법령상 근거가 있는 경우에만 개인정보를 제3자에게 제공하며, 제공받는 자, 제공 목적, 제공 항목 및 보유기간을 사전에 고지한다.",
+  "defined_terms_used": [
+    "정보주체",
+    "개인정보"
+  ],
+  "cross_refs": [],
+  "paragraph_count": 1,
+  "char_count": 88
+}
