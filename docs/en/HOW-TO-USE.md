@@ -63,7 +63,7 @@ python -m pip install pyyaml
 
 ### 1. Customize Policies to Your Practice
 
-The policy files in [`contract-review/library/policies/`](../../contract-review/library/policies/) control how the agent classifies and reviews contracts. They ship with broad defaults covering 27 contract families, but you should tailor them to your practice area.
+The policy files in [`contract-review/library/policies/`](../../contract-review/library/policies/) control how the agent classifies and reviews contracts. They ship with broad defaults covering 29 contract families, but you should tailor them to your practice area.
 
 In the Claude Code terminal or extension chat panel, just ask:
 
@@ -138,7 +138,7 @@ The agent compares the new draft against the prior review round and produces a *
 | `/library` | Search, list, show, deprecate, or archive library assets |
 | `/export-clean` | Strip `[INTERNAL]` comments from a redlined DOCX (safe for counterparty) |
 | `/resume` | Resume an interrupted pipeline from where it left off |
-| `/draft` | Draft a new contract |
+| `/draft` | Draft a new contract (assisted drafting; DOCX packaging is still manual/experimental) |
 
 You can also use natural language — the orchestrator routes to the correct workflow automatically.
 
@@ -171,6 +171,16 @@ Both options produce identical results. The extension panel is often easier for 
 
 ---
 
+## Advanced Operations
+
+If you are maintaining the synthetic template library over time, use the dedicated seed-maintenance guide:
+
+- [Seed Calibration Playbook](./SEED-CALIBRATION-PLAYBOOK.md)
+
+This is the document to follow when real matter review results should influence library baselines, calibration metadata, or `acceptable` vs `preferred` authority decisions.
+
+---
+
 ## Policy Files
 
 <a id="policy-files"></a>
@@ -183,7 +193,7 @@ Six YAML files under [`contract-review/library/policies/`](../../contract-review
 | `clause-taxonomy.yaml` | Clause classification hierarchy | **Yes** |
 | `review-mode.yaml` | Strict / moderate / loose review settings | **Yes** |
 | `approval-rules.yaml` | Auto-approval toggle and per-asset-type rules | **Yes** |
-| `retrieval-priority.yaml` | Search ranking, affinity groups | Optional |
+| `retrieval-priority.yaml` | Search ranking, language preference, freshness handling, and affinity fallback | Optional |
 | `metadata-schema.yaml` | Metadata field definitions | Optional |
 
 These are **read-only for the agent** — only you (or Claude Code at your request) edit them.

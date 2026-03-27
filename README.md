@@ -25,6 +25,7 @@ and negotiation recommendations** — all generated directly in DOCX.
 > **Before you start, please read:**
 > - **[Disclaimer](./docs/en/DISCLAIMER.md)** — important limitations and data security considerations
 > - **[How to Use](./docs/en/HOW-TO-USE.md)** — setup, environment, and step-by-step guide
+> - **[Seed Calibration Playbook](./docs/en/SEED-CALIBRATION-PLAYBOOK.md)** — advanced operating guide for maintaining synthetic library baselines over time
 
 ---
 
@@ -100,7 +101,7 @@ python -m pip install pyyaml
 
 ### Step 2 — Customize Policies to Your Practice
 
-The policy files in [`contract-review/library/policies/`](./contract-review/library/policies/) control how the agent classifies and reviews contracts. They ship with broad defaults covering 27 contract families, but you should tailor them to your practice.
+The policy files in [`contract-review/library/policies/`](./contract-review/library/policies/) control how the agent classifies and reviews contracts. They ship with broad defaults covering 29 contract families, but you should tailor them to your practice.
 
 Ask Claude Code directly — in the terminal or the extension chat panel:
 
@@ -171,7 +172,7 @@ Review this NDA strictly.
 | `/library` | Search, list, show, deprecate, or archive library assets |
 | `/export-clean` | Strip `[INTERNAL]` comments from a redlined DOCX |
 | `/resume` | Resume an interrupted pipeline |
-| `/draft` | Draft a new contract |
+| `/draft` | Draft a new contract (assisted drafting; DOCX packaging is still manual/experimental) |
 
 Natural language works too — the orchestrator routes to the right workflow.
 
@@ -265,10 +266,10 @@ Beyond contract templates, you can build a **reference library** of statutes, co
 
 No embeddings or vector databases. Retrieval works in stages:
 
-1. **Deterministic filter** — JSON index filtering by contract family, clause type, jurisdiction
-2. **Narrowing** — structural attribute matching when candidates exceed threshold
-3. **LLM judgment** — best-match selection from the filtered set
-4. **Priority ranking** — controlled by [`retrieval-priority.yaml`](./contract-review/library/policies/retrieval-priority.yaml)
+1. **Deterministic filter** — JSON index filtering by contract family, jurisdiction, governing law, approval state, and status
+2. **Narrowing** — structural clause-type matching when candidates exceed threshold
+3. **Priority ranking** — controlled by [`retrieval-priority.yaml`](./contract-review/library/policies/retrieval-priority.yaml), including authority-level ranking, same-language preference, freshness downranking, and affinity-family fallback
+4. **LLM judgment** — best-match selection from the filtered set
 
 Fully auditable. Every match is traceable.
 
@@ -311,11 +312,11 @@ Six YAML files under [`contract-review/library/policies/`](./contract-review/lib
 
 | File | Controls | Edit? |
 |------|----------|-------|
-| `contract-families.yaml` | Supported agreement types (27 families: NDA, SPA, game dev, publishing, ...) | **Yes** |
+| `contract-families.yaml` | Supported agreement types (29 families: NDA, SPA, game dev, publishing, employment, lease, ...) | **Yes** |
 | `clause-taxonomy.yaml` | Clause classification hierarchy (M&A, IP, content, game dev categories, ...) | **Yes** |
 | `review-mode.yaml` | Strict / moderate / loose review settings + recommended modes per deal type | **Yes** |
 | `approval-rules.yaml` | Auto-approval toggle and per-asset-type rules | **Yes** |
-| `retrieval-priority.yaml` | Search ranking, affinity groups for cross-family matching | Optional |
+| `retrieval-priority.yaml` | Search ranking, language preference, freshness handling, and affinity fallback | Optional |
 | `metadata-schema.yaml` | Metadata field definitions (bilingual support, industry tags, ...) | Optional |
 
 Policies are **read-only for the agent** — only you edit them. The agent manages `indexes/` automatically.
