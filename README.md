@@ -313,10 +313,17 @@ Fully auditable. Every match is traceable.
 │   │   └── policies/            # YAML config files (user-managed)
 │   └── matters/                 # Per-deal working directories (gitignored)
 │
+├── logs/                        # Session logs — your conversation notes (gitignored)
 ├── docs/
 ├── CLAUDE.md                    # Orchestrator routing rules
 └── package.json
 ```
+
+### Session Logs
+
+The `logs/` folder is your personal workspace for saving conversation notes, analysis records, and session history. Files in this folder are gitignored — they stay on your machine and are never committed.
+
+Use it to keep track of review decisions, negotiation strategy discussions, or any context you want to carry across sessions. Claude Code will save session summaries here when asked.
 
 ---
 

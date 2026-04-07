@@ -311,10 +311,17 @@ inbox/raw/  ──>  validate  ──>  classify  ──>  segment  ──>  app
 │   │   └── policies/            # YAML 설정 파일 (사용자 관리)
 │   └── matters/                 # 딜별 작업 디렉터리 (gitignored)
 │
+├── logs/                        # 세션 로그 — 대화 기록 저장 (gitignored)
 ├── docs/
 ├── CLAUDE.md                    # 오케스트레이터 라우팅 규칙
 └── package.json
 ```
+
+### 세션 로그
+
+`logs/` 폴더는 대화 기록, 분석 메모, 세션 히스토리를 저장하는 개인 작업 공간입니다. 이 폴더의 파일은 gitignore 처리되어 로컬에만 남으며 커밋되지 않습니다.
+
+검토 결정 사항, 협상 전략 논의, 세션 간 이어갈 맥락 등을 기록하는 데 활용하세요. Claude Code에게 요청하면 세션 요약을 여기에 저장합니다.
 
 ---
 
