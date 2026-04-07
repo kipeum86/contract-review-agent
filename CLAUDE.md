@@ -97,6 +97,18 @@ counterparty: "상대방 회사명"
 3. **No Auto-Promotion**: Assets cannot skip the approval gate. Staging → Approved requires an explicit decision (auto or human per `approval-rules.yaml`).
 4. **No Fabrication**: If the library is empty or no match is found, operate in general review mode and explicitly state this. Never fabricate house positions.
 
+## Policy Initialization
+
+`policies/` is gitignored so users' customizations survive `git pull`. On first run (or if `policies/` is empty), copy defaults:
+
+```
+if policies/ contains only .gitkeep or is empty:
+    copy all files from policies.default/ → policies/
+    notify user: "기본 정책 파일을 초기화했습니다. policies/ 폴더에서 커스터마이즈하세요."
+```
+
+**Before any pipeline step that reads policy files**, check that `policies/` has the required YAML files. If missing, copy from `policies.default/` and notify the user.
+
 ## Folder Access Rules
 
 | Folder | Read | Write | Notes |
@@ -109,7 +121,8 @@ counterparty: "상대방 회사명"
 | `contract-review/library/quarantine/` | Yes | Yes | Failed/rejected assets |
 | `contract-review/library/approved/` | Yes | Yes (publish only) | Only via publish step (templates, precedents, redline-records) |
 | `contract-review/library/indexes/` | Yes | Yes | Index build/rebuild |
-| `contract-review/library/policies/` | Yes | No | User-managed config |
+| `contract-review/library/policies/` | Yes | No | User-managed config (gitignored — defaults in `policies.default/`) |
+| `contract-review/library/policies.default/` | Yes | No | Shipped defaults — do not modify |
 | `contract-review/matters/` | Yes | Yes | Matter working directories |
 | `contract-review/library/runs/` | Yes | Yes | Execution logs |
 
