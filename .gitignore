@@ -144,6 +144,7 @@ contract-review-agent-design.md
 drafting-system-prompt.md
 /scripts/generate_*.py
 .gstack/
-/logs/*.log
+/logs/*
+!/logs/.gitkeep
 *quality-audit-log*
 *build-log*
