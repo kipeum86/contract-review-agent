@@ -257,6 +257,115 @@ def build_supersession_index(manifests: list[dict]) -> dict:
     }
 
 
+def build_redline_patterns_index(manifests: list[dict]) -> dict:
+    """Build redline-patterns.json from redline_record documents.
+
+    Scans clauses in redline_record packages for redline_data.review_pattern
+    and groups them by {contract_family}:{clause_type} for retrieval.
+    """
+    redline_manifests = [m for m in manifests if m.get('doc_class') == 'redline_record']
+    entries_map = {}
+
+    for m in redline_manifests:
+        doc_id = m.get('doc_id')
+        manifest_path = m.get('_manifest_path')
+        if not manifest_path:
+            continue
+        doc_dir = os.path.dirname(manifest_path)
+        clauses_dir = os.path.join(doc_dir, 'clauses')
+        if not os.path.isdir(clauses_dir):
+            continue
+
+        for clause_file in sorted(os.listdir(clauses_dir)):
+            if not clause_file.endswith('.json'):
+                continue
+            clause_data = load_json(os.path.join(clauses_dir, clause_file))
+            if not clause_data:
+                continue
+
+            redline_data = clause_data.get('redline_data')
+            if not redline_data or not redline_data.get('has_changes'):
+                continue
+
+            family = m.get('contract_family', 'unknown')
+            clause_type = clause_data.get('clause_type', 'unmapped')
+            key = f"{family}:{clause_type}"
+
+            review_pattern = redline_data.get('review_pattern', {})
+            record = {
+                'doc_id': doc_id,
+                'clause_id': clause_data.get('clause_id'),
+                'base_template_id': m.get('base_template_id'),
+                'pattern_type': review_pattern.get('pattern_type'),
+                'change_summary': review_pattern.get('description', ''),
+                'reviewer': m.get('reviewer'),
+                'counterparty': m.get('counterparty'),
+                'date': m.get('created_at', '')[:10] if m.get('created_at') else '',
+                'clause_path': to_library_relative_path(
+                    os.path.join(clauses_dir, clause_file)
+                ),
+            }
+
+            if key not in entries_map:
+                entries_map[key] = []
+            entries_map[key].append(record)
+
+    return {
+        'version': INDEX_VERSION,
+        'updated_at': datetime.now(timezone.utc).isoformat(),
+        'entries': [
+            {'key': k, 'records': v} for k, v in sorted(entries_map.items())
+        ],
+    }
+
+
+def build_negotiation_history_index(manifests: list[dict]) -> dict:
+    """Build negotiation-history.json grouping redline records by deal_id."""
+    redline_manifests = [m for m in manifests if m.get('doc_class') == 'redline_record']
+    deal_map = {}
+
+    for m in redline_manifests:
+        deal_id = m.get('deal_id')
+        if not deal_id:
+            continue
+
+        if deal_id not in deal_map:
+            deal_map[deal_id] = {
+                'deal_id': deal_id,
+                'contract_family': m.get('contract_family'),
+                'counterparty': m.get('counterparty'),
+                'rounds': [],
+            }
+
+        # Count total changes across clauses
+        total_changes = 0
+        manifest_path = m.get('_manifest_path')
+        if manifest_path:
+            report_path = os.path.join(
+                os.path.dirname(manifest_path), 'extraction', 'extraction-report.json'
+            )
+            report = load_json(report_path)
+            if report:
+                total_changes = report.get('total_changes', 0)
+
+        deal_map[deal_id]['rounds'].append({
+            'round': m.get('negotiation_round', 1),
+            'doc_id': m.get('doc_id'),
+            'date': m.get('created_at', '')[:10] if m.get('created_at') else '',
+            'total_changes': total_changes,
+        })
+
+    # Sort rounds within each deal
+    for deal in deal_map.values():
+        deal['rounds'].sort(key=lambda r: r.get('round', 0))
+
+    return {
+        'version': INDEX_VERSION,
+        'updated_at': datetime.now(timezone.utc).isoformat(),
+        'histories': list(deal_map.values()),
+    }
+
+
 def register_document(manifest_path: str) -> dict:
     """Register a single document by adding it to indexes.
 
@@ -298,6 +407,8 @@ def rebuild_all() -> dict:
     terms_index = build_terms_index(manifests)
     retrieval_map = build_retrieval_map(clauses_index)
     supersession_index = build_supersession_index(manifests)
+    redline_patterns = build_redline_patterns_index(manifests)
+    negotiation_history = build_negotiation_history_index(manifests)
 
     save_index(os.path.join(INDEXES_DIR, 'documents.json'), docs_index)
     save_index(os.path.join(INDEXES_DIR, 'clauses.json'), clauses_index)
@@ -305,6 +416,8 @@ def rebuild_all() -> dict:
     save_index(os.path.join(INDEXES_DIR, 'terms.json'), terms_index)
     save_index(os.path.join(INDEXES_DIR, 'retrieval-map.json'), retrieval_map)
     save_index(os.path.join(INDEXES_DIR, 'supersession.json'), supersession_index)
+    save_index(os.path.join(INDEXES_DIR, 'redline-patterns.json'), redline_patterns)
+    save_index(os.path.join(INDEXES_DIR, 'negotiation-history.json'), negotiation_history)
 
     return {
         'success': True,
@@ -314,6 +427,8 @@ def rebuild_all() -> dict:
         'terms_count': len(terms_index['terms']),
         'retrieval_mappings': len(retrieval_map['mappings']),
         'supersession_chains': len(supersession_index['chains']),
+        'redline_patterns_count': len(redline_patterns['entries']),
+        'negotiation_histories_count': len(negotiation_history['histories']),
         'updated_at': datetime.now(timezone.utc).isoformat(),
     }
 

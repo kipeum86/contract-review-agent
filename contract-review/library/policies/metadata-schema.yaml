@@ -14,7 +14,7 @@ manifest_schema:
 
     - field: doc_class
       type: enum
-      values: [template, precedent, playbook, comment_bank, review_target]
+      values: [template, precedent, playbook, comment_bank, review_target, redline_record]
       description: Document classification
 
     - field: contract_family
@@ -122,6 +122,22 @@ manifest_schema:
     - field: industry
       type: string
       description: Industry context (e.g., "gaming", "publishing", "tech", "entertainment")
+
+    - field: base_template_id
+      type: string
+      description: doc_id of the clean template this redline was applied to (redline_record only)
+
+    - field: negotiation_round
+      type: integer
+      description: Round number in a multi-round negotiation (redline_record only)
+
+    - field: deal_id
+      type: string
+      description: Links multiple rounds of the same deal (redline_record only)
+
+    - field: reviewer
+      type: string
+      description: Name of the reviewing attorney (redline_record only)
 
     - field: tags
       type: list

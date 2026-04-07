@@ -139,6 +139,9 @@ Claude Code는 계약군, 조항 분류 체계, 검토 모드, 검색 규칙 등
 
 템플릿과 선례는 기본적으로 **자동 승인**됩니다. 플레이북과 코멘트 뱅크는 여전히 사람의 확인이 필요합니다. [`approval-rules.yaml`](../../contract-review/library/policies/approval-rules.yaml)을 참고하세요.
 
+> [!TIP]
+> **레드라인이 달린 계약서도 등록할 수 있습니다.** 추적 변경(tracked changes) + 코멘트가 포함된 DOCX 파일을 같은 `inbox/raw/` 폴더에 넣으세요. 시스템이 추적 변경을 자동 감지하여, *어떤* 조항을 *어떻게* 수정했는지, *어떤* 코멘트를 남겼는지를 구조화하여 리뷰 패턴 인덱스로 축적합니다. 시간이 지날수록 에이전트가 과거 협상 패턴을 참고하여 더 정교한 리뷰 추천을 제공합니다.
+
 ### Step 4 — 계약서 검토하기
 
 검토할 계약서를 프로젝트 루트의 [`input/`](../../input/) 폴더에 넣은 뒤 다음을 입력하세요:
@@ -164,7 +167,7 @@ Review this NDA strictly.
 
 | 명령어 | 동작 |
 |--------|------|
-| `/ingest` | 문서를 라이브러리에 ingest합니다 |
+| `/ingest` | 문서를 라이브러리에 ingest합니다 (클린 템플릿 또는 레드라인 계약서 — 자동 감지) |
 | `/contract-review` | 상대방 계약서를 검토합니다 |
 | `/rereview` | 이전 라운드와 비교해 수정본을 다시 검토합니다 |
 | `/library` | 라이브러리 자산을 검색, 조회, 표시, 폐기, 보관합니다 |
@@ -238,11 +241,19 @@ Review this NDA strictly.
 
 ```
 inbox/raw/  ──>  validate  ──>  classify  ──>  segment  ──>  approved/
-                                                   \
-                                                    └──>  quarantine/  (실패 시)
+                    │                                            ├── templates/
+                    │                                            ├── precedents/
+                    │                                            └── redline-records/
+                    │                 \
+                    │                  └──>  quarantine/  (실패 시)
+                    │
+                    └──  tracked changes 감지?
+                              │
+                              └──>  extract-redlines.py  ──>  redline_record 경로
+                                    (changes.json, comments.json, 리뷰 패턴)
 ```
 
-템플릿과 선례는 기본적으로 자동 승인 처리되므로, 별도의 수동 승인 절차가 필요하지 않습니다.
+템플릿, 선례, 레드라인 기록은 기본적으로 자동 승인 처리되므로, 별도의 수동 승인 절차가 필요하지 않습니다.
 
 ### 참조 소스 추가하기
 
@@ -291,6 +302,9 @@ inbox/raw/  ──>  validate  ──>  classify  ──>  segment  ──>  app
 │   │   ├── inbox/sidecars/      # 보조 메타데이터 (gitignored)
 │   │   ├── staging/             # 검증 완료, 승인 대기 (gitignored)
 │   │   ├── approved/            # 게시된 자산 (gitignored)
+│   │   │   ├── templates/       #   클린 계약서 템플릿
+│   │   │   ├── precedents/      #   선례 계약서
+│   │   │   └── redline-records/ #   레드라인 계약서 (리뷰 패턴 데이터)
 │   │   ├── quarantine/          # 실패 / 거절된 항목 (gitignored)
 │   │   ├── sources/             # 참조 소스 (법령, 판례, 샘플 양식 등)
 │   │   ├── indexes/             # JSON 인덱스 (자동 관리)
@@ -382,7 +396,7 @@ inbox/raw/  ──>  validate  ──>  classify  ──>  segment  ──>  app
 | 단계 | 범위 |
 |------|------|
 | **v1-alpha** | 인제스트, 라이브러리 관리, 검토(JSON/MD 보고서), 파이프라인 상태, 슬래시 명령 |
-| **v1-beta** | DOCX 레드라인/코멘트, 외부 공유용 clean export, 재검토 delta 보고서 |
+| **v1-beta** | DOCX 레드라인/코멘트, 외부 공유용 clean export, 재검토 delta 보고서, **레드라인 기록 인제스트 (리뷰 패턴 개인화)** |
 | **v2** | 계약서 초안 작성, 표 단위 레드라인, 플레이북 자동 제안, 임베딩 검색 |
 
 ---

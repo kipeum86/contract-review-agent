@@ -141,6 +141,9 @@ Drop your house templates and reference contracts into [`contract-review/library
 
 Templates and precedents are **auto-approved** by default. Playbooks and comment banks still require human confirmation. See [`approval-rules.yaml`](./contract-review/library/policies/approval-rules.yaml).
 
+> [!TIP]
+> **Redlined contracts too.** Drop a DOCX with tracked changes and comments into the same `inbox/raw/` folder. The system auto-detects tracked changes and extracts *what* was changed, *how*, and *why* — building a personalized review pattern index. Over time, this lets the agent reference your past negotiation patterns during future reviews.
+
 ### Step 4 — Review a Contract
 
 Drop the contract you want reviewed into the [`input/`](./input/) folder at the project root, then type:
@@ -166,7 +169,7 @@ Review this NDA strictly.
 
 | Command | What it does |
 |---------|-------------|
-| `/ingest` | Ingest documents into the library |
+| `/ingest` | Ingest documents into the library (clean templates or redlined contracts — auto-detected) |
 | `/contract-review` | Review a counterparty contract |
 | `/rereview` | Re-review a revised draft against a prior round |
 | `/library` | Search, list, show, deprecate, or archive library assets |
@@ -240,11 +243,19 @@ Default is `moderate`. Override per-review: `"이거 엄격하게 검토해줘"`
 
 ```
 inbox/raw/  ──>  validate  ──>  classify  ──>  segment  ──>  approved/
-                                                   \
-                                                    └──>  quarantine/  (on failure)
+                    │                                            ├── templates/
+                    │                                            ├── precedents/
+                    │                                            └── redline-records/
+                    │                 \
+                    │                  └──>  quarantine/  (on failure)
+                    │
+                    └──  tracked changes detected?
+                              │
+                              └──>  extract-redlines.py  ──>  redline_record pathway
+                                    (changes.json, comments.json, review patterns)
 ```
 
-Auto-approval is on by default for templates and precedents. No manual approval step needed.
+Auto-approval is on by default for templates, precedents, and redline records. No manual approval step needed.
 
 ### Adding Reference Sources
 
@@ -293,6 +304,9 @@ Fully auditable. Every match is traceable.
 │   │   ├── inbox/sidecars/      # Auxiliary metadata (gitignored)
 │   │   ├── staging/             # Validated, awaiting approval (gitignored)
 │   │   ├── approved/            # Published assets (gitignored)
+│   │   │   ├── templates/       #   Clean contract templates
+│   │   │   ├── precedents/      #   Precedent agreements
+│   │   │   └── redline-records/ #   Ingested redlined contracts (review pattern data)
 │   │   ├── quarantine/          # Failed / rejected (gitignored)
 │   │   ├── sources/             # Reference sources (statutes, precedents, sample forms, etc.)
 │   │   ├── indexes/             # JSON indexes (auto-managed)
@@ -384,7 +398,7 @@ The agent is composed of three specialized sub-agents coordinated by an orchestr
 | Phase | Scope |
 |-------|-------|
 | **v1-alpha** | Ingestion, library management, review (JSON/MD reports), pipeline state, slash commands |
-| **v1-beta** | DOCX redlines/comments, external-clean export, re-review delta reports |
+| **v1-beta** | DOCX redlines/comments, external-clean export, re-review delta reports, **redline record ingestion (review pattern personalization)** |
 | **v2** | Contract drafting, table-level redlines, playbook auto-suggestion, embedding retrieval |
 
 ---

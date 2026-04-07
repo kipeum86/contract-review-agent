@@ -19,6 +19,7 @@ Manage library indexes for document and clause retrieval.
    - Ranking honors `retrieval-priority.yaml` priority buckets, language preference, and affinity-family expansion
    - Usage: `python3 query-index.py query '{"contract_family":"nda"}'`
    - Search: `python3 query-index.py search '{"query_text":"liability","clause_type":"limitation_of_liability"}'`
+   - Redline patterns: `python3 query-index.py redline-patterns '{"contract_family":"safe","clause_type":"indemnification"}'`
 
 3. **Coverage Reporting** (`scripts/report-coverage.py`)
    - Summarizes configured family coverage, observed clause types, unmapped ratios, and top unmapped headings
@@ -45,6 +46,8 @@ Manage library indexes for document and clause retrieval.
 | `terms.json` | All defined terms | `library/indexes/` |
 | `retrieval-map.json` | Clause lookup by family:type key | `library/indexes/` |
 | `supersession.json` | Supersession chains | `library/indexes/` |
+| `redline-patterns.json` | Past review patterns by family:clause_type | `library/indexes/` |
+| `negotiation-history.json` | Multi-round negotiation history by deal_id | `library/indexes/` |
 
 ## Query Pipeline for Review (Step 5)
 

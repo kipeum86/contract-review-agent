@@ -482,10 +482,56 @@ def search(query_text: str = None, clause_type: str = None,
     }
 
 
+def query_redline_patterns(contract_family: str = None,
+                           clause_type: str = None) -> dict:
+    """Query redline-patterns.json for past review patterns.
+
+    Args:
+        contract_family: filter by contract family
+        clause_type: filter by clause type
+
+    Returns:
+        dict with matching redline pattern records
+    """
+    patterns_index = load_json(os.path.join(INDEXES_DIR, 'redline-patterns.json'))
+    if not patterns_index or not patterns_index.get('entries'):
+        return {
+            'success': True,
+            'total_entries': 0,
+            'total_records': 0,
+            'entries': [],
+            'message': 'No redline patterns in index.',
+        }
+
+    entries = patterns_index['entries']
+    filtered = []
+
+    for entry in entries:
+        key = entry.get('key', '')
+        parts = key.split(':', 1)
+        entry_family = parts[0] if len(parts) > 0 else ''
+        entry_clause_type = parts[1] if len(parts) > 1 else ''
+
+        if contract_family and entry_family != contract_family:
+            continue
+        if clause_type and entry_clause_type != clause_type:
+            continue
+        filtered.append(entry)
+
+    total_records = sum(len(e.get('records', [])) for e in filtered)
+
+    return {
+        'success': True,
+        'total_entries': len(filtered),
+        'total_records': total_records,
+        'entries': filtered,
+    }
+
+
 def main():
     if len(sys.argv) < 2:
         print(json.dumps({
-            'error': 'Usage: query-index.py <query|search> [options as JSON]'
+            'error': 'Usage: query-index.py <query|search|redline-patterns> [options as JSON]'
         }))
         sys.exit(1)
 
@@ -504,6 +550,12 @@ def main():
         else:
             params = json.loads(sys.stdin.read())
         result = search(**params)
+    elif mode == 'redline-patterns':
+        if len(sys.argv) > 2:
+            params = json.loads(sys.argv[2])
+        else:
+            params = json.loads(sys.stdin.read())
+        result = query_redline_patterns(**params)
     else:
         result = {'error': f'Unknown mode: {mode}'}
         print(json.dumps(result, indent=2, ensure_ascii=False))

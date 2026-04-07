@@ -78,10 +78,11 @@ Write `output_selection: [1, 2, 3]` (with only selected numbers) to `matter-cont
 ### Step 5 — Library Candidate Retrieval
 **Executor**: Script + LLM
 1. Run `query-index.py query` with target's `contract_family` and clause types
-2. If `library_empty` is true, or `general_review_mode` is true, or `total_candidates == 0`: warn user and proceed in **general review mode**
-3. If library has candidates: present filtered set to LLM for semantic matching
-4. LLM selects best match per clause (clause_type first, semantic similarity second)
-5. Write matching results to `working/matches.json`
+2. Run `query-index.py redline-patterns` with same `contract_family` to retrieve past review patterns (if any exist in `redline-patterns.json`)
+3. If `library_empty` is true, or `general_review_mode` is true, or `total_candidates == 0`: warn user and proceed in **general review mode**
+4. If library has candidates: present filtered set to LLM for semantic matching
+5. LLM selects best match per clause (clause_type first, semantic similarity second)
+6. Write matching results to `working/matches.json`
 
 **General review mode**: Analyze based on general contract law principles only. Explicitly state this in the report. Omit house position comparison. Persist the fallback reason from `query-index.py` in the review data when available.
 
@@ -90,9 +91,10 @@ Write `output_selection: [1, 2, 3]` (with only selected numbers) to `matter-cont
 For each clause:
 1. Read target clause + matched library clause + playbook (if available) + fallback ladder
 2. Load review mode from `review-mode.yaml` (or per-review override)
-3. Apply the four-lens analysis framework from `review-guide.md` (Asymmetries / Overbroad Qualifiers / Missing Protections / Structural Traps)
-4. Identify divergences from house position
-5. Assign risk grade: Critical | High | Medium | Low | Acceptable
+3. If redline pattern records exist for this clause type (from Step 5.2), include them as context — reference how the reviewer handled similar clauses in past deals (e.g., "이전 Series A 딜에서 이 indemnity 조항을 계약금액 200% 한도로 narrowing한 바 있음")
+4. Apply the four-lens analysis framework from `review-guide.md` (Asymmetries / Overbroad Qualifiers / Missing Protections / Structural Traps)
+5. Identify divergences from house position
+6. Assign risk grade: Critical | High | Medium | Low | Acceptable
 6. Determine playbook tier hit: preferred | acceptable | fallback | prohibited
 7. Document reasoning using the structured format from `review-guide.md`: `[deviation identified] → [legal/commercial impact] → [market standard reference] → [risk verdict]`
 8. Write per-clause analysis to `working/analysis/`

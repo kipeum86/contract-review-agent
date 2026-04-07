@@ -35,6 +35,12 @@ per_asset_type:
     default_authority_level: null
     default_external_safe: false  # external entries must be explicitly marked
 
+  redline_record:
+    auto_approvable: true  # Descriptive records of past reviews — no normative authority
+    requires_human_fields: []
+    default_authority_level: reference_only
+    default_external_safe: false
+
 approval_decisions:
   valid_values:
     - approve         # Accept and publish to approved/

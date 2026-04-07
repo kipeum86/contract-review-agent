@@ -44,6 +44,37 @@ For each clause, produce a JSON file named `clause-{NNN}.json`:
 }
 ```
 
+### Redline Record Enrichment
+
+For documents with `doc_class: redline_record`, after standard segmentation:
+
+1. Read `extraction/changes.json` and `extraction/comments.json` from the document package
+2. For each clause, identify changes and comments whose `paragraph_index` falls within the clause's line range
+3. Enrich each clause JSON with a `redline_data` field:
+
+```json
+{
+  "redline_data": {
+    "has_changes": true,
+    "has_comments": true,
+    "changes": [ ... ],
+    "comments": [ ... ],
+    "change_summary": {
+      "total_changes": 2,
+      "change_types": {"replacement": 1, "insertion": 1},
+      "net_char_delta": 15
+    },
+    "review_pattern": {
+      "pattern_type": "narrowing",
+      "description": "Capped unlimited liability to 200% of contract value"
+    }
+  }
+}
+```
+
+4. The `review_pattern` is classified by LLM at Step 7 (Metadata Enrichment) with types: `narrowing`, `broadening`, `clarification`, `deletion`, `addition`, `replacement`, `cosmetic`
+5. Use `text_original` (pre-edit) and `text_accepted` (post-edit) fields alongside the standard `text` field (= `text_accepted` for index compatibility)
+
 ### Quality Thresholds
 
 - Total clause count must be ≥ 5 for a valid contract
