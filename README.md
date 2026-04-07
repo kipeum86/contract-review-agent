@@ -101,7 +101,9 @@ python -m pip install pyyaml
 
 ### Step 2 — Customize Policies to Your Practice
 
-The policy files in [`contract-review/library/policies/`](./contract-review/library/policies/) control how the agent classifies and reviews contracts. They ship with broad defaults covering 29 contract families, but you should tailor them to your practice.
+Policy files control how the agent classifies and reviews contracts. They ship with broad defaults covering 29 contract families, but you should tailor them to your practice.
+
+On first run, default policies are automatically copied from `policies.default/` to `policies/`. Your customizations in `policies/` are gitignored — they won't be overwritten by `git pull`.
 
 Ask Claude Code directly — in the terminal or the extension chat panel:
 
@@ -310,7 +312,8 @@ Fully auditable. Every match is traceable.
 │   │   ├── quarantine/          # Failed / rejected (gitignored)
 │   │   ├── sources/             # Reference sources (statutes, precedents, sample forms, etc.)
 │   │   ├── indexes/             # JSON indexes (auto-managed)
-│   │   └── policies/            # YAML config files (user-managed)
+│   │   ├── policies/            # Your customized config (gitignored)
+│   │   └── policies.default/    # Shipped defaults (do not edit)
 │   └── matters/                 # Per-deal working directories (gitignored)
 │
 ├── logs/                        # Session logs — your conversation notes (gitignored)
@@ -329,7 +332,10 @@ Use it to keep track of review decisions, negotiation strategy discussions, or a
 
 ## Policy Files
 
-Six YAML files under [`contract-review/library/policies/`](./contract-review/library/policies/) control the agent's behavior. These are the primary customization surface.
+Six YAML files under `contract-review/library/policies/` control the agent's behavior. These are the primary customization surface.
+
+> [!NOTE]
+> `policies/` is gitignored — your customizations are safe from `git pull`. Defaults are shipped in `policies.default/` and auto-copied on first run.
 
 | File | Controls | Edit? |
 |------|----------|-------|

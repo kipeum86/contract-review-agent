@@ -99,7 +99,9 @@ python -m pip install pyyaml
 
 ### Step 2 — 실무에 맞게 정책 커스터마이즈하기
 
-[`contract-review/library/policies/`](../../contract-review/library/policies/) 아래의 정책 파일은 에이전트가 계약을 분류하고 검토하는 방식을 제어합니다. 기본값은 27개 계약군을 폭넓게 포괄하도록 되어 있지만, 실제로는 자신의 업무에 맞게 조정하는 것이 좋습니다.
+정책 파일은 에이전트가 계약을 분류하고 검토하는 방식을 제어합니다. 기본값은 27개 계약군을 폭넓게 포괄하도록 되어 있지만, 실제로는 자신의 업무에 맞게 조정하는 것이 좋습니다.
+
+처음 실행 시 기본 정책이 `policies.default/`에서 `policies/`로 자동 복사됩니다. `policies/`는 gitignore 처리되어 있으므로 `git pull`로 업데이트해도 커스텀 설정이 덮어쓰이지 않습니다.
 
 터미널이나 확장 프로그램 채팅 패널에서 Claude Code에게 바로 이렇게 요청하면 됩니다:
 
@@ -308,7 +310,8 @@ inbox/raw/  ──>  validate  ──>  classify  ──>  segment  ──>  app
 │   │   ├── quarantine/          # 실패 / 거절된 항목 (gitignored)
 │   │   ├── sources/             # 참조 소스 (법령, 판례, 샘플 양식 등)
 │   │   ├── indexes/             # JSON 인덱스 (자동 관리)
-│   │   └── policies/            # YAML 설정 파일 (사용자 관리)
+│   │   ├── policies/            # 커스텀 설정 (gitignored)
+│   │   └── policies.default/    # 기본값 (수정 금지)
 │   └── matters/                 # 딜별 작업 디렉터리 (gitignored)
 │
 ├── logs/                        # 세션 로그 — 대화 기록 저장 (gitignored)
@@ -327,7 +330,10 @@ inbox/raw/  ──>  validate  ──>  classify  ──>  segment  ──>  app
 
 ## 정책 파일
 
-[`contract-review/library/policies/`](../../contract-review/library/policies/) 아래의 여섯 개 YAML 파일이 에이전트의 동작을 제어합니다. 이 파일들이 가장 중요한 커스터마이즈 지점입니다.
+`contract-review/library/policies/` 아래의 여섯 개 YAML 파일이 에이전트의 동작을 제어합니다. 이 파일들이 가장 중요한 커스터마이즈 지점입니다.
+
+> [!NOTE]
+> `policies/`는 gitignore 처리되어 `git pull`로 덮어쓰이지 않습니다. 기본값은 `policies.default/`에 포함되어 있으며, 처음 실행 시 자동 복사됩니다.
 
 | 파일 | 제어 대상 | 수정 여부 |
 |------|-----------|-----------|
