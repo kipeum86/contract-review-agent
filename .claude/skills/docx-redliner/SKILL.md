@@ -24,7 +24,19 @@ Apply tracked changes and comments to DOCX files via XML manipulation.
    - Prefixes: `[INTERNAL]` or `[EXTERNAL]`
    - Usage: `python3 apply-comments.py <unpacked_dir> <clause-map.json> <comments.json>`
 
-4. **Internal Comment Stripping** (`scripts/strip-internal-comments.py`)
+4. **Redline Extraction** (`scripts/extract-redlines.py`)
+   - Extracts tracked changes (`w:ins`/`w:del`) and comments from an existing DOCX
+   - Detects adjacent deletion+insertion pairs and merges them into `replacement` records
+   - Maps comments to paragraph positions via `commentRangeStart/End` markers
+   - Generates pre-edit text (`original.md`) by rejecting all changes
+   - Usage: `python3 extract-redlines.py <input.docx> <output_dir>`
+   - Output:
+     - `changes.json` — all tracked changes (type: insertion/deletion/replacement)
+     - `comments.json` — all margin comments with anchor paragraph indices
+     - `extraction-report.json` — statistics (change count, comment count, authors, date range)
+     - `original.md` — pre-edit text (all changes rejected)
+
+5. **Internal Comment Stripping** (`scripts/strip-internal-comments.py`)
    - Removes all `[INTERNAL]`-prefixed comments for external-clean version, including threaded comment metadata and stale rel/content-type entries
    - Safety-critical: prevents internal strategy leakage
    - Usage: `python3 strip-internal-comments.py <input.docx> <output.docx>`

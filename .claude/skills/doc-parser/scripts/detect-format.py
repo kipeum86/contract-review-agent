@@ -7,6 +7,8 @@ Validates that files are supported formats and checks basic integrity.
 import sys
 import os
 import json
+import zipfile
+import xml.etree.ElementTree as ET
 
 SUPPORTED_FORMATS = {
     '.docx': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
@@ -89,6 +91,54 @@ def detect_format(file_path: str) -> dict:
 
     result['mime_type'] = SUPPORTED_FORMATS[ext]
     result['supported'] = True
+
+    # For DOCX files, detect tracked changes and comments
+    if ext == '.docx':
+        tc = detect_tracked_changes(file_path)
+        result['has_tracked_changes'] = tc['has_tracked_changes']
+        result['has_comments'] = tc['has_comments']
+
+    return result
+
+
+def detect_tracked_changes(docx_path: str) -> dict:
+    """Check whether a DOCX file contains tracked changes or comments.
+
+    Opens the DOCX as a ZIP, parses word/document.xml for w:ins/w:del
+    elements, and checks for the existence of word/comments.xml.
+
+    Returns:
+        dict with has_tracked_changes (bool) and has_comments (bool).
+    """
+    result = {'has_tracked_changes': False, 'has_comments': False}
+    w_ns = 'http://schemas.openxmlformats.org/wordprocessingml/2006/main'
+
+    try:
+        with zipfile.ZipFile(docx_path, 'r') as zf:
+            # Check for tracked changes in document.xml
+            try:
+                doc_xml = zf.read('word/document.xml')
+                root = ET.fromstring(doc_xml)
+                for elem in root.iter():
+                    tag = elem.tag.split('}')[-1] if '}' in elem.tag else elem.tag
+                    if tag in ('ins', 'del'):
+                        result['has_tracked_changes'] = True
+                        break
+            except (KeyError, ET.ParseError):
+                pass
+
+            # Check for comments.xml existence and non-empty content
+            try:
+                comments_xml = zf.read('word/comments.xml')
+                comments_root = ET.fromstring(comments_xml)
+                if list(comments_root.iter(f'{{{w_ns}}}comment')):
+                    result['has_comments'] = True
+            except (KeyError, ET.ParseError):
+                pass
+
+    except (zipfile.BadZipFile, IOError):
+        pass
+
     return result
 
 

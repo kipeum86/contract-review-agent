@@ -24,7 +24,7 @@ Route user commands to the appropriate workflow. Accept both natural language an
 
 | Slash Command | Workflow | Trigger Patterns |
 |---------------|----------|------------------|
-| `/ingest` | WF1 — Library Ingestion | "ingest", "등록", "추가", "소스 추가", "자료 넣었어", file placed in inbox/raw |
+| `/ingest` | WF1 — Library Ingestion | "ingest", "등록", "추가", "소스 추가", "자료 넣었어", file placed in inbox/raw. Redlined DOCX (tracked changes) 자동 감지 → `redline_record` 경로로 분기 |
 | `/contract-review` | WF2 — Contract Review | "review", "검토", "분석", "이 계약서 검토해줘" |
 | `/library` | WF3 — Library Management | "library", "라이브러리", "list", "search", "목록", "검색" |
 | `/rereview` | WF4 — Contract Re-review | "re-review", "재검토", "revised version", "수정본" |
@@ -70,6 +70,26 @@ contract-review/library/
 4. 인덱스 업데이트 (`indexes/source-registry.json`)
 5. 원본은 `inbox/_processed/`로 보존
 
+### Redline Record Ingestion
+
+Redlined DOCX(tracked changes + comments 포함)를 `inbox/raw/`에 넣으면 자동으로 감지·처리된다.
+
+- **자동 감지**: `detect-format.py`가 DOCX 내 `w:ins`/`w:del` 존재 여부를 확인하여 `redline_record`로 자동 라우팅
+- **추출**: `extract-redlines.py`가 변경 이력(삽입/삭제/교체)과 코멘트를 JSON으로 구조화
+- **조항 매핑**: 각 변경·코멘트를 해당 조항에 매핑하고 `redline_data` 필드로 enrichment
+- **패턴 분류**: LLM이 각 조항의 수정 패턴을 분류 (narrowing, broadening, clarification 등)
+- **저장 위치**: `approved/redline-records/{contract_family}/{doc_id}/`
+- **사이드카 (선택)**: clean 템플릿 연결, 협상 라운드, 상대방 정보 등 추가 메타데이터 제공 가능
+
+```yaml
+# inbox/sidecars/my-redlined-contract.yaml
+doc_class: redline_record
+base_template_id: "0-safe-conditional-equity"
+reviewer: "고덕수 변호사"
+negotiation_round: 1
+counterparty: "상대방 회사명"
+```
+
 ## Core Safety Rules
 
 1. **Audience Firewall**: `[EXTERNAL]` comments must NEVER contain internal strategy, fallback positions, or negotiation leverage information. Only materials flagged `external_safe = true` may be referenced in external-facing output.
@@ -87,7 +107,7 @@ contract-review/library/
 | `contract-review/library/sources/` | Yes | Yes (ingest only) | 참조 소스 (법령, 판례, 해설, 샘플 양식 등) |
 | `contract-review/library/staging/` | Yes | Yes | Ingestion intermediate storage |
 | `contract-review/library/quarantine/` | Yes | Yes | Failed/rejected assets |
-| `contract-review/library/approved/` | Yes | Yes (publish only) | Only via publish step |
+| `contract-review/library/approved/` | Yes | Yes (publish only) | Only via publish step (templates, precedents, redline-records) |
 | `contract-review/library/indexes/` | Yes | Yes | Index build/rebuild |
 | `contract-review/library/policies/` | Yes | No | User-managed config |
 | `contract-review/matters/` | Yes | Yes | Matter working directories |
