@@ -108,6 +108,97 @@ function normalizeList(value) {
   return [];
 }
 
+// ─────────────────────────────────────────────────────────────────────────────
+// Domain Reference Forced-Load — baseline trace injection (v2.1, P4)
+//
+// Reads the per-matter baseline-context/loaded.json (written by
+// .claude/scripts/load-domain-references.sh) and appends a forensic trace
+// line to data.executive_summary.recommendation BEFORE rendering. Both the
+// English (createExecutiveSummary) and Korean (createKoreanMemorandum)
+// renderers consume `summary.recommendation`, so a single string mutation
+// reaches both code paths.
+//
+// CRITICAL — backward compatibility:
+//   If matterWorkingDir is null/undefined (v1 invocation: `compile-report.js
+//   review.json out.docx` with only 2 args), this function is a no-op.
+//   The output DOCX is identical to the v1 behavior — no warnings, no
+//   appended text. This preserves re-compilation of pre-v2.1 review data.
+//
+// Hallucination resistance:
+//   The trace line content is read from the JSON file directly. The LLM
+//   never writes this line. sha256 + canary heading in the JSON cannot be
+//   guessed without actually running the loader against the real files.
+//
+// See: docs/ko/domain-reference-forced-load.md (Section 9.3)
+// ─────────────────────────────────────────────────────────────────────────────
+function injectBaselineTrace(data, matterWorkingDir) {
+  // Backward compat: if caller did not provide matter dir, do nothing.
+  if (!matterWorkingDir) {
+    return;
+  }
+
+  const tracePath = path.join(matterWorkingDir, 'baseline-context', 'loaded.json');
+
+  // Ensure executive_summary exists
+  data.executive_summary = data.executive_summary || {};
+  const existing = data.executive_summary.recommendation || '';
+
+  // Helper: append text to recommendation with a blank-line separator
+  const appendToRecommendation = (text) => {
+    data.executive_summary.recommendation = existing
+      ? existing + '\n\n' + text
+      : text;
+  };
+
+  if (!fs.existsSync(tracePath)) {
+    appendToRecommendation(
+      '⚠️ REVIEW INVALID — baseline-context/loaded.json missing. ' +
+      'Analysis may have relied on pretrained knowledge only. ' +
+      'Re-run review recommended.',
+    );
+    return;
+  }
+
+  let trace;
+  try {
+    trace = JSON.parse(fs.readFileSync(tracePath, 'utf8'));
+  } catch (err) {
+    appendToRecommendation(
+      `⚠️ REVIEW INVALID — baseline-context/loaded.json malformed: ${err.message}`,
+    );
+    return;
+  }
+
+  if (!trace || !Array.isArray(trace.files_loaded) || trace.files_loaded.length === 0) {
+    appendToRecommendation(
+      '⚠️ REVIEW INVALID — loaded.json has no files_loaded entries.',
+    );
+    return;
+  }
+
+  const fileSummaries = trace.files_loaded.map((f) => {
+    const canary = f.last_section_heading || 'n/a';
+    return `${f.name} (${f.byte_size} bytes, sha256: ${f.sha256_short}, canary: "${canary}")`;
+  }).join(', ');
+
+  let traceLine = `Baselines applied: ${fileSummaries}. ` +
+                  `Loaded at ${trace.loaded_at} via ${trace.source}.`;
+
+  // Add chunking info if present (chunk-*.json siblings of loaded.json)
+  try {
+    const baselineDir = path.join(matterWorkingDir, 'baseline-context');
+    const chunkFiles = fs.readdirSync(baselineDir)
+      .filter((f) => /^chunk-\d+\.json$/.test(f));
+    if (chunkFiles.length > 0) {
+      traceLine += ` Chunking: ${chunkFiles.length} chunks with per-chunk re-injection.`;
+    }
+  } catch (_) {
+    // chunk enumeration is optional; ignore errors
+  }
+
+  appendToRecommendation(traceLine);
+}
+
 function resolveReportLanguage(data) {
   const explicitLanguage = firstNonEmpty(
     data.report_language,
@@ -688,9 +779,15 @@ function buildChildren(data) {
   return children;
 }
 
-async function compileReport(inputPath, outputPath) {
+async function compileReport(inputPath, outputPath, matterWorkingDir) {
   const rawData = fs.readFileSync(inputPath, 'utf-8');
   const data = JSON.parse(rawData);
+
+  // v2.1 — inject baseline trace line BEFORE rendering so both English and
+  // Korean renderers see the mutated summary.recommendation. No-op when
+  // matterWorkingDir is omitted (backward compat with v1 2-arg invocation).
+  injectBaselineTrace(data, matterWorkingDir);
+
   const children = buildChildren(data);
 
   const doc = new Document({
@@ -729,13 +826,16 @@ async function compileReport(inputPath, outputPath) {
 async function main() {
   if (process.argv.length < 4) {
     console.log(JSON.stringify({
-      error: 'Usage: compile-report.js <review_data.json> <output.docx>',
+      error: 'Usage: compile-report.js <review_data.json> <output.docx> [<matter_working_dir>]',
     }));
     process.exit(1);
   }
 
   try {
-    const result = await compileReport(process.argv[2], process.argv[3]);
+    // Optional 3rd arg: matter working directory (for baseline trace injection).
+    // Omitting it preserves v1 behavior exactly (no injection, no warnings).
+    const matterWorkingDir = process.argv[4] || null;
+    const result = await compileReport(process.argv[2], process.argv[3], matterWorkingDir);
     console.log(JSON.stringify(result, null, 2));
   } catch (err) {
     console.log(JSON.stringify({ error: err.message, success: false }));
@@ -751,4 +851,5 @@ module.exports = {
   compileReport,
   buildChildren,
   resolveReportLanguage,
+  injectBaselineTrace,
 };
