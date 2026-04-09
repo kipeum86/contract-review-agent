@@ -2,7 +2,15 @@
   "permissions": {
     "allow": [
       "Bash(find \"/c/Users/localuser/Desktop/VS Code/contract-review-agent/.claude/skills\" -name \"*.py\" -type f -exec wc -l {} +)",
-      "Bash(kill %1)"
+      "Bash(kill %1)",
+      "Edit(/.claude/skills/docx-redliner/**)",
+      "Edit(/.claude/skills/doc-parser/**)",
+      "Edit(/.claude/skills/index-manager/**)",
+      "Edit(/.claude/skills/clause-segmenter/**)",
+      "Bash(rm generate_cdkey_template.py)",
+      "Bash(rm -f CD_Key_Distribution_Agreement_Template_Outline.docx)",
+      "Bash(ls -la \"/path/to/contract-review-agent/output/\"*.docx)",
+      "Bash(find \"/path/to/GDPR-expert\" -type f -name \"*.py\" -exec grep -l \"def.*search\\\\|def.*query\\\\|def.*retrieve\" {} \\\\;)"
     ]
   },
   "hooks": {
