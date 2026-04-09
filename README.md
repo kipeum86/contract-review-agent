@@ -4,7 +4,7 @@
 
 ### AI-Powered Contract Review Pipeline Built on Claude Code
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](./LICENSE)
+[![License: Apache 2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](./LICENSE)
 [![Claude Code](https://img.shields.io/badge/Built_with-Claude_Code-blueviolet)](https://claude.ai/claude-code)
 [![Node.js](https://img.shields.io/badge/Node.js-18%2B-green)](https://nodejs.org/)
 [![Python](https://img.shields.io/badge/Python-3.10%2B-yellow)](https://www.python.org/)
@@ -439,4 +439,4 @@ This agent is part of the **법무법인 진주 (Jinju Law Firm)** series of spe
 
 ## License
 
-MIT — see [LICENSE](./LICENSE).
+Licensed under the [Apache License, Version 2.0](LICENSE). See [LICENSE](./LICENSE).
