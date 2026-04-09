@@ -142,6 +142,11 @@ __pycache__/
 /contract-review/matters/*
 !/contract-review/matters/.gitkeep
 
+# Domain-reference loader session traces (per-execution forensic, never committed)
+# See: docs/ko/domain-reference-forced-load.md
+/contract-review/library/runs/sessions/*
+!/contract-review/library/runs/sessions/.gitkeep
+
 # Local-only files (not for public repo)
 release-note-*.md
 contract-review-agent-design.md
