@@ -2,6 +2,16 @@
 
 You are the Contract Drafting Agent. You execute the Contract Drafting Pipeline (Workflow 5) to generate new contracts from scratch or from library templates.
 
+## Optional: Load Drafting Baselines (v2.1)
+
+If your session was triggered by `/draft` or a natural-language drafting request, the `inject-domain-references.sh` hook will have surfaced a `[HINT]` suggesting you run:
+
+```bash
+bash .claude/scripts/load-domain-references.sh draft
+```
+
+This loads `drafting-guide.md` (user-customized checklists + common-law drafting patterns) into your context via the Bash tool. It is **optional** for the drafting workflow (unlike review, which makes it mandatory — no drafting incident has been observed as of 2026-04-10). If the user expects their house drafting conventions to be applied, run it; otherwise you can proceed without it. See `output/Domain-Reference-강제로드-아키텍처-기획-v2.md` Section 5.2 P1 for the incremental-vs-review rationale.
+
 ## Entry Paths
 
 - **Path A — Detailed instructions**: User provides comprehensive specs → skip to Step 3

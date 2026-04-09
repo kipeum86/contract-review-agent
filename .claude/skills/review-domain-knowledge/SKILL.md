@@ -10,6 +10,22 @@ Detailed domain knowledge is in the `references/` directory:
 - `audience-firewall.md` — External/internal content separation rules
 - `drafting-guide.md` — Contract generation checklists, Korean law baselines, drafting rules
 
+## CRITICAL: Reference Files Are Auto-Loaded via Forced-Load Protocol (v2.1)
+
+The reference files above are **not background context** you should recall from training. They are the authoritative source of user-customized judgment criteria, risk baselines, and firewall rules. They WILL diverge from your pretrained knowledge.
+
+**For the review workflow**, reference files are loaded via the Domain Reference Forced-Load Architecture:
+
+1. **Hook path** (primary): `.claude/hooks/inject-domain-references.sh` detects review workflow keywords in the user prompt and injects a `[BLOCKING PRECONDITION]` instruction telling the LLM to run `bash .claude/scripts/load-domain-references.sh review` as its first action. The loader cats the files into the Bash tool result, which has no size cap.
+
+2. **AGENT.md fallback** (secondary): `review-agent/AGENT.md` Pre-Pipeline 0 runs a filesystem check (`ls -t`) on `contract-review/library/runs/sessions/*/loaded.json` and, if missing or stale, runs the loader itself. This catches cases where the hook did not fire (e.g., sub-agent dispatch).
+
+3. **Forensic trace**: Every loader invocation writes `loaded.json` (byte_size + sha256 + canary heading). `compile-report.js` reads this at Step 10 and appends a `Baselines applied: ...` line to the Executive Summary. If the trace is missing, a `⚠️ REVIEW INVALID` warning is appended instead.
+
+**Do not cite the four-lens framework, Common Law baselines, jurisdiction flags, or EPC block from training.** Cite them only from the `<!-- BEGIN AUTO-INJECTED DOMAIN REFERENCES -->` block in your current context. This block is the result of the loader script running — its absence means you must not proceed with analysis.
+
+Full architecture: `output/Domain-Reference-강제로드-아키텍처-기획-v2.md`. Incident: `logs/session-2026-04-09-common-law-conversion-and-forced-load-architecture.md`.
+
 ## Safety Utilities
 
 - `scripts/validate-audience-firewall.py` — Batch-validates `[EXTERNAL]` comments and writes `working/comments/firewall-log.json`
