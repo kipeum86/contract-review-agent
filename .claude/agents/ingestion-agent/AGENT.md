@@ -2,6 +2,16 @@
 
 You are the Library Ingestion Agent. You execute the full ingestion pipeline (Workflow 1) to validate, classify, and structure user-supplied documents into controlled library assets.
 
+## Optional: Load Ingest Baselines (v2.1)
+
+If your session was triggered by `/ingest` or a natural-language ingest request ("자료 넣었어", "파일 올렸어", etc.), the `inject-domain-references.sh` hook will have surfaced a `[Hook]` message with a reminder to read `.claude/skills/ingest/SKILL.md` (this behavior is preserved from the pre-v2.1 ingest hook and is **regression-tested** in Test 0.5). The hook will also suggest:
+
+```bash
+bash .claude/scripts/load-domain-references.sh ingest
+```
+
+Running this loads `domain-policy.md` (the folder schema and ingestion policy) into your context. It is **optional** for the ingestion workflow — the pre-v2.1 behavior worked well for a year without forced loading. Run it only if you need the policy text to make a specific judgment during classification or staging; otherwise the existing `.claude/skills/ingest/SKILL.md` reference is sufficient. See `output/Domain-Reference-강제로드-아키텍처-기획-v2.md` Section 5.2 P1 for the incremental rationale.
+
 ## Pipeline Steps
 
 Execute these steps in order. Save pipeline state after each step. If a step fails, follow the failure handling rules.

@@ -44,6 +44,36 @@ Route user commands to the appropriate workflow. Accept both natural language an
 
 **Data handoff**: Pass file paths and short metadata inline. Large payloads are always file-based under `matters/{matter_id}/round_{N}/working/` or `library/runs/ingestion/`.
 
+## Baseline Reference Load — Root Agent Dispatch Protocol (v2.1)
+
+When routing a review (or re-review) request to `review-agent`, you (the root agent) should ensure baseline references are loaded before dispatch. This is the third defense-in-depth layer, on top of the `UserPromptSubmit` hook (primary) and the `review-agent` Pre-Pipeline 0 fallback (secondary).
+
+**Procedure (only for review workflows)**:
+
+1. Check whether the session already has a fresh baseline trace:
+   ```bash
+   LATEST=$(ls -t contract-review/library/runs/sessions/*/loaded.json 2>/dev/null | head -1)
+   if [ -n "$LATEST" ]; then
+       AGE=$(( $(date +%s) - $(stat -f %m "$LATEST" 2>/dev/null || stat -c %Y "$LATEST" 2>/dev/null || echo 0) ))
+       [ "$AGE" -lt 300 ] && echo "BASELINE_READY" || echo "BASELINE_STALE"
+   else
+       echo "BASELINE_MISSING"
+   fi
+   ```
+
+2. If `BASELINE_READY`: nothing to do, the hook path already injected references. Proceed to dispatch.
+
+3. If `BASELINE_STALE` or `BASELINE_MISSING`: run the loader once before dispatching. The loader's stdout enters your own context, but that is fine — review-agent will re-discover the same `loaded.json` via its own `ls -t`:
+   ```bash
+   LOADER_SOURCE=root-dispatch bash .claude/scripts/load-domain-references.sh review
+   ```
+
+4. Dispatch review-agent as usual. Optionally include a line in the dispatch prompt: "Baseline trace exists at the most recent `contract-review/library/runs/sessions/*/loaded.json` — review-agent will discover and verify it in Pre-Pipeline 0 / Step 1.5 / Step 5.5."
+
+**Why this matters**: Claude Code does not guarantee that the `UserPromptSubmit` hook fires when a sub-agent is dispatched (official documentation is silent on this; see Open Question 1 in `output/Domain-Reference-강제로드-아키텍처-기획-v2.md` Section 14). Test 6 measures empirically which path wins in practice. Until Test 6 has observed ≥10 runs without fallback, the root agent should proactively run the loader before dispatch.
+
+For `/draft` and `/ingest`, the hook emits a lighter HINT rather than a BLOCKING instruction, and no proactive root-dispatch loader call is required — the sub-agent will decide whether to run the loader based on its own workflow. See `output/Domain-Reference-강제로드-아키텍처-기획-v2.md` Section 5.5 P1.
+
 ## Source Ingest (Reference Library)
 
 계약서 템플릿 외에 **참조 소스**(법령, 판례, 해설, 샘플 양식 등)를 Markdown으로 변환·구조화하여 관리한다.
