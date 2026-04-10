@@ -6,11 +6,12 @@ Compile analysis results into professional DOCX report deliverables.
 
 1. **Analysis Report** (`scripts/compile-report.js`)
    - Generates DOCX with either:
-     - generic Executive Summary + per-clause analysis, or
+     - legacy flat Executive Summary + per-clause analysis, or
+     - numbered Section 1-6 English structure when `executive_summary.negotiation_priority` is present, or
      - Korean memorandum-style opinion when report language is Korean
    - Korean renderer applies A4 sizing, CJK font, minimal color, disclaimer blocks, information block, and signature block
-   - Input: review data JSON with clauses, executive_summary, risk distribution, and optional memorandum metadata
-   - Usage: `node compile-report.js <review_data.json> <output.docx>`
+   - Input: review data JSON with clauses, executive_summary, risk distribution, optional memorandum metadata, and optional matter working directory for baseline trace injection
+   - Usage: `node compile-report.js <review_data.json> <output.docx> [<matter_working_dir>]`
 
 2. **Delta Report** (`scripts/compile-delta-report.js`)
    - Generates DOCX for re-review delta reports
@@ -49,8 +50,18 @@ Compile analysis results into professional DOCX report deliverables.
   "limitations_disclaimer": "...",
   "closing_disclaimer": "...",
   "executive_summary": {
+    "overview": "2-3 sentence contract overview",
     "overall_risk": "high",
     "key_issues": ["Issue 1", "Issue 2"],
+    "negotiation_priority": {
+      "must_haves": ["Item 1"],
+      "should_haves": ["Item 2"],
+      "nice_to_haves": ["Item 3"]
+    },
+    "review_notes": [
+      "Library mode: House position comparison active",
+      "Review date: 2026-04-10"
+    ],
     "recommendation": "...",
     "risk_distribution": { "critical": 1, "high": 3, "medium": 5 }
   },
@@ -65,6 +76,7 @@ Compile analysis results into professional DOCX report deliverables.
       "divergence": "...",
       "playbook_tier": "preferred",
       "playbook_missing": false,
+      "suggested_action": "Tighten the liability cap to direct damages only.",
       "suggested_redline": "...",
       "internal_note": "..."
     }
@@ -100,5 +112,6 @@ Compile analysis results into professional DOCX report deliverables.
 
 - Redline text: always in the contract's original language
 - Analysis report: follows user's prompt language or explicit language instruction
+- English reports render as numbered Section 1-6 output when `executive_summary.negotiation_priority` is present; otherwise the compiler falls back to the legacy flat structure for backward compatibility
 - Korean reports render as memorandum-style DOCX when `report_language`, `language`, or the supplied text indicates Korean
 - The report compiler accepts the substantive text as-is; language adaptation and memorandum metadata selection happen at render time
