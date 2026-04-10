@@ -52,6 +52,26 @@ def direct_paragraphs(document_path: Path):
     return body.findall(f"{{{W_NS}}}p")
 
 
+def make_clause(index: int, *, include_action: bool = False, korean: bool = False) -> dict:
+    prefix = "제" if korean else "§"
+    clause = {
+        "clause_id": f"clause-{index:03d}",
+        "section_no": f"{prefix}{index}조" if korean else str(index),
+        "heading": f"Clause {index}",
+        "clause_type": "general_clause",
+        "risk_level": "high" if index <= 5 else "medium",
+        "risk_rationale": f"Clause {index} shifts risk to the client.",
+        "divergence": f"Clause {index} diverges from the preferred baseline.",
+        "playbook_tier": "fallback" if index <= 5 else "acceptable",
+        "playbook_missing": False,
+        "suggested_redline": f"Revised clause text {index}.",
+        "internal_note": f"Internal note for clause {index}.",
+    }
+    if include_action:
+        clause["suggested_action"] = f"Negotiate clause {index} back to the preferred position."
+    return clause
+
+
 class SessionDAudit009CommentsTests(unittest.TestCase):
     def test_apply_comments_preserves_existing_comments_and_package_parts(self):
         with tempfile.TemporaryDirectory() as tmpdir:
@@ -469,6 +489,174 @@ class SessionDAudit011ReportTests(unittest.TestCase):
             document_xml = read_zip_text(output_docx, "word/document.xml")
             self.assertIn("Executive Summary", document_xml)
             self.assertIn("Per-Clause Analysis", document_xml)
+            self.assertNotIn("Section 1. Executive Summary", document_xml)
+            self.assertNotIn("Section 6. Clause-by-Clause Analysis", document_xml)
+
+    def test_compile_report_uses_numbered_sections_when_negotiation_priority_present(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            review_data_path = Path(tmpdir) / "review-data.json"
+            output_docx = Path(tmpdir) / "report.docx"
+            matter_working_dir = Path(tmpdir) / "working"
+            trace_path = matter_working_dir / "baseline-context" / "loaded.json"
+            trace_path.parent.mkdir(parents=True, exist_ok=True)
+            trace_path.write_text(
+                json.dumps(
+                    {
+                        "loaded_at": "2026-04-10T12:34:56Z",
+                        "source": "agent-prepipe",
+                        "files_loaded": [
+                            {
+                                "name": "review-guide.md",
+                                "byte_size": 12345,
+                                "sha256_short": "abc12345",
+                                "last_section_heading": "Section 5 — Review Notes",
+                            }
+                        ],
+                    },
+                    indent=2,
+                ),
+                encoding="utf-8",
+            )
+            review_data_path.write_text(
+                json.dumps(
+                    {
+                        "report_language": "en",
+                        "review_mode": "strict",
+                        "contract_info": {
+                            "title": "EPC Supply Agreement",
+                            "contract_family": "supply_agreement",
+                            "language": "en",
+                            "jurisdiction": "Singapore",
+                            "governing_law": "England & Wales",
+                        },
+                        "executive_summary": {
+                            "overview": "This EPC supply agreement governs the delivery of key plant equipment and allocates major schedule and performance risk.",
+                            "overall_risk": "high",
+                            "risk_distribution": {
+                                "critical": 5,
+                                "high": 11,
+                                "medium": 6,
+                                "low": 2,
+                                "acceptable": 3,
+                            },
+                            "key_issues": [
+                                "[§4] Performance Bond cap — exposure is uncapped.",
+                                "[§13] Liquidated damages — cap is missing.",
+                                "[§22] Termination — convenience right is one-sided.",
+                            ],
+                            "negotiation_priority": {
+                                "must_haves": ["[§4] Cap the performance bond."],
+                                "should_haves": ["[§18] Broaden force majeure relief."],
+                                "nice_to_haves": ["[§29] Add a change-of-control carve-out."],
+                            },
+                            "review_notes": [
+                                "Library mode: House position comparison active",
+                                "Review date: 2026-04-10",
+                            ],
+                            "recommendation": "Negotiate the critical allocation points before signing.",
+                        },
+                        "clauses": [make_clause(index, include_action=True) for index in range(1, 28)],
+                    },
+                    ensure_ascii=False,
+                    indent=2,
+                ),
+                encoding="utf-8",
+            )
+
+            completed = subprocess.run(
+                [
+                    "node",
+                    str(REPO_ROOT / ".claude/skills/report-compiler/scripts/compile-report.js"),
+                    str(review_data_path),
+                    str(output_docx),
+                    str(matter_working_dir),
+                ],
+                cwd=REPO_ROOT,
+                capture_output=True,
+                text=True,
+                check=True,
+            )
+            result = json.loads(completed.stdout)
+            self.assertTrue(result["success"], result)
+            self.assertEqual(result["report_language"], "en")
+            self.assertEqual(result["clauses_count"], 27)
+
+            document_xml = read_zip_text(output_docx, "word/document.xml")
+            self.assertIn("Section 1. Executive Summary", document_xml)
+            self.assertIn("Section 2. Overall Risk Assessment", document_xml)
+            self.assertIn("Section 3. Key Issues", document_xml)
+            self.assertIn("Section 4. Negotiation Priority", document_xml)
+            self.assertIn("4.1 Must-haves (Critical)", document_xml)
+            self.assertIn("4.2 Should-haves (High)", document_xml)
+            self.assertIn("4.3 Nice-to-haves (Medium)", document_xml)
+            self.assertIn("Section 5. Review Notes", document_xml)
+            self.assertIn("Section 6. Clause-by-Clause Analysis", document_xml)
+            self.assertNotIn("Per-Clause Analysis", document_xml)
+            self.assertEqual(document_xml.count("Clause Type: "), 27)
+            self.assertIn("Baselines applied:", document_xml)
+
+    def test_compile_report_renders_all_korean_clauses_when_many_are_present(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            review_data_path = Path(tmpdir) / "review-data.json"
+            output_docx = Path(tmpdir) / "report.docx"
+            review_data_path.write_text(
+                json.dumps(
+                    {
+                        "report_language": "ko",
+                        "contract_info": {
+                            "title": "EPC 공급계약",
+                            "contract_family": "supply_agreement",
+                        },
+                        "memo_metadata": {
+                            "date": "2026-04-10",
+                            "recipient": "주식회사 예시",
+                            "sender": "법무법인 예시",
+                            "subject": "EPC 공급계약 검토 의견서",
+                            "signer": "고덕수 변호사",
+                        },
+                        "executive_summary": {
+                            "overall_risk": "high",
+                            "recommendation": "핵심 위험 조항의 수정 협의가 필요합니다.",
+                            "key_issues": [
+                                "성능보증 조항이 과도합니다.",
+                                "손해배상 한도가 불명확합니다.",
+                            ],
+                            "negotiation_priority": {
+                                "must_haves": ["성능보증 상한 설정"],
+                                "should_haves": ["손해배상 구조 정비"],
+                                "nice_to_haves": ["통지 절차 정비"],
+                            },
+                        },
+                        "clauses": [make_clause(index, korean=True) for index in range(1, 28)],
+                    },
+                    ensure_ascii=False,
+                    indent=2,
+                ),
+                encoding="utf-8",
+            )
+
+            completed = subprocess.run(
+                [
+                    "node",
+                    str(REPO_ROOT / ".claude/skills/report-compiler/scripts/compile-report.js"),
+                    str(review_data_path),
+                    str(output_docx),
+                ],
+                cwd=REPO_ROOT,
+                capture_output=True,
+                text=True,
+                check=True,
+            )
+            result = json.loads(completed.stdout)
+            self.assertTrue(result["success"], result)
+            self.assertEqual(result["report_language"], "ko")
+            self.assertEqual(result["clauses_count"], 27)
+
+            document_xml = read_zip_text(output_docx, "word/document.xml")
+            self.assertIn("4. 검토의견", document_xml)
+            self.assertEqual(document_xml.count("위험도:"), 27)
+            self.assertIn("제1조 Clause 1", document_xml)
+            self.assertIn("제27조 Clause 27", document_xml)
 
 
 if __name__ == "__main__":

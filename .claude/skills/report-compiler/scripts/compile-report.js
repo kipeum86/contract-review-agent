@@ -5,7 +5,7 @@
  * - Generic renderer: Executive Summary + per-clause analysis
  * - Korean renderer: Memorandum-style opinion aligned to the local style guide
  *
- * Usage: node compile-report.js <review_data.json> <output.docx>
+ * Usage: node compile-report.js <review_data.json> <output.docx> [<matter_working_dir>]
  */
 
 const fs = require('fs');
@@ -113,10 +113,9 @@ function normalizeList(value) {
 //
 // Reads the per-matter baseline-context/loaded.json (written by
 // .claude/scripts/load-domain-references.sh) and appends a forensic trace
-// line to data.executive_summary.recommendation BEFORE rendering. Both the
-// English (createExecutiveSummary) and Korean (createKoreanMemorandum)
-// renderers consume `summary.recommendation`, so a single string mutation
-// reaches both code paths.
+// line before rendering. For the numbered English renderer, the trace is
+// appended to `executive_summary.review_notes`; for legacy English and Korean
+// paths it is appended to `executive_summary.recommendation`.
 //
 // CRITICAL — backward compatibility:
 //   If matterWorkingDir is null/undefined (v1 invocation: `compile-report.js
@@ -141,17 +140,24 @@ function injectBaselineTrace(data, matterWorkingDir) {
 
   // Ensure executive_summary exists
   data.executive_summary = data.executive_summary || {};
-  const existing = data.executive_summary.recommendation || '';
+  const summary = data.executive_summary;
 
-  // Helper: append text to recommendation with a blank-line separator
-  const appendToRecommendation = (text) => {
-    data.executive_summary.recommendation = existing
-      ? existing + '\n\n' + text
+  const appendTraceText = (text) => {
+    const useReviewNotes = resolveReportLanguage(data) === 'en' && !!summary.negotiation_priority;
+    if (useReviewNotes) {
+      summary.review_notes = normalizeList(summary.review_notes);
+      summary.review_notes.push(text);
+      return;
+    }
+
+    const existing = summary.recommendation || '';
+    summary.recommendation = existing
+      ? `${existing}\n\n${text}`
       : text;
   };
 
   if (!fs.existsSync(tracePath)) {
-    appendToRecommendation(
+    appendTraceText(
       '⚠️ REVIEW INVALID — baseline-context/loaded.json missing. ' +
       'Analysis may have relied on pretrained knowledge only. ' +
       'Re-run review recommended.',
@@ -163,14 +169,14 @@ function injectBaselineTrace(data, matterWorkingDir) {
   try {
     trace = JSON.parse(fs.readFileSync(tracePath, 'utf8'));
   } catch (err) {
-    appendToRecommendation(
+    appendTraceText(
       `⚠️ REVIEW INVALID — baseline-context/loaded.json malformed: ${err.message}`,
     );
     return;
   }
 
   if (!trace || !Array.isArray(trace.files_loaded) || trace.files_loaded.length === 0) {
-    appendToRecommendation(
+    appendTraceText(
       '⚠️ REVIEW INVALID — loaded.json has no files_loaded entries.',
     );
     return;
@@ -196,7 +202,7 @@ function injectBaselineTrace(data, matterWorkingDir) {
     // chunk enumeration is optional; ignore errors
   }
 
-  appendToRecommendation(traceLine);
+  appendTraceText(traceLine);
 }
 
 function resolveReportLanguage(data) {
@@ -355,6 +361,194 @@ function createExecutiveSummary(data) {
   return sections;
 }
 
+function createNumberedExecutiveSummary(data) {
+  const sections = [];
+  const summary = data.executive_summary || {};
+  const contractInfo = data.contract_info || {};
+
+  sections.push(
+    createParagraph([styledRun('Section 1. Executive Summary', { bold: true })], {
+      heading: HeadingLevel.HEADING_1,
+    }),
+  );
+
+  if (summary.overview) {
+    sections.push(createParagraph([styledRun(summary.overview)], {
+      spacing: { before: 200, after: 100 },
+    }));
+  }
+
+  const overallRisk = summary.overall_risk || 'Not assessed';
+  sections.push(
+    createParagraph(
+      [
+        styledRun('Overall Risk Profile: ', { bold: true, size: 24 }),
+        createRiskBadge(overallRisk.toLowerCase()),
+      ],
+      { spacing: { before: 200, after: 100 } },
+    ),
+  );
+
+  if (data.review_mode) {
+    sections.push(
+      createParagraph([
+        styledRun('Review Mode: ', { bold: true }),
+        styledRun(data.review_mode),
+      ]),
+    );
+  }
+
+  if (contractInfo.title) {
+    sections.push(
+      createParagraph(
+        [styledRun('Contract: ', { bold: true }), styledRun(contractInfo.title)],
+        { spacing: { before: 200 } },
+      ),
+    );
+  }
+  if (contractInfo.contract_family) {
+    sections.push(
+      createParagraph([
+        styledRun('Type: ', { bold: true }),
+        styledRun(contractInfo.contract_family),
+      ]),
+    );
+  }
+  if (contractInfo.language) {
+    sections.push(
+      createParagraph([
+        styledRun('Contract Language: ', { bold: true }),
+        styledRun(contractInfo.language),
+      ]),
+    );
+  }
+  if (contractInfo.jurisdiction) {
+    sections.push(
+      createParagraph([
+        styledRun('Jurisdiction: ', { bold: true }),
+        styledRun(contractInfo.jurisdiction),
+      ]),
+    );
+  }
+  if (contractInfo.governing_law) {
+    sections.push(
+      createParagraph([
+        styledRun('Governing Law: ', { bold: true }),
+        styledRun(contractInfo.governing_law),
+      ]),
+    );
+  }
+
+  sections.push(
+    createParagraph([styledRun('Section 2. Overall Risk Assessment', { bold: true })], {
+      heading: HeadingLevel.HEADING_1,
+      spacing: { before: 400 },
+    }),
+  );
+
+  const stats = summary.risk_distribution || {};
+  if (Object.keys(stats).length > 0) {
+    sections.push(
+      createParagraph([styledRun('Risk Distribution', { bold: true })], {
+        heading: HeadingLevel.HEADING_2,
+        spacing: { before: 200 },
+      }),
+    );
+    for (const [level, count] of Object.entries(stats)) {
+      sections.push(
+        createParagraph([createRiskBadge(level), styledRun(`: ${count} clause(s)`)]),
+      );
+    }
+  } else {
+    sections.push(createParagraph([styledRun('Risk distribution not available.', { color: '666666' })]));
+  }
+
+  sections.push(
+    createParagraph([styledRun('Section 3. Key Issues', { bold: true })], {
+      heading: HeadingLevel.HEADING_1,
+      spacing: { before: 400 },
+    }),
+  );
+
+  const keyIssues = normalizeList(summary.key_issues);
+  if (keyIssues.length === 0) {
+    sections.push(createParagraph([styledRun('No key issues flagged.', { color: '666666' })]));
+  } else {
+    for (const issue of keyIssues) {
+      sections.push(new Paragraph({
+        bullet: { level: 0 },
+        spacing: DEFAULT_PARAGRAPH_SPACING,
+        children: [styledRun(issue)],
+      }));
+    }
+  }
+
+  sections.push(
+    createParagraph([styledRun('Section 4. Negotiation Priority', { bold: true })], {
+      heading: HeadingLevel.HEADING_1,
+      spacing: { before: 400 },
+    }),
+  );
+
+  const priority = summary.negotiation_priority || {};
+  const priorityGroups = [
+    { key: 'must_haves', label: '4.1 Must-haves (Critical)' },
+    { key: 'should_haves', label: '4.2 Should-haves (High)' },
+    { key: 'nice_to_haves', label: '4.3 Nice-to-haves (Medium)' },
+  ];
+  for (const group of priorityGroups) {
+    sections.push(
+      createParagraph([styledRun(group.label, { bold: true })], {
+        heading: HeadingLevel.HEADING_2,
+        spacing: { before: 200 },
+      }),
+    );
+    const items = normalizeList(priority[group.key]);
+    if (items.length === 0) {
+      sections.push(createParagraph([styledRun('— (none)', { color: '666666' })]));
+      continue;
+    }
+    for (const item of items) {
+      sections.push(new Paragraph({
+        bullet: { level: 0 },
+        spacing: DEFAULT_PARAGRAPH_SPACING,
+        children: [styledRun(item)],
+      }));
+    }
+  }
+
+  sections.push(
+    createParagraph([styledRun('Section 5. Review Notes', { bold: true })], {
+      heading: HeadingLevel.HEADING_1,
+      spacing: { before: 400 },
+    }),
+  );
+
+  const notes = normalizeList(summary.review_notes);
+  if (notes.length === 0 && !summary.recommendation) {
+    sections.push(createParagraph([styledRun('No additional review notes.', { color: '666666' })]));
+  } else {
+    for (const note of notes) {
+      sections.push(new Paragraph({
+        bullet: { level: 0 },
+        spacing: DEFAULT_PARAGRAPH_SPACING,
+        children: [styledRun(note)],
+      }));
+    }
+    if (summary.recommendation) {
+      sections.push(
+        createParagraph([styledRun('Recommendation', { bold: true })], {
+          heading: HeadingLevel.HEADING_2,
+          spacing: { before: 200 },
+        }),
+      );
+      sections.push(createParagraph([styledRun(summary.recommendation)]));
+    }
+  }
+
+  return sections;
+}
+
 function createClauseAnalysis(clauses) {
   const sections = [];
 
@@ -430,6 +624,79 @@ function createClauseAnalysis(clauses) {
           styledRun(clause.internal_note),
         ], { spacing: { before: 100 } }),
       );
+    }
+  }
+
+  return sections;
+}
+
+function createNumberedClauseAnalysis(clauses) {
+  const sections = [];
+
+  sections.push(
+    createParagraph([styledRun('Section 6. Clause-by-Clause Analysis', { bold: true })], {
+      heading: HeadingLevel.HEADING_1,
+      spacing: { before: 500 },
+    }),
+  );
+
+  if (!clauses.length) {
+    sections.push(createParagraph([styledRun('No clauses analyzed.', { color: '666666' })]));
+    return sections;
+  }
+
+  for (const clause of clauses) {
+    const heading = clause.heading || clause.clause_type || 'Unnamed Clause';
+    const sectionNo = clause.section_no ? `${clause.section_no} ` : '';
+
+    sections.push(
+      createParagraph(
+        [
+          styledRun(`${sectionNo}${heading}`),
+          styledRun('  '),
+          createRiskBadge(clause.risk_level || 'acceptable'),
+        ],
+        {
+          heading: HeadingLevel.HEADING_2,
+          spacing: { before: 400 },
+        },
+      ),
+    );
+
+    if (clause.clause_type) {
+      sections.push(
+        createParagraph([
+          styledRun('Clause Type: ', { bold: true, size: 20, color: '666666' }),
+          styledRun(clause.clause_type, { size: 20, color: '666666' }),
+        ]),
+      );
+    }
+
+    if (clause.risk_rationale) {
+      sections.push(createParagraph([styledRun('Risk Assessment: ', { bold: true })], { spacing: { before: 100 } }));
+      sections.push(createParagraph([styledRun(clause.risk_rationale)]));
+    }
+
+    if (clause.divergence) {
+      sections.push(createParagraph([styledRun('Divergence: ', { bold: true })], { spacing: { before: 100 } }));
+      sections.push(createParagraph([styledRun(clause.divergence)]));
+    }
+
+    if (clause.playbook_tier) {
+      const tierText = clause.playbook_missing
+        ? `${clause.playbook_tier} (playbook missing)`
+        : clause.playbook_tier;
+      sections.push(
+        createParagraph([
+          styledRun('Playbook Tier: ', { bold: true }),
+          styledRun(tierText),
+        ]),
+      );
+    }
+
+    if (clause.suggested_action) {
+      sections.push(createParagraph([styledRun('Suggested Action: ', { bold: true })], { spacing: { before: 100 } }));
+      sections.push(createParagraph([styledRun(clause.suggested_action)]));
     }
   }
 
@@ -756,10 +1023,20 @@ function buildChildren(data) {
     return createKoreanMemorandum(data);
   }
 
-  const children = [
-    ...createExecutiveSummary(data),
-    ...createClauseAnalysis(clauses),
-  ];
+  const useNumberedStructure = !!(
+    data.executive_summary
+    && data.executive_summary.negotiation_priority
+  );
+
+  const children = useNumberedStructure
+    ? [
+      ...createNumberedExecutiveSummary(data),
+      ...createNumberedClauseAnalysis(clauses),
+    ]
+    : [
+      ...createExecutiveSummary(data),
+      ...createClauseAnalysis(clauses),
+    ];
 
   if (data.general_review_mode) {
     children.unshift(
@@ -852,4 +1129,6 @@ module.exports = {
   buildChildren,
   resolveReportLanguage,
   injectBaselineTrace,
+  createNumberedExecutiveSummary,
+  createNumberedClauseAnalysis,
 };

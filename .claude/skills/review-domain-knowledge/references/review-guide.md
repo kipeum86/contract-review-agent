@@ -398,16 +398,20 @@ Include: all Critical issues + top 3 High issues. If Critical+High total is fewe
 - Any review limitations (bilingual discrepancies, exhibits not analyzed, large-document chunking applied, etc.)
 - Review date
 
-### JSON Field Mapping for compile-report.js
+### JSON Field Mapping for compile-report.js (v2, 2026-04-10)
 
-When populating the `executive_summary` object in the review data JSON at Step 10, map the five template sections to the existing schema fields as follows:
+When populating the `executive_summary` object in the review data JSON at Step 10, map the five template sections to the following native schema fields. **Do not write Section numbers as text inside field values** — `compile-report.js` emits "Section 1. Executive Summary", "Section 2. Overall Risk Assessment", etc. as Heading 1 automatically.
 
 | Template Section | JSON Field | Format |
 |---|---|---|
-| Section 1 — Contract Overview | Opening lines of `recommendation` | 2–3 sentences of prose |
-| Section 2 — Overall Risk Assessment | `overall_risk` (string) + `risk_distribution` (object) | `"high"` / `{"critical":1,"high":3,...}` |
-| Section 3 — Key Issues | `key_issues` (array) | Each item: `"[§No.] [Title] — [description]"` |
-| Section 4 — Negotiation Priority | Middle paragraph of `recommendation` | Must-haves / Should-haves / Nice-to-haves prose |
-| Section 5 — Review Notes | Final lines of `recommendation` | One line per note |
+| Section 1 — Contract Overview | `executive_summary.overview` | String, 2-3 sentences of prose with no headings |
+| Section 2 — Overall Risk Assessment | `executive_summary.overall_risk` + `executive_summary.risk_distribution` | `"high"` / `{"critical":1,"high":3,"medium":5,"low":2,"acceptable":3}` |
+| Section 3 — Key Issues | `executive_summary.key_issues` | Array of strings, each formatted like `"[§No.] [Title] — [description]"` |
+| Section 4 — Negotiation Priority | `executive_summary.negotiation_priority` | Object with `must_haves`, `should_haves`, `nice_to_haves` arrays |
+| Section 5 — Review Notes | `executive_summary.review_notes` | Array of note strings |
 
-The `recommendation` field therefore carries Sections 1, 4, and 5 in sequence. The script renders it as a continuous narrative block; the three sections are separated by blank lines within the field.
+`executive_summary.recommendation` (optional) is rendered as a final verdict paragraph under Section 5, after `review_notes`. It is optional; if absent, Section 5 renders only the review notes list.
+
+The `clauses` array is Section 6 — Clause-by-Clause Analysis. It MUST contain every rated clause from Step 6. Do not filter to Critical+High only; the reader triages visually from the risk badges.
+
+**Backward compatibility**: If `executive_summary.negotiation_priority` is absent in the JSON (pre-v2 review files), `compile-report.js` falls back to the legacy flat renderer (Executive Summary / Key Issues / Recommendation / Risk Distribution / Per-Clause Analysis with no section numbering).
