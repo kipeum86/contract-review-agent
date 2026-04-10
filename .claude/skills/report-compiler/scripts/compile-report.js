@@ -206,10 +206,25 @@ function injectBaselineTrace(data, matterWorkingDir) {
 }
 
 function resolveReportLanguage(data) {
+  // Report language resolution order (2026-04-11 hardening):
+  //
+  //   1. data.report_language        ← Pre-Pipeline intake item 3 (user's
+  //                                     explicit choice, copied to review.json
+  //                                     at Step 10)
+  //   2. data.language               ← legacy alias, still honored
+  //   3. data.memo_metadata.language ← Korean memo metadata override
+  //
+  // NOTE: data.contract_info?.language is deliberately NOT in this chain.
+  // That field describes the CONTRACT's own language (set by Step 2
+  // classification) and is orthogonal to the report language. The 2026-04-10
+  // incident was caused by treating an English contract as an English report
+  // request even when the user asked for a Korean memorandum. Do not
+  // reintroduce this fallback without rethinking the Pre-Pipeline language
+  // intake flow. See docs/ko/domain-reference-forced-load.md incident
+  // history.
   const explicitLanguage = firstNonEmpty(
     data.report_language,
     data.language,
-    data.contract_info?.language,
     data.memo_metadata?.language,
   ).toLowerCase();
 
@@ -220,8 +235,14 @@ function resolveReportLanguage(data) {
     return 'en';
   }
 
+  // Last-resort heuristic: if no explicit language was set, inspect the actual
+  // text the LLM populated. A review.json written against a Korean matter will
+  // naturally contain Hangul in titles, recommendations, and key issues. This
+  // only fires when the LLM forgot to set report_language AND did not populate
+  // memo_metadata.language.
   const samples = [
     data.contract_info?.title,
+    data.executive_summary?.overview,
     data.executive_summary?.recommendation,
     ...(data.executive_summary?.key_issues || []),
   ].filter(Boolean);

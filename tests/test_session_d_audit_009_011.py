@@ -727,6 +727,77 @@ class SessionDAudit011ReportTests(unittest.TestCase):
             self.assertNotIn("가. 협상 우선순위", document_xml)
             self.assertNotIn("나. 조항별 분석", document_xml)
 
+    def test_contract_language_en_does_not_force_english_report(self):
+        """Regression guard for the 2026-04-10 incident.
+
+        If the review JSON has contract_info.language = "en" (the CONTRACT's
+        own language set by Step 2) but no report_language, the resolver
+        MUST NOT treat this as an English report request. Instead, it should
+        fall back to Hangul detection on the recommendation / overview text.
+        A Korean attorney reviewing an English contract should see a Korean
+        memorandum as long as the review text itself is in Korean.
+        """
+        with tempfile.TemporaryDirectory() as tmpdir:
+            review_data_path = Path(tmpdir) / "review-data.json"
+            output_docx = Path(tmpdir) / "report.docx"
+            review_data_path.write_text(
+                json.dumps(
+                    {
+                        # Deliberately omit report_language to simulate an LLM
+                        # that forgot to copy Pre-Pipeline intake item 3 into
+                        # the review JSON.
+                        "contract_info": {
+                            "title": "English Supply Agreement",
+                            "contract_family": "supply_agreement",
+                            "language": "en",  # ← must NOT force English report
+                        },
+                        "memo_metadata": {
+                            "date": "2026-04-11",
+                            "recipient": "주식회사 예시",
+                            "sender": "법무법인 예시",
+                            "subject": "영문 공급계약 검토 의견서",
+                            "signer": "고덕수 변호사",
+                        },
+                        "executive_summary": {
+                            "overall_risk": "high",
+                            "recommendation": "본 영문 공급계약은 핵심 위험 조항의 수정이 필요합니다.",
+                            "key_issues": [
+                                "성능보증 조항이 과도합니다.",
+                                "손해배상 한도가 불명확합니다.",
+                            ],
+                        },
+                        "clauses": [make_clause(index, korean=True) for index in range(1, 4)],
+                    },
+                    ensure_ascii=False,
+                    indent=2,
+                ),
+                encoding="utf-8",
+            )
+
+            completed = subprocess.run(
+                [
+                    "node",
+                    str(REPO_ROOT / ".claude/skills/report-compiler/scripts/compile-report.js"),
+                    str(review_data_path),
+                    str(output_docx),
+                ],
+                cwd=REPO_ROOT,
+                capture_output=True,
+                text=True,
+                check=True,
+            )
+            result = json.loads(completed.stdout)
+            self.assertTrue(result["success"], result)
+            # The resolver should pick Korean via Hangul heuristic, NOT English
+            # via contract_info.language.
+            self.assertEqual(result["report_language"], "ko")
+
+            document_xml = read_zip_text(output_docx, "word/document.xml")
+            # Must render as Korean memorandum, not English Executive Summary
+            self.assertIn("4. 검토의견", document_xml)
+            self.assertNotIn("Executive Summary", document_xml)
+            self.assertNotIn("Per-Clause Analysis", document_xml)
+
 
 if __name__ == "__main__":
     unittest.main()
