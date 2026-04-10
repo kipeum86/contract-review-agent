@@ -885,6 +885,49 @@ function createMemoCallout(text) {
   });
 }
 
+function createKoreanNegotiationPriority(priority) {
+  const sections = [];
+
+  sections.push(
+    createParagraph([styledRun('가. 협상 우선순위', { bold: true })], {
+      spacing: { before: 180, after: 120 },
+    }),
+  );
+
+  const groups = [
+    { key: 'must_haves', label: '(1) 반드시 수정 사항 (Must-haves)' },
+    { key: 'should_haves', label: '(2) 협상 추진 사항 (Should-haves)' },
+    { key: 'nice_to_haves', label: '(3) 여력 있을 시 제기 사항 (Nice-to-haves)' },
+  ];
+
+  for (const group of groups) {
+    sections.push(
+      createParagraph([styledRun(group.label, { bold: true })], {
+        spacing: { before: 120, after: 60 },
+      }),
+    );
+
+    const items = normalizeList(priority[group.key]);
+    if (items.length === 0) {
+      sections.push(
+        createParagraph([styledRun('— 해당 사항 없음', { color: '666666' })]),
+      );
+      continue;
+    }
+    for (const item of items) {
+      sections.push(
+        new Paragraph({
+          bullet: { level: 0 },
+          spacing: DEFAULT_PARAGRAPH_SPACING,
+          children: [styledRun(item)],
+        }),
+      );
+    }
+  }
+
+  return sections;
+}
+
 function createKoreanClauseAnalysis(clauses) {
   const sections = [];
 
@@ -997,6 +1040,21 @@ function createKoreanMemorandum(data) {
   }
 
   sections.push(createMemoSectionTitle('4. 검토의견'));
+
+  // Optional 협상 우선순위 sub-section — rendered only when
+  // executive_summary.negotiation_priority is present (v2 schema). Backward
+  // compat: legacy Korean review.json without this field renders the
+  // clause-by-clause list directly under "4. 검토의견" as before.
+  const negotiationPriority = data.executive_summary && data.executive_summary.negotiation_priority;
+  if (negotiationPriority) {
+    sections.push(...createKoreanNegotiationPriority(negotiationPriority));
+    sections.push(
+      createParagraph([styledRun('나. 조항별 분석', { bold: true })], {
+        spacing: { before: 240, after: 120 },
+      }),
+    );
+  }
+
   sections.push(...createKoreanClauseAnalysis(clauses));
 
   sections.push(createMemoSectionTitle('5. 결론'));
