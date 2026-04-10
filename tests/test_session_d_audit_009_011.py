@@ -657,6 +657,75 @@ class SessionDAudit011ReportTests(unittest.TestCase):
             self.assertEqual(document_xml.count("위험도:"), 27)
             self.assertIn("제1조 Clause 1", document_xml)
             self.assertIn("제27조 Clause 27", document_xml)
+            # Korean negotiation priority sub-section (v2 schema)
+            self.assertIn("가. 협상 우선순위", document_xml)
+            self.assertIn("(1) 반드시 수정 사항", document_xml)
+            self.assertIn("(2) 협상 추진 사항", document_xml)
+            self.assertIn("(3) 여력 있을 시 제기 사항", document_xml)
+            self.assertIn("성능보증 상한 설정", document_xml)
+            self.assertIn("손해배상 구조 정비", document_xml)
+            self.assertIn("통지 절차 정비", document_xml)
+            self.assertIn("나. 조항별 분석", document_xml)
+
+    def test_compile_report_korean_without_negotiation_priority_uses_legacy_structure(self):
+        """Backward compat: Korean review.json without negotiation_priority
+        should render the legacy 5-section memorandum with no 가./나.
+        sub-headings under 4. 검토의견."""
+        with tempfile.TemporaryDirectory() as tmpdir:
+            review_data_path = Path(tmpdir) / "review-data.json"
+            output_docx = Path(tmpdir) / "report.docx"
+            review_data_path.write_text(
+                json.dumps(
+                    {
+                        "report_language": "ko",
+                        "contract_info": {
+                            "title": "기존 형식 계약",
+                            "contract_family": "nda",
+                        },
+                        "memo_metadata": {
+                            "date": "2026-04-10",
+                            "recipient": "주식회사 예시",
+                            "sender": "법무법인 예시",
+                            "subject": "기존 형식 검토 의견서",
+                            "signer": "고덕수 변호사",
+                        },
+                        "executive_summary": {
+                            "overall_risk": "medium",
+                            "recommendation": "조항별 검토 결과를 반영하시기 바랍니다.",
+                            "key_issues": ["예시 이슈"],
+                            # negotiation_priority intentionally omitted
+                        },
+                        "clauses": [make_clause(index, korean=True) for index in range(1, 6)],
+                    },
+                    ensure_ascii=False,
+                    indent=2,
+                ),
+                encoding="utf-8",
+            )
+
+            completed = subprocess.run(
+                [
+                    "node",
+                    str(REPO_ROOT / ".claude/skills/report-compiler/scripts/compile-report.js"),
+                    str(review_data_path),
+                    str(output_docx),
+                ],
+                cwd=REPO_ROOT,
+                capture_output=True,
+                text=True,
+                check=True,
+            )
+            result = json.loads(completed.stdout)
+            self.assertTrue(result["success"], result)
+            self.assertEqual(result["report_language"], "ko")
+            self.assertEqual(result["clauses_count"], 5)
+
+            document_xml = read_zip_text(output_docx, "word/document.xml")
+            self.assertIn("4. 검토의견", document_xml)
+            self.assertEqual(document_xml.count("위험도:"), 5)
+            # Backward compat: legacy Korean memo has no Korean sub-headings
+            self.assertNotIn("가. 협상 우선순위", document_xml)
+            self.assertNotIn("나. 조항별 분석", document_xml)
 
 
 if __name__ == "__main__":
