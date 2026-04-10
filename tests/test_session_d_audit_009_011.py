@@ -983,6 +983,133 @@ class SessionDAudit011ReportTests(unittest.TestCase):
             self.assertNotIn("Executive Summary", document_xml)
             self.assertNotIn("Per-Clause Analysis", document_xml)
 
+    def test_clause_count_mismatch_surfaces_warning_in_numbered_english(self):
+        """Regression guard for the 2026-04-10 "Selected 10/27" symptom.
+
+        When risk_distribution totals N but data.clauses has fewer than N
+        entries, the compiler must surface a visible warning in the rendered
+        DOCX so the reviewer notices the dropped clauses. This is in Section
+        5 Review Notes for numbered English reports.
+        """
+        with tempfile.TemporaryDirectory() as tmpdir:
+            review_data_path = Path(tmpdir) / "review-data.json"
+            output_docx = Path(tmpdir) / "report.docx"
+            review_data_path.write_text(
+                json.dumps(
+                    {
+                        "report_language": "en",
+                        "review_mode": "strict",
+                        "contract_info": {
+                            "title": "Large EPC Contract",
+                            "contract_family": "supply_agreement",
+                            "language": "en",
+                        },
+                        "executive_summary": {
+                            "overview": "Large EPC supply agreement.",
+                            "overall_risk": "critical",
+                            "risk_distribution": {
+                                "critical": 5, "high": 11, "medium": 6,
+                                "low": 2, "acceptable": 3,
+                            },
+                            "key_issues": ["[§4] Performance Bond cap."],
+                            "negotiation_priority": {
+                                "must_haves": ["[§4] Cap the performance bond."],
+                                "should_haves": [],
+                                "nice_to_haves": [],
+                            },
+                            "review_notes": ["Review date: 2026-04-11"],
+                        },
+                        "clauses": [make_clause(index, include_action=True) for index in range(1, 11)],
+                    },
+                    ensure_ascii=False,
+                    indent=2,
+                ),
+                encoding="utf-8",
+            )
+
+            completed = subprocess.run(
+                [
+                    "node",
+                    str(REPO_ROOT / ".claude/skills/report-compiler/scripts/compile-report.js"),
+                    str(review_data_path),
+                    str(output_docx),
+                ],
+                cwd=REPO_ROOT,
+                capture_output=True,
+                text=True,
+                check=True,
+            )
+            result = json.loads(completed.stdout)
+            self.assertTrue(result["success"], result)
+            self.assertEqual(result["clauses_count"], 10)
+
+            document_xml = read_zip_text(output_docx, "word/document.xml")
+            self.assertIn("CLAUSE COUNT MISMATCH", document_xml)
+            self.assertIn("27", document_xml)
+            self.assertIn("10", document_xml)
+            self.assertIn("INCOMPLETE", document_xml)
+
+    def test_clause_count_mismatch_surfaces_warning_in_korean_memo(self):
+        """Korean path: warning is prepended to recommendation so it shows in
+        the 5. 결론 area of the memorandum. Existing recommendation text must
+        be preserved, not replaced."""
+        with tempfile.TemporaryDirectory() as tmpdir:
+            review_data_path = Path(tmpdir) / "review-data.json"
+            output_docx = Path(tmpdir) / "report.docx"
+            review_data_path.write_text(
+                json.dumps(
+                    {
+                        "report_language": "ko",
+                        "contract_info": {
+                            "title": "대형 EPC 계약",
+                            "contract_family": "supply_agreement",
+                        },
+                        "memo_metadata": {
+                            "date": "2026-04-11",
+                            "recipient": "주식회사 예시",
+                            "sender": "법무법인 예시",
+                            "subject": "EPC 계약 검토 의견서",
+                            "signer": "고덕수 변호사",
+                        },
+                        "executive_summary": {
+                            "overall_risk": "critical",
+                            "recommendation": "기존 결론 텍스트입니다.",
+                            "risk_distribution": {
+                                "critical": 3, "high": 7, "medium": 3,
+                                "low": 1, "acceptable": 1,
+                            },
+                            "key_issues": ["성능보증 조항"],
+                        },
+                        "clauses": [make_clause(index, korean=True) for index in range(1, 6)],
+                    },
+                    ensure_ascii=False,
+                    indent=2,
+                ),
+                encoding="utf-8",
+            )
+
+            completed = subprocess.run(
+                [
+                    "node",
+                    str(REPO_ROOT / ".claude/skills/report-compiler/scripts/compile-report.js"),
+                    str(review_data_path),
+                    str(output_docx),
+                ],
+                cwd=REPO_ROOT,
+                capture_output=True,
+                text=True,
+                check=True,
+            )
+            result = json.loads(completed.stdout)
+            self.assertTrue(result["success"], result)
+            self.assertEqual(result["report_language"], "ko")
+
+            document_xml = read_zip_text(output_docx, "word/document.xml")
+            self.assertIn("CLAUSE COUNT MISMATCH", document_xml)
+            self.assertIn("15", document_xml)
+            self.assertIn("INCOMPLETE", document_xml)
+            self.assertIn("기존 결론 텍스트입니다", document_xml)
+
 
 if __name__ == "__main__":
     unittest.main()

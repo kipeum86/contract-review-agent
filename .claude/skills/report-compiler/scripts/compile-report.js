@@ -1135,6 +1135,65 @@ function buildChildren(data) {
   return children;
 }
 
+// ─────────────────────────────────────────────────────────────────────────────
+// validateClauseCompleteness (2026-04-11 hardening)
+// ─────────────────────────────────────────────────────────────────────────────
+// Cross-checks data.clauses.length against the sum of
+// data.executive_summary.risk_distribution counts. If they disagree, the LLM
+// dropped clauses somewhere between Step 6 (per-clause analysis) and Step 10
+// (review.json assembly) — a pattern observed in the 2026-04-10 incident
+// where 27 rated clauses silently collapsed to 10 "selected" entries.
+//
+// This does NOT halt rendering. Legal reviews must ship even when partial.
+// Instead, it prepends a visible warning to executive_summary.review_notes
+// (for numbered English reports) or summary.recommendation (for legacy and
+// Korean paths) so the warning lands in the final DOCX where the reviewer
+// will see it. The review is still usable, just annotated as incomplete.
+// ─────────────────────────────────────────────────────────────────────────────
+function validateClauseCompleteness(data) {
+  const clauses = data.clauses || data.analysis || [];
+  const summary = data.executive_summary || {};
+  const stats = summary.risk_distribution || {};
+
+  const expectedTotal = Object.values(stats).reduce(
+    (sum, count) => sum + (Number(count) || 0),
+    0,
+  );
+
+  // Guard: if risk_distribution is empty, we cannot compare. Skip silently.
+  if (expectedTotal === 0) {
+    return;
+  }
+
+  if (clauses.length === expectedTotal) {
+    return;
+  }
+
+  const delta = expectedTotal - clauses.length;
+  const warning = delta > 0
+    ? `⚠️ CLAUSE COUNT MISMATCH: risk_distribution totals ${expectedTotal} clauses, but data.clauses contains only ${clauses.length}. ${delta} clause(s) appear to have been dropped during Step 10 assembly. Section 6 / 4. 검토의견 is INCOMPLETE. Re-run Step 10 with the full per-clause set.`
+    : `⚠️ CLAUSE COUNT MISMATCH: data.clauses contains ${clauses.length} entries but risk_distribution totals only ${expectedTotal}. The clause list and the risk table are inconsistent; the executive summary may understate risk counts.`;
+
+  console.warn(warning);
+
+  // Surface the warning in the rendered DOCX. Prefer review_notes for numbered
+  // English reports (it lands in Section 5). For legacy English and Korean
+  // paths, prepend to recommendation so it shows in the Executive Summary
+  // recommendation block (English legacy) or 4. 검토의견 intro (Korean).
+  data.executive_summary = summary;
+  const useReviewNotes = resolveReportLanguage(data) === 'en' && !!summary.negotiation_priority;
+
+  if (useReviewNotes) {
+    summary.review_notes = normalizeList(summary.review_notes);
+    summary.review_notes.unshift(warning);
+  } else {
+    const existing = summary.recommendation || '';
+    summary.recommendation = existing
+      ? `${warning}\n\n${existing}`
+      : warning;
+  }
+}
+
 async function compileReport(inputPath, outputPath, matterWorkingDir) {
   const rawData = fs.readFileSync(inputPath, 'utf-8');
   const data = JSON.parse(rawData);
@@ -1143,6 +1202,11 @@ async function compileReport(inputPath, outputPath, matterWorkingDir) {
   // Korean renderers see the mutated summary.recommendation. No-op when
   // matterWorkingDir is omitted (backward compat with v1 2-arg invocation).
   injectBaselineTrace(data, matterWorkingDir);
+
+  // 2026-04-11 — validate clause completeness before rendering. If the LLM
+  // dropped clauses between Step 6 and Step 10 assembly, surface a visible
+  // warning in the final DOCX instead of silently producing a partial report.
+  validateClauseCompleteness(data);
 
   const children = buildChildren(data);
 
@@ -1208,6 +1272,7 @@ module.exports = {
   buildChildren,
   resolveReportLanguage,
   injectBaselineTrace,
+  validateClauseCompleteness,
   createNumberedExecutiveSummary,
   createNumberedClauseAnalysis,
 };
