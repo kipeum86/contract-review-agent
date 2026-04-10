@@ -38,6 +38,10 @@ Claude Code는 대화형 에이전트로 동작합니다. 자연어 지시나 �
 | **Python** | 3.14+ | 파싱/생성 스크립트에 필요 |
 | **Node.js** | 24+ | 프로젝트 도구에 필요 |
 | **PyYAML** | Latest | `pip install pyyaml` |
+| **jq** | 1.6+ | `brew install jq` (macOS) · `apt-get install jq` (Linux). 도메인 레퍼런스 forced-load hook에서 사용 |
+| **shasum / sha256sum** | — | macOS 및 대부분의 Linux 배포판에 기본 포함 |
+
+> **왜 jq가 필요한가요?** `.claude/hooks/inject-domain-references.sh` hook과 `.claude/scripts/load-domain-references.sh` loader가 hook의 stdin JSON을 파싱하고, `additionalContext` 주입 페이로드를 생성하고, 포렌식 트레이스 파일(`contract-review/library/runs/sessions/*/loaded.json`)을 쓸 때 `jq`를 사용합니다. `jq`가 없으면 hook이 stderr에 에러를 남기고 빈 주입으로 fall-through되며, 이 경우 `review-guide.md`가 LLM 컨텍스트에 **주입되지 않고** 검토가 사전 학습 지식에만 기반한 상태로 조용히 회귀합니다. 아키텍처 상세는 [`domain-reference-forced-load.md`](./domain-reference-forced-load.md) 참고.
 
 선택 설치 항목:
 
@@ -55,7 +59,17 @@ git clone https://github.com/kipeum86/contract-review-agent.git
 cd contract-review-agent
 npm install
 python -m pip install pyyaml
+
+# jq 설치 확인 (forced-load hook이 사용)
+command -v jq || echo "jq 설치: brew install jq  (macOS)  |  apt-get install jq  (Linux)"
+
+# hook/loader 스크립트 실행 권한 확인 (git이 보존하지만 만약을 위해 한 번만 실행)
+chmod +x .claude/hooks/*.sh .claude/scripts/*.sh
 ```
+
+### 설치 후 Claude Code 첫 세션
+
+저장소를 clone한 뒤 Claude Code를 처음 실행하면 **UserPromptSubmit hook 실행 허용** 다이얼로그가 뜹니다 (`.claude/hooks/inject-domain-references.sh`). **Allow**를 눌러주세요. 이 hook은 `/contract-review`, `/rereview`, `/draft`, `/ingest`를 실행할 때마다 도메인 레퍼런스 baseline을 LLM 컨텍스트에 주입하는 역할을 합니다. 거부하면 review-agent 내부의 2차 방어선(Pre-Pipeline 0 fallback)은 여전히 작동하지만 기본(가장 빠른) 경로가 사라집니다.
 
 ---
 

@@ -38,6 +38,10 @@ Both methods support the same slash commands and natural language — choose whi
 | **Python** | 3.14+ | Required for parsing/generation scripts |
 | **Node.js** | 24+ | Required for project tooling |
 | **PyYAML** | Latest | `pip install pyyaml` |
+| **jq** | 1.6+ | `brew install jq` (macOS) · `apt-get install jq` (Linux). Required by the domain reference forced-load hook. |
+| **shasum / sha256sum** | — | Preinstalled on macOS and most Linux distros |
+
+> **Why jq?** The `.claude/hooks/inject-domain-references.sh` hook and the `.claude/scripts/load-domain-references.sh` loader both use `jq` to parse hook input JSON, build `additionalContext` injections, and write forensic trace files (`contract-review/library/runs/sessions/*/loaded.json`). Without `jq`, the hook logs an error to stderr and falls through to an empty injection, which means `review-guide.md` is **not** injected and reviews silently regress to pretrained knowledge. See [`domain-reference-forced-load.md`](./domain-reference-forced-load.md) for the full architecture.
 
 Optional dependencies:
 
@@ -55,7 +59,24 @@ git clone https://github.com/kipeum86/contract-review-agent.git
 cd contract-review-agent
 npm install
 python -m pip install pyyaml
+
+# Verify jq is available (used by the forced-load hook)
+command -v jq || echo "Install jq: brew install jq  (macOS)  |  apt-get install jq  (Linux)"
+
+# Make sure hook and loader scripts are executable (git should preserve this,
+# but run this once after cloning if you hit permission errors)
+chmod +x .claude/hooks/*.sh .claude/scripts/*.sh
 ```
+
+### First Claude Code session after install
+
+The first time you launch Claude Code in this repo, you will see a permission
+dialog asking you to **allow the UserPromptSubmit hook**
+(`.claude/hooks/inject-domain-references.sh`). Click **Allow** — this is the
+hook that injects domain reference baselines into the LLM context on every
+`/contract-review`, `/rereview`, `/draft`, or `/ingest` invocation. If you
+deny it, reviews will fall back to a secondary defense path inside the
+review-agent but the primary (and fastest) path is gone.
 
 ---
 
