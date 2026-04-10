@@ -379,12 +379,36 @@ def apply_redlines(document_xml_path: str, clause_map_path: str,
         os.makedirs(output_dir, exist_ok=True)
     tree.write(output_path, encoding='UTF-8', xml_declaration=True)
 
+    total_redlines = len([key for key in redlines.keys() if key != '_meta'])
+
+    # Fail-loud guard: if we had redline entries but applied zero, the pipeline
+    # has a silent contract violation (schema mismatch, missing
+    # suggested_redline fields, or total clause-mapping failure). Do not return
+    # success — callers must halt.
+    success = True
+    error_message = None
+    if total_redlines > 0 and applied_count == 0:
+        success = False
+        error_message = (
+            'No redlines were applied despite '
+            f'{total_redlines} redline entries in the input. '
+            'Likely causes: (1) all entries missing "suggested_redline" field, '
+            '(2) all clause_ids failed to map to DOCX paragraphs, '
+            '(3) clause-map.json is empty or mismatched. '
+            'Check Step 7 output schema and Step 8 mapping coverage.'
+        )
+    elif total_redlines == 0:
+        # No redlines to apply at all. This is a legitimate "nothing to do"
+        # case, so we warn but do not halt.
+        error_message = 'Input redlines.json contains zero entries (excluding _meta).'
+
     return {
-        'success': True,
+        'success': success,
+        'error': error_message,
         'output_path': output_path,
         'applied_count': applied_count,
         'failed_count': failed_count,
-        'total_redlines': len([key for key in redlines.keys() if key != '_meta']),
+        'total_redlines': total_redlines,
         'paragraphs_touched': paragraphs_touched,
         'reviewer': reviewer,
     }
