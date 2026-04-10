@@ -298,6 +298,8 @@ Fully auditable. Every match is traceable.
 ├── .claude/
 │   ├── agents/                  # Sub-agents: ingestion, review, drafting
 │   ├── skills/                  # Skills: parsing, indexing, validation, redlining, etc.
+│   ├── hooks/                   # UserPromptSubmit hook (domain reference injector)
+│   ├── scripts/                 # Loader script + test scripts
 │   └── settings.json
 │
 ├── contract-review/
@@ -313,7 +315,8 @@ Fully auditable. Every match is traceable.
 │   │   ├── sources/             # Reference sources (statutes, precedents, sample forms, etc.)
 │   │   ├── indexes/             # JSON indexes (auto-managed)
 │   │   ├── policies/            # Your customized config (gitignored)
-│   │   └── policies.default/    # Shipped defaults (do not edit)
+│   │   ├── policies.default/    # Shipped defaults (do not edit)
+│   │   └── runs/sessions/       # Per-execution forensic traces (gitignored)
 │   └── matters/                 # Per-deal working directories (gitignored)
 │
 ├── logs/                        # Session logs — your conversation notes (gitignored)
@@ -352,13 +355,18 @@ Policies are **read-only for the agent** — only you edit them. The agent manag
 
 ## Prerequisites
 
-| Requirement | Version |
-|-------------|---------|
-| Python | 3.10+ |
-| Node.js | 18+ |
-| PyYAML | `pip install pyyaml` |
+| Requirement | Version | Install |
+|-------------|---------|---------|
+| Python | 3.10+ | — |
+| Node.js | 18+ | — |
+| PyYAML | — | `pip install pyyaml` |
+| `jq` | 1.6+ | `brew install jq` (macOS) · `apt-get install jq` (Linux) |
+| `shasum` or `sha256sum` | — | Preinstalled on macOS / most Linux distros |
 
 Optional: `pymupdf` or `pypdf` (PDF support), `pandoc` (enhanced DOCX conversion).
+
+> [!IMPORTANT]
+> `jq` is required by the domain reference forced-load hook (`.claude/hooks/inject-domain-references.sh`) and the loader script. Without it, the hook will log an error to stderr and silently fall through to an empty injection — meaning `review-guide.md` will not be injected into the LLM context and reviews will silently regress to pretrained knowledge only. See [`docs/en/domain-reference-forced-load.md`](./docs/en/domain-reference-forced-load.md) for the architecture.
 
 ---
 

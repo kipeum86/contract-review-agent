@@ -296,6 +296,8 @@ inbox/raw/  ──>  validate  ──>  classify  ──>  segment  ──>  app
 ├── .claude/
 │   ├── agents/                  # 서브 에이전트: ingestion, review, drafting
 │   ├── skills/                  # 스킬: 파싱, 인덱싱, 검증, 레드라이닝 등
+│   ├── hooks/                   # UserPromptSubmit hook (도메인 레퍼런스 주입기)
+│   ├── scripts/                 # Loader script + 테스트 스크립트
 │   └── settings.json
 │
 ├── contract-review/
@@ -311,7 +313,8 @@ inbox/raw/  ──>  validate  ──>  classify  ──>  segment  ──>  app
 │   │   ├── sources/             # 참조 소스 (법령, 판례, 샘플 양식 등)
 │   │   ├── indexes/             # JSON 인덱스 (자동 관리)
 │   │   ├── policies/            # 커스텀 설정 (gitignored)
-│   │   └── policies.default/    # 기본값 (수정 금지)
+│   │   ├── policies.default/    # 기본값 (수정 금지)
+│   │   └── runs/sessions/       # 실행별 포렌식 트레이스 (gitignored)
 │   └── matters/                 # 딜별 작업 디렉터리 (gitignored)
 │
 ├── logs/                        # 세션 로그 — 대화 기록 저장 (gitignored)
@@ -350,13 +353,18 @@ inbox/raw/  ──>  validate  ──>  classify  ──>  segment  ──>  app
 
 ## 사전 요구사항
 
-| 요구사항 | 버전 |
-|----------|------|
-| Python | 3.10+ |
-| Node.js | 18+ |
-| PyYAML | `pip install pyyaml` |
+| 요구사항 | 버전 | 설치 |
+|----------|------|------|
+| Python | 3.10+ | — |
+| Node.js | 18+ | — |
+| PyYAML | — | `pip install pyyaml` |
+| `jq` | 1.6+ | `brew install jq` (macOS) · `apt-get install jq` (Linux) |
+| `shasum` 또는 `sha256sum` | — | macOS/대부분의 Linux에 기본 포함 |
 
 선택 사항: `pymupdf` 또는 `pypdf` (PDF 지원), `pandoc` (향상된 DOCX 변환).
+
+> [!IMPORTANT]
+> `jq`는 도메인 레퍼런스 forced-load hook(`.claude/hooks/inject-domain-references.sh`)과 loader script 동작에 필요합니다. 설치되어 있지 않으면 hook이 stderr에 에러를 남기고 주입을 건너뛰므로, `review-guide.md`가 LLM 컨텍스트에 들어가지 않고 검토가 사전 학습 지식에만 의존하는 상태로 조용히 되돌아갑니다. 아키텍처 상세는 [`docs/ko/domain-reference-forced-load.md`](./domain-reference-forced-load.md) 참고.
 
 ---
 
