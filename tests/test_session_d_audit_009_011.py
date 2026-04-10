@@ -201,6 +201,191 @@ class SessionDAudit009CommentsTests(unittest.TestCase):
             ]
             self.assertIn("/word/comments.xml", overrides)
 
+    def _write_minimal_docx_package(self, unpacked_dir: Path) -> None:
+        """Helper: write a minimal DOCX package for comment tests."""
+        write_file(
+            unpacked_dir / "word" / "document.xml",
+            """<?xml version="1.0" encoding="UTF-8"?>
+<w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">
+  <w:body>
+    <w:p>
+      <w:r><w:t>Clause text for comments.</w:t></w:r>
+    </w:p>
+  </w:body>
+</w:document>
+""",
+        )
+        write_file(
+            unpacked_dir / "word" / "comments.xml",
+            """<?xml version="1.0" encoding="UTF-8"?>
+<w:comments xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">
+</w:comments>
+""",
+        )
+        write_file(
+            unpacked_dir / "word" / "_rels" / "document.xml.rels",
+            """<?xml version="1.0" encoding="UTF-8"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+  <Relationship Id="rIdStyles" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/>
+</Relationships>
+""",
+        )
+        write_file(
+            unpacked_dir / "[Content_Types].xml",
+            """<?xml version="1.0" encoding="UTF-8"?>
+<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">
+  <Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>
+  <Default Extension="xml" ContentType="application/xml"/>
+  <Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/>
+</Types>
+""",
+        )
+
+    def test_apply_comments_accepts_v2_list_schema(self):
+        """v2 schema: each clause_id maps to a list of {audience, text} entries.
+
+        This is the schema specified in AGENT.md Step 7 Fix 2. Previously the
+        parser only accepted the v1 dict schema and silently dropped list
+        entries — a P0 bug where LLM-generated v2 comments would produce
+        zero-comment DOCX output. Fix 2026-04-11: accept both schemas.
+        """
+        with tempfile.TemporaryDirectory() as tmpdir:
+            unpacked_dir = Path(tmpdir) / "unpacked"
+            self._write_minimal_docx_package(unpacked_dir)
+
+            clause_map_path = Path(tmpdir) / "clause-map.json"
+            clause_map_path.write_text(
+                json.dumps({
+                    "mappings": [
+                        {"clause_id": "clause-001", "mapped": True, "paragraph_indices": [0]}
+                    ]
+                }, ensure_ascii=False, indent=2),
+                encoding="utf-8",
+            )
+
+            comments_path = Path(tmpdir) / "comments.json"
+            comments_path.write_text(
+                json.dumps({
+                    "_meta": {
+                        "reviewer_author": "고덕수 변호사",
+                        "reviewer_initials": "GDS",
+                    },
+                    # v2 schema: array of {audience, text}
+                    "clause-001": [
+                        {
+                            "audience": "EXTERNAL",
+                            "text": "[EXTERNAL] Performance bond cap is above market.",
+                        },
+                        {
+                            "audience": "INTERNAL",
+                            "text": "[INTERNAL] Fallback: 100% → 50% → direct damages only.",
+                        },
+                    ],
+                }, ensure_ascii=False, indent=2),
+                encoding="utf-8",
+            )
+
+            result = apply_comments_module.apply_comments(
+                str(unpacked_dir),
+                str(clause_map_path),
+                str(comments_path),
+            )
+
+            self.assertTrue(result["success"], result)
+            self.assertEqual(result["total_comments"], 2)
+            self.assertEqual(result["total_clause_comments"], 2)
+            self.assertEqual(result["comments_applied"], 2)
+            self.assertEqual(result["reviewer"]["author"], "고덕수 변호사")
+
+            comments_tree = ET.parse(unpacked_dir / "word" / "comments.xml")
+            comments_root = comments_tree.getroot()
+            comments = comments_root.findall(f"{{{W_NS}}}comment")
+            self.assertEqual(len(comments), 2)
+
+            # Verify the audience prefixes landed correctly in the XML
+            texts = [c.find(f".//{{{W_NS}}}t").text for c in comments]
+            self.assertTrue(any("[EXTERNAL]" in t for t in texts))
+            self.assertTrue(any("[INTERNAL]" in t for t in texts))
+
+    def test_apply_comments_fail_loud_on_unknown_audience(self):
+        """v2 schema with unknown audience values must fail loudly.
+
+        Previously, if every comment entry had an unknown audience (e.g. LLM
+        typo "external" lowercase, or "EXT" abbreviation), every entry would
+        be silently skipped and success: True returned. Fix 2026-04-11:
+        total_clause_comments tracks intent; if intent > 0 but applied == 0,
+        return success: False.
+        """
+        with tempfile.TemporaryDirectory() as tmpdir:
+            unpacked_dir = Path(tmpdir) / "unpacked"
+            self._write_minimal_docx_package(unpacked_dir)
+
+            clause_map_path = Path(tmpdir) / "clause-map.json"
+            clause_map_path.write_text(
+                json.dumps({
+                    "mappings": [
+                        {"clause_id": "clause-001", "mapped": True, "paragraph_indices": [0]}
+                    ]
+                }, ensure_ascii=False, indent=2),
+                encoding="utf-8",
+            )
+
+            comments_path = Path(tmpdir) / "comments.json"
+            comments_path.write_text(
+                json.dumps({
+                    "_meta": {"reviewer_author": "Reviewer"},
+                    "clause-001": [
+                        # Unknown audience → silently dropped by builder but
+                        # still counted toward total_clause_comments.
+                        {"audience": "typo", "text": "Should not land."},
+                    ],
+                }, ensure_ascii=False, indent=2),
+                encoding="utf-8",
+            )
+
+            result = apply_comments_module.apply_comments(
+                str(unpacked_dir),
+                str(clause_map_path),
+                str(comments_path),
+            )
+
+            # Must fail loudly, not silently succeed
+            self.assertFalse(result["success"], result)
+            self.assertIn("error", result)
+            self.assertIn("audience", result["error"].lower())
+            self.assertEqual(result["comments_applied"], 0)
+            self.assertEqual(result["total_clause_comments"], 1)
+
+    def test_apply_comments_legitimate_empty_is_success(self):
+        """Empty comments.json (only _meta) is a legitimate no-op and must
+        return success: True. Loose review mode or all-Acceptable contracts
+        may produce zero comment entries, which is not a failure."""
+        with tempfile.TemporaryDirectory() as tmpdir:
+            unpacked_dir = Path(tmpdir) / "unpacked"
+            self._write_minimal_docx_package(unpacked_dir)
+
+            clause_map_path = Path(tmpdir) / "clause-map.json"
+            clause_map_path.write_text(
+                json.dumps({"mappings": []}, ensure_ascii=False, indent=2),
+                encoding="utf-8",
+            )
+
+            comments_path = Path(tmpdir) / "comments.json"
+            comments_path.write_text(
+                json.dumps({"_meta": {"reviewer_author": "Reviewer"}}, ensure_ascii=False, indent=2),
+                encoding="utf-8",
+            )
+
+            result = apply_comments_module.apply_comments(
+                str(unpacked_dir),
+                str(clause_map_path),
+                str(comments_path),
+            )
+
+            self.assertTrue(result["success"], result)
+            self.assertEqual(result["comments_applied"], 0)
+            self.assertEqual(result["total_clause_comments"], 0)
+
 
 class SessionDAudit009RedlinesTests(unittest.TestCase):
     def test_apply_redlines_preserves_existing_revisions_and_only_tracks_changed_substring(self):

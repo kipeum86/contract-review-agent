@@ -280,8 +280,28 @@ def load_comment_reviewer_metadata(comments_data: dict) -> dict:
     return {'author': author, 'initials': initials}
 
 
-def build_comment_payloads(comments_data: dict, comments_xml_path: str) -> tuple[list[dict], dict, dict]:
-    """Build comment entries and per-clause assignments."""
+def build_comment_payloads(comments_data: dict, comments_xml_path: str) -> tuple[list[dict], dict, dict, int]:
+    """Build comment entries and per-clause assignments.
+
+    Accepts both the v1 dict schema and the v2 list schema for each clause:
+
+    v1 (legacy):
+        {"clause-001": {"external_comment": "...", "internal_note": "..."}}
+
+    v2 (AGENT.md Step 7, 2026-04-10 hardening):
+        {"clause-001": [
+            {"audience": "EXTERNAL", "text": "[EXTERNAL] ..."},
+            {"audience": "INTERNAL", "text": "[INTERNAL] ..."}
+        ]}
+
+    Both schemas are fully supported to avoid silent comment drops during the
+    migration window. The v2 schema is the canonical form going forward.
+
+    Returns (all_comments, comment_assignments, reviewer, total_clause_comments).
+    total_clause_comments counts how many comments the JSON *intended* to emit
+    (before any schema skips), so callers can fail-loud when applied == 0 but
+    the input had entries.
+    """
     _, root = load_comments_root(comments_xml_path)
     next_id = next_comment_id(root)
     now = datetime.now(timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ')
@@ -289,41 +309,64 @@ def build_comment_payloads(comments_data: dict, comments_xml_path: str) -> tuple
 
     all_comments = []
     comment_assignments = {}
+    total_clause_comments = 0
+
+    def append_comment(clause_comment_ids: list, raw_text: str, prefix: str) -> None:
+        nonlocal next_id
+        if not raw_text:
+            return
+        # Ensure the audience prefix is present exactly once. If the caller
+        # already wrote "[EXTERNAL] ..." into text, keep it. Otherwise prepend.
+        if raw_text.startswith(prefix):
+            text = raw_text
+        else:
+            text = f"{prefix} {raw_text}"
+        all_comments.append({
+            'id': next_id,
+            'text': text,
+            'author': reviewer['author'],
+            'date': now,
+            'initials': reviewer['initials'],
+        })
+        clause_comment_ids.append(next_id)
+        next_id += 1
 
     for clause_id, clause_comments in comments_data.items():
-        if clause_id == '_meta' or not isinstance(clause_comments, dict):
+        if clause_id == '_meta':
             continue
 
-        clause_comment_ids = []
+        clause_comment_ids: list[int] = []
 
-        external_comment = clause_comments.get('external_comment')
-        if external_comment:
-            all_comments.append({
-                'id': next_id,
-                'text': f"[EXTERNAL] {external_comment}",
-                'author': reviewer['author'],
-                'date': now,
-                'initials': reviewer['initials'],
-            })
-            clause_comment_ids.append(next_id)
-            next_id += 1
-
-        internal_note = clause_comments.get('internal_note')
-        if internal_note:
-            all_comments.append({
-                'id': next_id,
-                'text': f"[INTERNAL] {internal_note}",
-                'author': reviewer['author'],
-                'date': now,
-                'initials': reviewer['initials'],
-            })
-            clause_comment_ids.append(next_id)
-            next_id += 1
+        if isinstance(clause_comments, list):
+            # v2 schema: array of {audience, text} objects
+            for entry in clause_comments:
+                if not isinstance(entry, dict):
+                    continue
+                total_clause_comments += 1
+                audience = str(entry.get('audience', '')).upper()
+                text = entry.get('text', '')
+                if audience == 'EXTERNAL':
+                    append_comment(clause_comment_ids, text, '[EXTERNAL]')
+                elif audience == 'INTERNAL':
+                    append_comment(clause_comment_ids, text, '[INTERNAL]')
+                # Unknown audience → silently drop from output but still count
+                # toward total_clause_comments so the fail-loud check fires.
+        elif isinstance(clause_comments, dict):
+            # v1 schema: single dict with external_comment / internal_note keys
+            external_comment = clause_comments.get('external_comment')
+            internal_note = clause_comments.get('internal_note')
+            if external_comment:
+                total_clause_comments += 1
+                append_comment(clause_comment_ids, external_comment, '[EXTERNAL]')
+            if internal_note:
+                total_clause_comments += 1
+                append_comment(clause_comment_ids, internal_note, '[INTERNAL]')
+        # else: neither list nor dict → skip (malformed entry)
 
         if clause_comment_ids:
             comment_assignments[clause_id] = clause_comment_ids
 
-    return all_comments, comment_assignments, reviewer
+    return all_comments, comment_assignments, reviewer, total_clause_comments
 
 
 def apply_comments(unpacked_dir: str, clause_map_path: str,
@@ -336,10 +379,41 @@ def apply_comments(unpacked_dir: str, clause_map_path: str,
         comments_data = json.load(handle)
 
     comments_xml_path = os.path.join(unpacked_dir, 'word', 'comments.xml')
-    all_comments, comment_assignments, reviewer = build_comment_payloads(comments_data, comments_xml_path)
+    all_comments, comment_assignments, reviewer, total_clause_comments = build_comment_payloads(
+        comments_data, comments_xml_path
+    )
+
+    # Fail-loud guard (2026-04-11 hardening): if the input JSON had comment
+    # entries but zero were built (all skipped due to schema mismatch or
+    # malformed entries), do not return success. The 2026-04-10 incident
+    # included a "memos 0건" symptom alongside the redline 0건 symptom, and
+    # apply-comments.py was previously the silent counterpart to
+    # apply-redlines.py's silent success path. Matching apply-redlines.py
+    # behavior: explicitly error out so Step 9 halts instead of producing a
+    # DOCX with zero comments applied despite the LLM having written entries.
+    if total_clause_comments > 0 and not all_comments:
+        return {
+            'success': False,
+            'error': (
+                f'No comments were built despite {total_clause_comments} comment '
+                f'entries in the input. Likely causes: (1) unknown audience values '
+                f'(must be "EXTERNAL" or "INTERNAL"), (2) missing text field, '
+                f'(3) malformed entries (not dict or list). Check Step 7 output '
+                f'schema in AGENT.md against docx-redliner/scripts/apply-comments.py.'
+            ),
+            'comments_applied': 0,
+            'total_clause_comments': total_clause_comments,
+        }
 
     if not all_comments:
-        return {'success': True, 'comments_applied': 0, 'message': 'No comments to apply'}
+        # Legitimate "no comments to apply" case (e.g. loose review mode with
+        # only Acceptable clauses). Distinct from the fail-loud case above.
+        return {
+            'success': True,
+            'comments_applied': 0,
+            'total_clause_comments': 0,
+            'message': 'No comments to apply',
+        }
 
     comments_result = append_comments_xml(all_comments, comments_xml_path)
     relationship_added = ensure_comments_relationship(unpacked_dir)
@@ -347,7 +421,22 @@ def apply_comments(unpacked_dir: str, clause_map_path: str,
 
     doc_xml_path = os.path.join(unpacked_dir, 'word', 'document.xml')
     result = insert_comment_markers(doc_xml_path, clause_map, comment_assignments, doc_xml_path)
+
+    # Fail-loud guard part 2: even if we built comments, zero may have actually
+    # landed in the DOCX if every clause failed to map via docx-clause-map.json.
+    # This is the Step 8 mapping failure case.
+    comments_applied_count = result.get('comments_applied', 0)
+    if len(all_comments) > 0 and comments_applied_count == 0:
+        result['success'] = False
+        result['error'] = (
+            f'{len(all_comments)} comments were built but zero were inserted '
+            f'into the DOCX. Likely cause: Step 8 clause-to-DOCX mapping failed '
+            f'for every clause that had a comment. Check docx-clause-map.json '
+            f'coverage.'
+        )
+
     result['total_comments'] = len(all_comments)
+    result['total_clause_comments'] = total_clause_comments
     result['comments_xml_updated'] = comments_result
     result['comments_relationship_added'] = relationship_added
     result['comments_content_type_added'] = content_type_added
