@@ -493,10 +493,12 @@ class TestEdgeCases(unittest.TestCase):
                 {"mappings": [{"clause_id": "c1", "mapped": True, "paragraph_indices": [0]}]},
                 {"c1": {"suggested_redline": "This text does not change."}},
             )
-            self.assertTrue(result["success"])
+            self.assertFalse(result["success"])
             self.assertEqual(result["paragraphs_touched"], 0)
             self.assertEqual(result["applied_count"], 0)
             self.assertEqual(result["failed_count"], 1)
+            self.assertEqual(result["total_redlines"], 1)
+            self.assertIn('No redlines were applied despite 1 redline entries', result["error"])
 
             xml = para_xml(result["_out"], 0)
             self.assertNotIn("<w:ins", xml)
@@ -511,9 +513,10 @@ class TestEdgeCases(unittest.TestCase):
                 {"mappings": []},
                 {"c1": {"suggested_redline": "Changed text."}},
             )
-            self.assertTrue(result["success"])
+            self.assertFalse(result["success"])
             self.assertEqual(result["applied_count"], 0)
             self.assertEqual(result["failed_count"], 1)
+            self.assertEqual(result["total_redlines"], 1)
 
     def test_reviewer_metadata_from_meta(self):
         """Reviewer author/initials come from _meta block."""
@@ -543,9 +546,41 @@ class TestEdgeCases(unittest.TestCase):
                 {"mappings": [{"clause_id": "c1", "mapped": True, "paragraph_indices": [5]}]},
                 {"c1": {"suggested_redline": "Changed."}},
             )
-            self.assertTrue(result["success"])
+            self.assertFalse(result["success"])
             self.assertEqual(result["applied_count"], 0)
             self.assertEqual(result["failed_count"], 1)
+            self.assertEqual(result["total_redlines"], 1)
+
+    def test_zero_redline_entries_returns_warning_but_success(self):
+        """No redline entries is a legitimate no-op."""
+        with tempfile.TemporaryDirectory() as tmpdir:
+            result = run_redline(
+                tmpdir,
+                ["Some text."],
+                {"mappings": [{"clause_id": "c1", "mapped": True, "paragraph_indices": [0]}]},
+                {"_meta": {"reviewer_author": "Reviewer", "reviewer_initials": "RV"}},
+            )
+            self.assertTrue(result["success"])
+            self.assertEqual(result["applied_count"], 0)
+            self.assertEqual(result["total_redlines"], 0)
+            self.assertEqual(
+                result["error"],
+                "Input redlines.json contains zero entries (excluding _meta).",
+            )
+
+    def test_missing_suggested_redline_field_fails_loudly(self):
+        """Schema mismatch should not masquerade as success."""
+        with tempfile.TemporaryDirectory() as tmpdir:
+            result = run_redline(
+                tmpdir,
+                ["Some text."],
+                {"mappings": [{"clause_id": "c1", "mapped": True, "paragraph_indices": [0]}]},
+                {"c1": {"new_text": "Changed text."}},
+            )
+            self.assertFalse(result["success"])
+            self.assertEqual(result["applied_count"], 0)
+            self.assertEqual(result["total_redlines"], 1)
+            self.assertIn('"suggested_redline"', result["error"])
 
 
 # ──────────────────────────────────────────────

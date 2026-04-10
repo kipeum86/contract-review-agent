@@ -242,22 +242,100 @@ After ALL individual clauses are analyzed, read the complete set of risk grades 
 
 ### Step 7 — Comment & Redline Suggestion Generation
 **Executor**: LLM judgment
+
+For each clause, generate two artifacts: (1) a redline suggestion (the replacement text) and (2) one or two comments ([EXTERNAL] for Critical+High, [INTERNAL] for any clause with observations).
+
+**Output file locations and schemas** (binding — `docx-redliner` scripts consume these exact filenames and field names):
+
+#### 7.1 `working/redlines.json`
+
+Consumed by `.claude/skills/docx-redliner/scripts/apply-redlines.py`. One JSON file with top-level keys for each `clause_id` that has a redline suggestion, plus a `_meta` key.
+
+```json
+{
+  "_meta": {
+    "reviewer_author": "고덕수 변호사",
+    "reviewer_initials": "GDS"
+  },
+  "clause-001": {
+    "suggested_redline": "The Supplier shall indemnify the Purchaser for direct damages up to an aggregate cap of one hundred percent (100%) of the Contract Price..."
+  },
+  "clause-007": {
+    "suggested_redline": "Performance Bond amount shall be ten percent (10%) of the Contract Price..."
+  }
+}
+```
+
+**Rules**:
+- Key is `clause_id` (exactly as produced in Step 4 clause segmentation, e.g. `clause-001`).
+- The value MUST be an object with a `suggested_redline` string field. Other field names (e.g. `new_text`, `redline`, `proposed`) will be silently skipped by `apply-redlines.py`.
+- `suggested_redline` is the full replacement paragraph(s) in the contract's original language. The script computes the diff against the original clause text and produces partial `<w:ins>`/`<w:del>` tracked changes automatically.
+- Multi-paragraph suggestions: use `\n\n` separator inside the string. The script splits on blank lines.
+- Only include clauses that actually need a redline. Do not include clauses without a suggestion.
+- The `_meta` block is optional but recommended. If omitted, `apply-redlines.py` falls back to `DOCX_REVIEWER_AUTHOR` / `DOCX_REVIEWER_INITIALS` env vars or hardcoded defaults.
+
+#### 7.2 `working/comments.json`
+
+Consumed by `.claude/skills/docx-redliner/scripts/apply-comments.py`. One JSON file with top-level keys for each `clause_id` that has a comment, plus a `_meta` key.
+
+```json
+{
+  "_meta": {
+    "reviewer_author": "고덕수 변호사",
+    "reviewer_initials": "GDS"
+  },
+  "clause-001": [
+    {
+      "audience": "EXTERNAL",
+      "text": "[EXTERNAL] The unlimited indemnity is not market for supply agreements of this scale. We propose a cap at the Contract Price."
+    },
+    {
+      "audience": "INTERNAL",
+      "text": "[INTERNAL] Fallback ladder: 200% of Contract Price → 100% → direct damages only. Counterparty's standard is 150% per their MSA (doc_id: past-deal-412)."
+    }
+  ],
+  "clause-004": [
+    {
+      "audience": "EXTERNAL",
+      "text": "[EXTERNAL] Performance bond at 30% is double market standard. Suggest 10-15%."
+    }
+  ]
+}
+```
+
+**Rules**:
+- Key is `clause_id`. Value is an array of comment objects (one clause may have one or two comments).
+- Each comment object has `audience` (`"EXTERNAL"` | `"INTERNAL"`) and `text` (the full comment text).
+- The `text` field MUST start with the audience prefix `[EXTERNAL] ` or `[INTERNAL] ` — `apply-comments.py` uses this for `strip-internal-comments.py` filtering in the external-clean flow.
+- **Audience firewall (see `audience-firewall.md`)**: `[EXTERNAL]` comments must not contain internal strategy, fallback positions, or negotiation leverage. The Batch Validation sub-step below enforces this.
+- **Comment distribution**:
+  - `[EXTERNAL]`: ONLY on Critical and High risk clauses (scope per review mode).
+  - `[INTERNAL]`: On any clause with substantive observations. Include reasoning, strategy, fallback positions.
+  - A single clause may have both an `[EXTERNAL]` and `[INTERNAL]` comment in the array.
+  - Clauses without observations (e.g. Acceptable grade with no notes) may be omitted entirely.
+
+#### 7.3 Generation steps
+
 For each clause:
-1. **External comment** (`[EXTERNAL]`): For Critical and High risk clauses (scope per review mode). Reuse from comment-bank/external when available. **AUDIENCE FIREWALL**: must not contain internal strategy.
-2. **Internal note** (`[INTERNAL]`): For all clauses with observations. Include reasoning, strategy, fallback positions. Reference comment-bank/internal.
-3. **Redline suggestion**: Propose alternative text from fallback ladder. Text in contract's original language.
-4. Write to `working/comments/`
+1. Evaluate if a redline suggestion is warranted (Critical/High per review mode; Medium if strict mode).
+2. If yes: write entry to `working/redlines.json` under the `clause_id` key with `suggested_redline` field.
+3. Evaluate if an `[EXTERNAL]` comment is warranted (Critical or High).
+4. Evaluate if an `[INTERNAL]` note is warranted (any clause with substantive observations).
+5. If any comment: write entry to `working/comments.json` under the `clause_id` key as an array of comment objects.
+6. **Audience firewall check**: For each `[EXTERNAL]` comment, verify it does not contain internal strategy, fallback positions, or negotiation leverage.
 
 **Audience firewall violation** → Delete and regenerate (max 2 retries) → Clear to `[MANUAL_REQUIRED]`
 
-**Batch [EXTERNAL] Comment Validation (mandatory final sub-step of Step 7):**
+#### 7.4 Batch [EXTERNAL] Comment Validation (mandatory final sub-step of Step 7)
 
 After ALL `[EXTERNAL]` comments for the entire contract are generated:
 1. Re-read every `[EXTERNAL]` comment as a complete set
-2. Run `review-domain-knowledge/scripts/validate-audience-firewall.py` on the aggregated comment payload in `working/comments/`
+2. Run `review-domain-knowledge/scripts/validate-audience-firewall.py` on the aggregated `comments.json`
 3. Check for distributed information leakage — strategy that only becomes visible when multiple comments are read together (see `audience-firewall.md` Batch Validation)
 4. Apply failure protocol for any violations found
 5. Write `working/comments/firewall-log.json`: list any `[MANUAL_REQUIRED]` outcomes with `clause_id` and `reason`; if no violations, write `{"status": "passed", "checked_at": "<timestamp>"}` to confirm the check ran
+
+**File path clarification**: Earlier drafts of this document referenced a `working/comments/` directory. The authoritative paths are now `working/redlines.json` and `working/comments.json` at the `working/` root. The `working/comments/firewall-log.json` remains in a subdirectory for the validator's use.
 
 ### Step 8 — MD → DOCX Clause Mapping (v1β)
 **Executor**: Script + LLM
@@ -273,13 +351,39 @@ After ALL `[EXTERNAL]` comments for the entire contract are generated:
 
 **Skip entirely** if `output_selection` includes neither output 1 nor output 2.
 
-1. Unpack original DOCX
-2. Run `apply-redlines.py` for tracked changes
-3. Run `apply-comments.py` for comment insertion
-4. **If output 1 selected**: Repack → `{matter_id}_round_{N}_redlined.docx` (internal)
-5. **If output 2 selected**: Run `strip-internal-comments.py` → `{matter_id}_round_{N}_redlined_clean.docx` (external-clean)
+1. **Verify Step 7 outputs exist**:
+   ```bash
+   REDLINES_JSON="contract-review/matters/${matter_id}/round_${N}/working/redlines.json"
+   COMMENTS_JSON="contract-review/matters/${matter_id}/round_${N}/working/comments.json"
+   [ -f "$REDLINES_JSON" ] || { echo "ERROR: Step 7 did not produce $REDLINES_JSON — halt pipeline"; exit 1; }
+   [ -f "$COMMENTS_JSON" ] || { echo "ERROR: Step 7 did not produce $COMMENTS_JSON — halt pipeline"; exit 1; }
+   ```
+2. Unpack original DOCX
+3. Run `apply-redlines.py` for tracked changes:
+   ```bash
+   python3 .claude/skills/docx-redliner/scripts/apply-redlines.py \
+       "$UNPACKED_DIR/word/document.xml" \
+       "$WORKING/docx-clause-map.json" \
+       "$REDLINES_JSON" \
+       "$UNPACKED_DIR/word/document.xml"
+   REDLINE_EXIT=$?
+   ```
+4. **Check redline exit code**. If `$REDLINE_EXIT != 0`, halt pipeline with the stderr output from `apply-redlines.py`. This will happen if `redlines.json` had entries but zero were applied (Step 7 schema violation or Step 8 mapping failure). Do not proceed with 0-redline output masquerading as success. Escalate to user with the error message.
+5. Run `apply-comments.py` for comment insertion:
+   ```bash
+   python3 .claude/skills/docx-redliner/scripts/apply-comments.py \
+       "$UNPACKED_DIR" \
+       "$WORKING/docx-clause-map.json" \
+       "$COMMENTS_JSON"
+   COMMENT_EXIT=$?
+   ```
+6. If `$COMMENT_EXIT != 0`, halt with stderr. Same reasoning as step 4.
+7. **If output 1 selected**: Repack → `{matter_id}_round_{N}_redlined.docx` (internal)
+8. **If output 2 selected**: Run `strip-internal-comments.py` → `{matter_id}_round_{N}_redlined_clean.docx` (external-clean)
 
 **Safety rule**: The external-clean version (`strip-internal-comments.py`) is only generated when output 2 is in `output_selection`. Never auto-generate it if only output 1 was requested.
+
+**Silent-success ban**: Zero applied redlines with non-zero `total_redlines` is treated as a hard failure. `apply-redlines.py` emits `"success": false` and exits 1; this step must check and halt. The 2026-04-10 incident (100-page EPC contract where redline DOCX came out as a one-page Appendix) was caused by exactly this silent-success path.
 
 ### Step 10 — Report Compilation
 **Executor**: Script + LLM
