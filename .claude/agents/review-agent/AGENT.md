@@ -50,7 +50,7 @@ fi
 
 ### Pre-Pipeline — Intake
 
-**Run before any pipeline step. Do not proceed until both items are resolved.**
+**Run before any pipeline step. Do not proceed until all three items are resolved.**
 
 **1. Client's party role (`party_role`)**
 
@@ -80,6 +80,23 @@ If not specified, **ask before starting Step 1:**
 > 3. **Review Report DOCX** — Executive Summary + 조항별 분석 보고서
 
 Write `output_selection: [1, 2, 3]` (with only selected numbers) to `matter-context.yaml`. Steps 8–10 will skip any unselected deliverable.
+
+**3. Report language (`report_language`)**
+
+Required for correct Executive Summary and Clause-by-Clause rendering language. The contract's own language is determined separately in Step 2 (`contract_info.language`) and does **not** control the report language — user preference does.
+
+- If the user specified a language in the prompt (Korean prompt → `ko`, English prompt → `en`, or explicit override like "리포트는 영어로", "write the report in Korean") → use that.
+- If inferable from the prompt language used in this session with **high confidence** (user has been writing consistently in one language) → infer and **state the inference explicitly** before proceeding.
+- **If ambiguous: ask before starting Step 1.** Use:
+
+  > 리포트를 어떤 언어로 작성할까요?
+  > Which language should the report be in?
+  > 1. 한국어 / Korean
+  > 2. English
+
+Write the confirmed `report_language` to `matter-context.yaml` as one of: `ko` | `en`.
+
+**Rationale**: The report language is orthogonal to the contract language. A Korean attorney may review an English contract and still want a Korean memorandum. This field drives `compile-report.js`'s renderer selection (Korean memorandum vs English Executive Summary structure) and MUST be explicit — `compile-report.js` will otherwise fall back to a Hangul-detection heuristic on the recommendation text, which is unreliable.
 
 ---
 
@@ -132,7 +149,7 @@ This guarantees that by Step 10, `matters/{id}/round_{N}/working/baseline-contex
 1. Read `clean.md` + `contract-families.yaml` + `clause-taxonomy.yaml`
 2. Classify with `doc_class = review_target`
 3. Determine `contract_family`, `jurisdiction`, `governing_law`, `language`
-4. Merge into `matter-context.yaml`: fields resolved in Pre-Pipeline (`party_role`, `output_selection`) plus any additional context provided by the user
+4. Merge into `matter-context.yaml`: fields resolved in Pre-Pipeline (`party_role`, `output_selection`, `report_language`) plus any additional context provided by the user
 
 ### Step 3 — Structural Parse
 **Executor**: LLM judgment + Script
@@ -402,7 +419,7 @@ After ALL `[EXTERNAL]` comments for the entire contract are generated:
    The 3rd argument is the **matter working directory**. `compile-report.js` reads `{matter_working_dir}/baseline-context/loaded.json` (populated by Step 1.5) and appends the forensic trace line. If `loaded.json` is missing or malformed, a `⚠️ REVIEW INVALID` warning is appended instead — this is the user-visible signal that forced-load protocol failed.
 4. Save review data → `{matter_id}_round_{N}_review.json`
 
-**Language**: Report in user's prompt language or explicit override. Redline text in contract language.
+**Language**: Report follows `report_language` from `matter-context.yaml` (set in Pre-Pipeline item 3, copied into `review.json.report_language`). Redline text stays in the contract's original language.
 
 **Backward compat note**: If you ever need to re-compile a pre-v2.1 review (no baseline-context), call `compile-report.js` with only 2 arguments. It will render exactly like v1 — no warnings, no trace line, no drift.
 
