@@ -407,9 +407,73 @@ After ALL `[EXTERNAL]` comments for the entire contract are generated:
 
 **Skip entirely** if output 3 (Review Report) is not in `output_selection`.
 
-1. LLM generates Executive Summary following the **Executive Summary Template** in `review-guide.md` (Sections 1–5), mapping content to JSON fields per the table at the end of that template. The LLM writes `executive_summary.recommendation` as prose; **do NOT write a manual "Baselines applied" trace line** — that is auto-injected by the script in the next step (v2.1 P4).
-2. Assemble review data JSON with all per-clause results
-3. Run `compile-report.js` **with 3 arguments** (v2.1) so it can inject the baseline trace line into the Executive Summary:
+#### 10.1 Assemble review data JSON
+
+The LLM assembles a `review.json` that `compile-report.js` will render. The JSON schema is defined in `.claude/skills/report-compiler/SKILL.md`. Populate the following fields in the exact names shown — do not invent alternative keys. **Never embed headings or section numbers as text inside field values** (for example, do not write `"recommendation": "Section 1. Executive Summary\n..."`); the structured fields below drive the section numbering natively.
+
+**Required top-level fields**:
+
+```jsonc
+{
+  "report_language": "ko" | "en",
+  "review_mode": "strict" | "moderate" | "loose",
+  "general_review_mode": true | false,
+  "contract_info": {
+    "title": "...",
+    "contract_family": "...",
+    "language": "en" | "ko",
+    "jurisdiction": "...",
+    "governing_law": "...",
+    "parties": [ ... ]
+  },
+  "executive_summary": {
+    "overview": "2-3 sentence contract summary",
+    "overall_risk": "critical" | "high" | "medium" | "low",
+    "risk_distribution": {
+      "critical": 0, "high": 0, "medium": 0, "low": 0, "acceptable": 0
+    },
+    "key_issues": [
+      "[§4] Performance Bond cap — unlimited exposure ...",
+      "[§13.4] Liquidated damages — no cap ..."
+    ],
+    "negotiation_priority": {
+      "must_haves": ["[§4] Cap performance bond at ..."],
+      "should_haves": ["[§18] Add force majeure carve-out ..."],
+      "nice_to_haves": ["[§22] Clarify termination-for-convenience ..."]
+    },
+    "review_notes": [
+      "Library mode: General Review Mode — no library match",
+      "Bilingual discrepancies: none observed",
+      "Review date: 2026-04-10"
+    ],
+    "recommendation": "Final one-sentence verdict, optional. If present, rendered after Section 5. Do NOT put Section N headings here."
+  },
+  "clauses": [
+    {
+      "clause_id": "clause-001",
+      "section_no": "4",
+      "heading": "Performance Bond",
+      "clause_type": "performance_bond",
+      "risk_level": "critical" | "high" | "medium" | "low" | "acceptable",
+      "risk_rationale": "...",
+      "divergence": "...",
+      "playbook_tier": "preferred" | "acceptable" | "fallback" | "prohibited",
+      "playbook_missing": true | false,
+      "suggested_action": "... (optional, 1-2 sentences)"
+    }
+  ]
+}
+```
+
+**Completeness requirement**: `clauses` MUST contain **every rated clause** from Step 6. If Step 6 produced 27 rated clauses, `clauses.length == 27`. **No "top-N" filtering, no "Critical+High only" shortcut.** `compile-report.js` will render all clauses under Section 6 with risk badges; the reader can triage visually. Selecting a subset here silently drops legal analysis and is forbidden.
+
+**Language field**: `report_language` MUST be copied from `matter-context.yaml` (set in Pre-Pipeline item 3). `compile-report.js` reads this field first in `resolveReportLanguage()` and uses it to select the Korean memorandum vs English renderer. Do not rely on the Hangul-detection fallback.
+
+**No section-number text inside field values**: The five `executive_summary.*` fields map 1:1 to Sections 1-5 in the rendered DOCX. `compile-report.js` adds "Section 1. Executive Summary", "Section 2. Overall Risk Assessment", etc. automatically. Writing "Section 4. Negotiation Priority" as text inside `key_issues` or `recommendation` will produce double-numbered output.
+
+#### 10.2 Run `compile-report.js` (3-argument form, v2.1)
+
+Run `compile-report.js` **with 3 arguments** (v2.1) so it can inject the baseline trace line into the report:
    ```bash
    node .claude/skills/report-compiler/scripts/compile-report.js \
        "contract-review/matters/${matter_id}/round_${N}/${matter_id}_round_${N}_review.json" \
@@ -417,9 +481,15 @@ After ALL `[EXTERNAL]` comments for the entire contract are generated:
        "contract-review/matters/${matter_id}/round_${N}/working"
    ```
    The 3rd argument is the **matter working directory**. `compile-report.js` reads `{matter_working_dir}/baseline-context/loaded.json` (populated by Step 1.5) and appends the forensic trace line. If `loaded.json` is missing or malformed, a `⚠️ REVIEW INVALID` warning is appended instead — this is the user-visible signal that forced-load protocol failed.
-4. Save review data → `{matter_id}_round_{N}_review.json`
 
-**Language**: Report follows `report_language` from `matter-context.yaml` (set in Pre-Pipeline item 3, copied into `review.json.report_language`). Redline text stays in the contract's original language.
+#### 10.3 Save review data
+
+Save review data → `{matter_id}_round_{N}_review.json`
+
+**Language policy (binding)**:
+- Analysis report (Section 1-6 structure + text): follows `report_language` from `matter-context.yaml` (set in Pre-Pipeline item 3, copied into `review.json.report_language`)
+- Redline text (Step 9 suggested replacements): always in the contract's original language (`contract_info.language`)
+- Comments (Step 9 `[EXTERNAL]` / `[INTERNAL]`): in the contract's original language to match the reviewer reading context
 
 **Backward compat note**: If you ever need to re-compile a pre-v2.1 review (no baseline-context), call `compile-report.js` with only 2 arguments. It will render exactly like v1 — no warnings, no trace line, no drift.
 
