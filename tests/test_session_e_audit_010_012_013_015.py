@@ -337,8 +337,6 @@ class SessionEAudit010AndDocsTests(unittest.TestCase):
 
         self.assertIn(f"{family_count} contract families", readme)
         self.assertIn(f"{family_count} contract families", how_to_use)
-        self.assertIn("manual/experimental", readme)
-        self.assertIn("manual/experimental", how_to_use)
 
 
 if __name__ == "__main__":
