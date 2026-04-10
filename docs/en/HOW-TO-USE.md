@@ -159,7 +159,7 @@ The agent compares the new draft against the prior review round and produces a *
 | `/library` | Search, list, show, deprecate, or archive library assets |
 | `/export-clean` | Strip `[INTERNAL]` comments from a redlined DOCX (safe for counterparty) |
 | `/resume` | Resume an interrupted pipeline from where it left off |
-| `/draft` | Draft a new contract (assisted drafting; DOCX packaging is still manual/experimental) |
+| `/draft` | Draft a new contract with interview-driven generation and DOCX export |
 
 You can also use natural language — the orchestrator routes to the correct workflow automatically.
 
