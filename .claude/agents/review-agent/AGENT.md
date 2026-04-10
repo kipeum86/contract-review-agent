@@ -107,6 +107,68 @@ Write the confirmed `report_language` to `matter-context.yaml` as one of: `ko` |
 3. Run `normalize.py` → `working/normalized/clean.md` + `plain.txt`
 4. Save pipeline state
 
+### Pre-Pipeline 0.5 — Document Size Check (NEW, 2026-04-10)
+
+**Executor**: Bash + Agent (non-skippable for contracts > 40 KB normalized)
+
+**Purpose**: Detect contracts that are large enough to risk context exhaustion, incomplete chunking merge, or LLM self-triaging (selective clause analysis) before the pipeline commits to processing them as a single session.
+
+**Execution point**: Despite the `Pre-Pipeline 0.5` name, run this step **immediately after Step 1 normalization produces `working/normalized/clean.md` and before Step 1.5 / Step 2**. The size check depends on `clean.md`; do not ask the user to choose a large-document path before normalization has produced that file.
+
+**Procedure**:
+
+```bash
+CLEAN_MD="contract-review/matters/${matter_id}/round_${N}/working/normalized/clean.md"
+if [ ! -f "$CLEAN_MD" ]; then
+    echo "ERROR: clean.md not found — Step 1 normalization must run first"
+    exit 1
+fi
+
+BYTE_SIZE=$(wc -c < "$CLEAN_MD" | tr -d ' ')
+CHAR_COUNT=$(wc -m < "$CLEAN_MD" | tr -d ' ')
+
+# Rough token estimate: conservative 1 token per 3 characters (English + Korean mixed)
+EST_TOKENS=$(( CHAR_COUNT / 3 ))
+
+echo "DOC_SIZE: bytes=$BYTE_SIZE chars=$CHAR_COUNT est_tokens=$EST_TOKENS"
+
+SMALL_THRESHOLD=20000
+MEDIUM_THRESHOLD=80000
+LARGE_THRESHOLD=160000
+
+if [ "$CHAR_COUNT" -lt "$SMALL_THRESHOLD" ]; then
+    echo "SIZE_VERDICT: small (safe for single-session processing)"
+elif [ "$CHAR_COUNT" -lt "$MEDIUM_THRESHOLD" ]; then
+    echo "SIZE_VERDICT: medium (single session, chunking not needed)"
+elif [ "$CHAR_COUNT" -lt "$LARGE_THRESHOLD" ]; then
+    echo "SIZE_VERDICT: large (chunking will be required, Large Document Handling activates at Step 6)"
+else
+    echo "SIZE_VERDICT: very_large (manual split strongly recommended)"
+fi
+```
+
+**After the Bash result returns**:
+- If `SIZE_VERDICT: small` or `medium`: log the size and proceed. No user prompt.
+- If `SIZE_VERDICT: large`: log the size and inform the user in one line that chunking will be required and processing will take longer. Proceed without blocking.
+- If `SIZE_VERDICT: very_large`: ask the user before proceeding. Present:
+
+  > 이 계약서는 매우 큽니다 (추정 토큰 수 T). 한 세션으로 처리하면 (1) chunking merge 중 일부 조항 누락, (2) LLM의 "중요 조항만 선별" 드리프트, (3) Executive Summary 품질 저하가 발생할 수 있습니다. 어떻게 진행할까요?
+  >
+  > A) 그대로 진행 (위험 감수)
+  > B) Article 경계에서 2-3개 파일로 수동 분할 후 각각 별도 `/contract-review` 실행
+  > C) Commercial / Technical / Risk allocation 등 논리 주제로 수동 분할 후 각각 별도 round로 실행
+
+  Do not proceed until the user answers.
+
+- If the user chooses A: record `size_warning_acknowledged: true` in `matter-context.yaml`, and include a review note indicating that large-document single-session mode was accepted by the user.
+- If the user chooses B or C: halt the current run and instruct the user to restart after manual split.
+
+**Rationale**: This is a warning layer only. It does not auto-split the matter, because automatic splitting would collide with the existing `round_{N}` re-review abstraction and require cross-round consolidation logic.
+
+**Do not block small contracts**: Contracts below 80,000 characters proceed without any prompt.
+
+**Do not re-run Step 1 if already normalized**: If `clean.md` already exists from a resumed run, reuse it.
+
 ### Step 1.5 — Session Trace Merge (v2.1)
 **Executor**: Bash (agent runs this after Step 1 creates the matter folder)
 
