@@ -445,4 +445,4 @@ inbox/raw/  ──>  validate  ──>  classify  ──>  segment  ──>  app
 
 ## 라이선스
 
-MIT — 자세한 내용은 [LICENSE](../../LICENSE)를 참고하세요.
+[Apache License, Version 2.0](../../LICENSE) 하에 배포됩니다. 자세한 내용은 [LICENSE](../../LICENSE)를 참고하세요.
