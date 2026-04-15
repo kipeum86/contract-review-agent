@@ -96,7 +96,7 @@ Required for correct Executive Summary and Clause-by-Clause rendering language. 
 
 Write the confirmed `report_language` to `matter-context.yaml` as one of: `ko` | `en`.
 
-**Rationale**: The report language is orthogonal to the contract language. A Korean attorney may review an English contract and still want a Korean memorandum. This field drives `compile-report.js`'s renderer selection (Korean memorandum vs English Executive Summary structure) and MUST be explicit — `compile-report.js` will otherwise fall back to a Hangul-detection heuristic on the recommendation text, which is unreliable.
+**Rationale**: The report language is orthogonal to the contract language. A Korean specialist reviewer may review an English contract and still want a Korean memorandum. This field drives `compile-report.js`'s renderer selection (Korean memorandum vs English Executive Summary structure) and MUST be explicit — `compile-report.js` will otherwise fall back to a Hangul-detection heuristic on the recommendation text, which is unreliable.
 
 ---
 
@@ -333,7 +333,7 @@ Consumed by `.claude/skills/docx-redliner/scripts/apply-redlines.py`. One JSON f
 ```json
 {
   "_meta": {
-    "reviewer_author": "고덕수 변호사",
+    "reviewer_author": "고덕수",
     "reviewer_initials": "GDS"
   },
   "clause-001": {
@@ -360,7 +360,7 @@ Consumed by `.claude/skills/docx-redliner/scripts/apply-comments.py`. One JSON f
 ```json
 {
   "_meta": {
-    "reviewer_author": "고덕수 변호사",
+    "reviewer_author": "고덕수",
     "reviewer_initials": "GDS"
   },
   "clause-001": [

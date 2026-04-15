@@ -757,14 +757,14 @@ function resolveMemoMetadata(data) {
     date: formatKoreanDate(meta.date || data.report_date || contractInfo.date),
     recipient: firstNonEmpty(meta.recipient, contractInfo.client_name, contractInfo.recipient, '의뢰인 귀중'),
     reference: firstNonEmpty(meta.reference, contractInfo.reference),
-    sender: firstNonEmpty(meta.sender, contractInfo.sender, '법무법인 [작성 주체 확인 필요]'),
+    sender: firstNonEmpty(meta.sender, contractInfo.sender, 'Jinju Legal Orchestrator'),
     subject: firstNonEmpty(
       meta.subject,
       contractInfo.subject,
-      contractInfo.title ? `${contractInfo.title} 관련 법률 검토 의견서` : '',
-      '계약 검토 의견서',
+      contractInfo.title ? `${contractInfo.title} 관련 계약 검토 분석 메모` : '',
+      '계약 검토 분석 메모',
     ),
-    signer: firstNonEmpty(meta.signer, contractInfo.signer, '[담당자 확인 필요]'),
+    signer: firstNonEmpty(meta.signer, contractInfo.signer, '[담당 스페셜리스트 확인 필요]'),
   };
 }
 
@@ -838,7 +838,7 @@ function resolveBackgroundFacts(data) {
   }
 
   const fallback = firstNonEmpty(
-    data.contract_info?.title && `본 의견서는 ${data.contract_info.title}에 대한 검토를 전제로 작성되었습니다.`,
+    data.contract_info?.title && `본 메모는 ${data.contract_info.title}에 대한 검토를 전제로 작성되었습니다.`,
     data.general_review_mode && '본 검토는 라이브러리 비교 근거 없이 일반 계약 검토 모드로 수행되었습니다.',
   );
 
@@ -864,7 +864,7 @@ function resolveLimitationsDisclaimer(data) {
   return firstNonEmpty(
     data.limitations_disclaimer,
     data.memo_metadata?.limitations_disclaimer,
-    '아래 의견은 귀사가 제공한 자료 및 정보만을 전제로 귀사가 문의한 사항에 국한된 법률검토임을 말씀드립니다. 제공된 자료 및 정보 이외에 다른 특별한 사정이 있는 경우 그 법률적 판단이 달라질 수 있습니다.',
+    '아래 메모는 귀사가 제공한 자료 및 정보만을 전제로 귀사가 문의한 사항에 국한된 계약 검토 결과입니다. 제공된 자료 및 정보 이외에 다른 특별한 사정이 있는 경우 그 검토 결과가 달라질 수 있습니다.',
   );
 }
 
@@ -890,7 +890,7 @@ function resolveClosingDisclaimer(data) {
   return firstNonEmpty(
     data.closing_disclaimer,
     data.memo_metadata?.closing_disclaimer,
-    '이상은 제공된 자료와 현 시점의 법령 및 통상적 해석을 기초로 한 의견이며, 추가 사실관계 또는 관련 법령의 변경이 있는 경우 결론이 달라질 수 있습니다.',
+    '이상은 제공된 자료와 현 시점의 법령 및 통상적 해석을 기초로 정리한 검토 메모이며, 추가 사실관계 또는 관련 법령의 변경이 있는 경우 결론이 달라질 수 있습니다.',
   );
 }
 
@@ -1056,11 +1056,11 @@ function createKoreanMemorandum(data) {
 
   if (data.general_review_mode) {
     sections.push(
-      createMemoCallout('본 의견서는 library-backed house position 비교 없이 일반 계약 검토 기준에 따라 작성되었습니다.'),
+      createMemoCallout('본 메모는 library-backed house position 비교 없이 일반 계약 검토 기준에 따라 작성되었습니다.'),
     );
   }
 
-  sections.push(createMemoSectionTitle('4. 검토의견'));
+  sections.push(createMemoSectionTitle('4. 검토 분석'));
 
   // Optional 협상 우선순위 sub-section — rendered only when
   // executive_summary.negotiation_priority is present (v2 schema). Backward

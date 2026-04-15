@@ -151,6 +151,7 @@ __pycache__/
 release-note-*.md
 contract-review-agent-design.md
 drafting-system-prompt.md
+docs/notes/naming-transition-guide.md
 /scripts/generate_*.py
 .gstack/
 /logs/*

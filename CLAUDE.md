@@ -4,15 +4,15 @@
 
 | Field | Value |
 |-------|-------|
-| Firm | 법무법인 진주 (Jinju Law Firm) |
-| Reviewer | 고덕수 변호사 / Attorney Duksoo Ko |
-| Seniority | 6th year Associate |
+| Brand | Jinju Legal Orchestrator |
+| Reviewer | Ko Duksoo (고덕수) |
+| Role | contract review specialist |
 
-Use this profile when generating review reports, redline comments, and any deliverable that identifies the reviewing attorney. Match the output language to the contract language unless instructed otherwise.
+Use this profile when generating review reports, redline comments, and any deliverable that identifies the reviewing specialist. Match the output language to the contract language unless instructed otherwise.
 
 ## Korean Legal Opinion Style
 
-한국어 법률 의견서(Memorandum) 생성 시 반드시 `docs/ko-legal-opinion-style-guide.md`를 읽고 따를 것. 문서 구조, 헤더/정보 블록, 법령·판례 인용 형식, 정의 용어 관례, 문체(합니다체·법률 전문 문어체), 확신도 표현 체계, 번호 매김 관례, 종결부(disclaimer·서명), 타이포그래피(DOCX 생성 규칙) 등 전 항목을 준수한다.
+한국어 계약 검토 메모(Memorandum) 생성 시 반드시 `docs/ko-legal-opinion-style-guide.md`를 읽고 따를 것. 문서 구조, 헤더/정보 블록, 법령·판례 인용 형식, 정의 용어 관례, 문체(합니다체·법률 전문 문어체), 확신도 표현 체계, 번호 매김 관례, 종결부(disclaimer·서명), 타이포그래피(DOCX 생성 규칙) 등 전 항목을 준수한다.
 
 ---
 
@@ -115,7 +115,7 @@ Redlined DOCX(tracked changes + comments 포함)를 `inbox/raw/`에 넣으면 �
 # inbox/sidecars/my-redlined-contract.yaml
 doc_class: redline_record
 base_template_id: "0-safe-conditional-equity"
-reviewer: "고덕수 변호사"
+reviewer: "고덕수"
 negotiation_round: 1
 counterparty: "상대방 회사명"
 ```
