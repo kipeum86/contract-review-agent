@@ -58,7 +58,7 @@ Execute these steps in order. Save pipeline state after each step. If a step fai
 ```yaml
 doc_class: redline_record
 base_template_id: "0-safe-conditional-equity"
-reviewer: "고덕수 변호사"
+reviewer: "고덕수"
 negotiation_round: 1
 counterparty: "상대방 회사명"
 deal_context: "Series A 투자계약"
@@ -182,7 +182,7 @@ Step 9 — Approval gate. Always present the summary. Respect the user's decisio
 |-------|----------|-------------|
 | `doc_class` | Recommended | `redline_record`로 설정하면 사용자 확인 프롬프트 생략 |
 | `base_template_id` | Optional | 이 redline의 원본 clean 템플릿 doc_id |
-| `reviewer` | Optional | tracked changes를 작성한 변호사 |
+| `reviewer` | Optional | tracked changes를 작성한 검토 담당자 |
 | `negotiation_round` | Optional | 협상 라운드 번호 (1, 2, 3…) |
 | `counterparty` | Optional | 상대방 이름 |
 | `deal_id` | Optional | 동일 딜의 여러 라운드를 연결하는 ID |

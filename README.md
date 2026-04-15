@@ -2,7 +2,7 @@
 
 # Contract Review Agent
 
-### AI-Powered Contract Review Pipeline Built on Claude Code
+### AI-Powered Contract Review Workflow for Jinju Legal Orchestrator
 
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](./LICENSE)
 [![Claude Code](https://img.shields.io/badge/Built_with-Claude_Code-blueviolet)](https://claude.ai/claude-code)
@@ -45,7 +45,7 @@ and negotiation recommendations** — all generated directly in DOCX.
 <tr>
 <td><strong>한국어</strong></td>
 <td><a href="https://docs.google.com/document/d/1g6AFUqiJp8fCb_3NayHfNhqRDFAq6c0Q/edit?usp=sharing&ouid=105178834220477378953&rtpof=true&sd=true">레드라인 DOCX</a></td>
-<td><a href="https://docs.google.com/document/d/1y_iMJBNwlvubzs1wfcLq1q8lNL3pQxXQ/edit?usp=sharing&ouid=105178834220477378953&rtpof=true&sd=true">검토 의견서</a></td>
+<td><a href="https://docs.google.com/document/d/1y_iMJBNwlvubzs1wfcLq1q8lNL3pQxXQ/edit?usp=sharing&ouid=105178834220477378953&rtpof=true&sd=true">검토 메모</a></td>
 </tr>
 </table>
 
@@ -226,7 +226,7 @@ Natural language works too — the orchestrator routes to the right workflow.
 |-------------|----------|------|
 | Client Memo | English | [View on Google Docs](https://docs.google.com/document/d/1QinVyQHdyb5VxxkjpmFVdVYgFoxgwX0e/edit?usp=sharing&ouid=105178834220477378953&rtpof=true&sd=true) |
 | Contract Redlined | English | [View on Google Docs](https://docs.google.com/document/d/1KIIW5lY-H-LddPgUGWLiA1kcFQxbJECq/edit?usp=sharing&ouid=105178834220477378953&rtpof=true&sd=true) |
-| 검토 의견서 | 한국어 | [Google Docs에서 보기](https://docs.google.com/document/d/1y_iMJBNwlvubzs1wfcLq1q8lNL3pQxXQ/edit?usp=sharing&ouid=105178834220477378953&rtpof=true&sd=true) |
+| 검토 메모 | 한국어 | [Google Docs에서 보기](https://docs.google.com/document/d/1y_iMJBNwlvubzs1wfcLq1q8lNL3pQxXQ/edit?usp=sharing&ouid=105178834220477378953&rtpof=true&sd=true) |
 | 계약서 검토본 | 한국어 | [Google Docs에서 보기](https://docs.google.com/document/d/1g6AFUqiJp8fCb_3NayHfNhqRDFAq6c0Q/edit?usp=sharing&ouid=105178834220477378953&rtpof=true&sd=true) |
 
 </details>
@@ -430,20 +430,20 @@ The agent is composed of three specialized sub-agents coordinated by an orchestr
 - [CLAUDE.md](./CLAUDE.md) — orchestrator routing and safety rules
 - [Implementation Notes](./docs/en/implementation-notes.md) — repository implementation details
 
-## Part of Jinju Law Firm
+## Part of Jinju Legal Orchestrator
 
-This agent is part of the **법무법인 진주 (Jinju Law Firm)** series of specialized legal AI agents:
+This agent is part of the **Jinju Legal Orchestrator** family of specialist legal workflow agents:
 
-| Agent | Attorney | Specialty |
-|-------|----------|-----------|
-| [game-legal-research](https://github.com/kipeum86/game-legal-research) | 심진주 (Sim Jinju) | Game industry law |
-| [legal-translation-agent](https://github.com/kipeum86/legal-translation-agent) | 변혁기 (Byeon Hyeok-gi) | Legal translation |
-| [general-legal-research](https://github.com/kipeum86/general-legal-research) | 김재식 (Kim Jaesik) | Legal research |
-| [PIPA-expert](https://github.com/kipeum86/PIPA-expert) | 정보호 (Jeong Bo-ho) | Data privacy law |
-| [GDPR-expert](https://github.com/kipeum86/GDPR-expert) | 김덕배 (Kim De Bruyne) | GDPR / EU data privacy law |
-| **[contract-review-agent](https://github.com/kipeum86/contract-review-agent)** | **고덕수 (Ko Duksoo)** | **Contract review** |
-| [legal-writing-agent](https://github.com/kipeum86/legal-writing-agent) | 한석봉 (Han Seokbong) | Legal writing |
-| [second-review-agent](https://github.com/kipeum86/second-review-agent) | 반성문 (Ban Seong-mun) | Quality review (Partner) |
+| Agent | Persona | Focus |
+|-------|---------|-------|
+| [game-legal-research](https://github.com/kipeum86/game-legal-research) | 심진주 (Sim Jinju) — game industry specialist | Game industry law |
+| [legal-translation-agent](https://github.com/kipeum86/legal-translation-agent) | 변혁기 (Byeon Hyeok-gi) — legal translation specialist | Legal translation |
+| [general-legal-research](https://github.com/kipeum86/general-legal-research) | 김재식 (Kim Jaesik) — research specialist | Legal research |
+| [PIPA-expert](https://github.com/kipeum86/PIPA-expert) | 정보호 (Jeong Bo-ho) — privacy specialist | Data privacy law |
+| [GDPR-expert](https://github.com/kipeum86/GDPR-expert) | 김덕배 (Kim De Bruyne) — GDPR specialist | GDPR / EU data privacy law |
+| **[contract-review-agent](https://github.com/kipeum86/contract-review-agent)** | **고덕수 (Ko Duksoo) — contract review specialist** | **Contract review** |
+| [legal-writing-agent](https://github.com/kipeum86/legal-writing-agent) | 한석봉 (Han Seokbong) — legal writing specialist | Legal writing |
+| [second-review-agent](https://github.com/kipeum86/second-review-agent) | 반성문 (Ban Seong-mun) — senior review specialist | Quality review |
 
 ## License
 

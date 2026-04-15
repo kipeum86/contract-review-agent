@@ -2,7 +2,7 @@
 
 # Contract Review Agent
 
-### Claude Code 기반 AI 계약 검토 파이프라인
+### Claude Code 기반 Jinju Legal Orchestrator 계약 검토 워크플로우
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](../../LICENSE)
 [![Claude Code](https://img.shields.io/badge/Built_with-Claude_Code-blueviolet)](https://claude.ai/claude-code)
@@ -43,7 +43,7 @@
 <tr>
 <td><strong>한국어</strong></td>
 <td><a href="https://docs.google.com/document/d/1g6AFUqiJp8fCb_3NayHfNhqRDFAq6c0Q/edit?usp=sharing&ouid=105178834220477378953&rtpof=true&sd=true">레드라인 DOCX</a></td>
-<td><a href="https://docs.google.com/document/d/1y_iMJBNwlvubzs1wfcLq1q8lNL3pQxXQ/edit?usp=sharing&ouid=105178834220477378953&rtpof=true&sd=true">검토 의견서</a></td>
+<td><a href="https://docs.google.com/document/d/1y_iMJBNwlvubzs1wfcLq1q8lNL3pQxXQ/edit?usp=sharing&ouid=105178834220477378953&rtpof=true&sd=true">검토 메모</a></td>
 </tr>
 </table>
 
@@ -224,7 +224,7 @@ Review this NDA strictly.
 |--------|------|------|
 | Client Memo | English | [Google Docs에서 보기](https://docs.google.com/document/d/1QinVyQHdyb5VxxkjpmFVdVYgFoxgwX0e/edit?usp=sharing&ouid=105178834220477378953&rtpof=true&sd=true) |
 | Contract Redlined | English | [Google Docs에서 보기](https://docs.google.com/document/d/1KIIW5lY-H-LddPgUGWLiA1kcFQxbJECq/edit?usp=sharing&ouid=105178834220477378953&rtpof=true&sd=true) |
-| 검토 의견서 | 한국어 | [Google Docs에서 보기](https://docs.google.com/document/d/1y_iMJBNwlvubzs1wfcLq1q8lNL3pQxXQ/edit?usp=sharing&ouid=105178834220477378953&rtpof=true&sd=true) |
+| 검토 메모 | 한국어 | [Google Docs에서 보기](https://docs.google.com/document/d/1y_iMJBNwlvubzs1wfcLq1q8lNL3pQxXQ/edit?usp=sharing&ouid=105178834220477378953&rtpof=true&sd=true) |
 | 계약서 검토본 | 한국어 | [Google Docs에서 보기](https://docs.google.com/document/d/1g6AFUqiJp8fCb_3NayHfNhqRDFAq6c0Q/edit?usp=sharing&ouid=105178834220477378953&rtpof=true&sd=true) |
 
 </details>
@@ -428,20 +428,20 @@ inbox/raw/  ──>  validate  ──>  classify  ──>  segment  ──>  app
 - [CLAUDE.md](../../CLAUDE.md) — 오케스트레이터 라우팅과 안전 규칙
 - [구현 노트](./implementation-notes.md) — 저장소 구현 세부사항
 
-## 법무법인 진주 (Jinju Law Firm)
+## Jinju Legal Orchestrator
 
-**법무법인 진주** 소속 전문 법률 AI 에이전트 시리즈:
+**Jinju Legal Orchestrator** 소속 전문 법률 워크플로우 에이전트 시리즈:
 
-| 에이전트 | 변호사 | 전문 분야 |
-|---------|--------|----------|
-| [game-legal-research](https://github.com/kipeum86/game-legal-research) | 심진주 | 게임 산업법 |
-| [legal-translation-agent](https://github.com/kipeum86/legal-translation-agent) | 변혁기 | 법률 번역 |
-| [general-legal-research](https://github.com/kipeum86/general-legal-research) | 김재식 | 법률 리서치 |
-| [PIPA-expert](https://github.com/kipeum86/PIPA-expert) | 정보호 | 개인정보보호법 |
-| [GDPR-expert](https://github.com/kipeum86/GDPR-expert) | 김덕배 | GDPR / EU 개인정보보호 |
-| **[contract-review-agent](https://github.com/kipeum86/contract-review-agent)** | **고덕수** | **계약서 검토** |
-| [legal-writing-agent](https://github.com/kipeum86/legal-writing-agent) | 한석봉 | 법률 문서 작성 |
-| [second-review-agent](https://github.com/kipeum86/second-review-agent) | 반성문 | 품질 리뷰 (파트너) |
+| 에이전트 | 페르소나 | 전문 분야 |
+|---------|----------|----------|
+| [game-legal-research](https://github.com/kipeum86/game-legal-research) | 심진주 — 게임 산업 스페셜리스트 | 게임 산업법 |
+| [legal-translation-agent](https://github.com/kipeum86/legal-translation-agent) | 변혁기 — 법률 번역 스페셜리스트 | 법률 번역 |
+| [general-legal-research](https://github.com/kipeum86/general-legal-research) | 김재식 — 리서치 스페셜리스트 | 법률 리서치 |
+| [PIPA-expert](https://github.com/kipeum86/PIPA-expert) | 정보호 — 개인정보 스페셜리스트 | 개인정보보호법 |
+| [GDPR-expert](https://github.com/kipeum86/GDPR-expert) | 김덕배 — GDPR 스페셜리스트 | GDPR / EU 개인정보보호 |
+| **[contract-review-agent](https://github.com/kipeum86/contract-review-agent)** | **고덕수 — 계약 검토 스페셜리스트** | **계약서 검토** |
+| [legal-writing-agent](https://github.com/kipeum86/legal-writing-agent) | 한석봉 — 법률 문서 작성 스페셜리스트 | 법률 문서 작성 |
+| [second-review-agent](https://github.com/kipeum86/second-review-agent) | 반성문 — 시니어 리뷰 스페셜리스트 | 품질 리뷰 |
 
 ## 라이선스
 
