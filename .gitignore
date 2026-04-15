@@ -152,6 +152,8 @@ release-note-*.md
 contract-review-agent-design.md
 drafting-system-prompt.md
 docs/ko-legal-opinion-style-guide.md
+/domain-reference-forced-load.md
+/implementation-note.md
 docs/notes/naming-transition-guide.md
 /scripts/generate_*.py
 .gstack/
