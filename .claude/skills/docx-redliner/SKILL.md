@@ -33,6 +33,7 @@ Apply tracked changes and comments to DOCX files via XML manipulation.
    - Output:
      - `changes.json` — all tracked changes (type: insertion/deletion/replacement)
      - `comments.json` — all margin comments with anchor paragraph indices
+     - `redline_audit.json` — prompt-injection audit log for suspicious tracked-change/comment content
      - `extraction-report.json` — statistics (change count, comment count, authors, date range)
      - `original.md` — pre-edit text (all changes rejected)
 
@@ -79,6 +80,20 @@ Generate the external-clean DOCX **only when output 2 is selected**:
 2. **External-clean** (`_redlined_clean.docx`): `[INTERNAL]` comments stripped for counterparty delivery
 
 This is a **safety-critical feature** whenever output 2 is requested.
+
+## Output: `redline_audit.json`
+
+`extract-redlines.py` detects and escapes prompt-injection patterns while extracting tracked changes and comments. The audit results are written to `redline_audit.json`.
+
+| Field | Description |
+|---|---|
+| `prompt_injection_suspected` | `true` when one or more matches are detected |
+| `total_matches` | Number of detected matches |
+| `matches[]` | Pattern, matched string, offsets, and context (for example `comment[3].text`) |
+
+Matched text is wrapped as `` `<escape>...</escape>` `` in the corresponding `changes.json` / `comments.json` fields so downstream LLM consumers see escaped data rather than raw control tokens. The raw matched text remains recoverable from `redline_audit.json.matches[*].match`.
+
+**Downstream contract**: redline records with `prompt_injection_suspected == true` must not be auto-promoted to `library/approved/`. Follow the review-agent / ingestion-agent Safety Envelope rules and require human review.
 
 ## Coverage Fallback Protocol
 
