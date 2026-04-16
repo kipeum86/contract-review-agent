@@ -1060,7 +1060,7 @@ function createKoreanMemorandum(data) {
     );
   }
 
-  sections.push(createMemoSectionTitle('4. 검토 분석'));
+  sections.push(createMemoSectionTitle('4. 검토의견'));
 
   // Optional 협상 우선순위 sub-section — rendered only when
   // executive_summary.negotiation_priority is present (v2 schema). Backward
