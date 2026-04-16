@@ -12,6 +12,7 @@ Usage:
 Outputs:
     <output_dir>/changes.json           — All tracked changes (ins/del/replacement)
     <output_dir>/comments.json          — All margin comments
+    <output_dir>/redline_audit.json     — Prompt-injection audit trail
     <output_dir>/extraction-report.json — Statistics
     <output_dir>/original.md            — Pre-edit text (all changes rejected)
 """
@@ -19,6 +20,7 @@ Outputs:
 import sys
 import os
 import json
+import re
 import zipfile
 import xml.etree.ElementTree as ET
 from datetime import datetime, timezone
@@ -52,6 +54,58 @@ def get_attr_local(element: ET.Element, attr_name: str) -> str | None:
     return None
 
 
+# ── Prompt-injection sanitization ──
+
+_PROMPT_INJECTION_PATTERNS = [
+    # Role marker tokens (exact)
+    r'\[(?:SYSTEM|ASSISTANT|USER|IGNORE|OVERRIDE|MANUAL_REQUIRED|PRIVILEGED)\]',
+    # Audience-firewall tokens that may be forged inside a counterparty comment
+    r'\[(?:INTERNAL|EXTERNAL)\]',
+    # XML-ish role tags
+    r'<\s*/?\s*(?:system|user|assistant|untrusted_contract_content|instruction|instructions)\s*>',
+    # English jailbreak phrases
+    r'(?i)ignore\s+(?:the\s+)?(?:previous|prior|above|all)\s+(?:instructions?|prompts?)',
+    r'(?i)disregard\s+(?:the\s+)?(?:previous|prior|above|all)',
+    r'(?i)system\s+override',
+    r'(?i)you\s+are\s+now\s+(?:a|an|the)\s+',
+    r'(?i)forget\s+(?:your|all|the)\s+(?:instructions?|prompts?|rules?)',
+    r'(?i)new\s+instructions?\s*:',
+    # Korean jailbreak phrases
+    r'이전\s*지시(?:사항)?(?:을|를)?\s*(?:무시|잊)',
+    r'이제부터\s+(?:너는|당신은)',
+    r'앞(?:의|에)\s*(?:지시|명령)(?:을|를)?\s*무시',
+]
+_COMPILED_PI_PATTERNS = [re.compile(pattern) for pattern in _PROMPT_INJECTION_PATTERNS]
+_MAX_SANITIZE_LENGTH = 200_000  # catastrophic backtracking guard
+
+
+def _sanitize_untrusted_text(text: str, context: str = '') -> tuple[str, list[dict]]:
+    """Escape prompt-injection tokens in untrusted DOCX text."""
+    if not text or len(text) > _MAX_SANITIZE_LENGTH:
+        return text, []
+
+    matches = []
+    for regex in _COMPILED_PI_PATTERNS:
+        for match in regex.finditer(text):
+            matches.append({
+                'pattern': regex.pattern,
+                'match': match.group(0),
+                'start': match.start(),
+                'end': match.end(),
+                'context': context,
+            })
+
+    if not matches:
+        return text, []
+
+    sanitized = text
+    for match in sorted(matches, key=lambda item: (-item['start'], -(item['end'] - item['start']))):
+        escaped = f'`<escape>{match["match"]}</escape>`'
+        sanitized = sanitized[:match['start']] + escaped + sanitized[match['end']:]
+
+    return sanitized, matches
+
+
 # ── Text extraction helpers ──
 
 def run_text_content(run: ET.Element) -> str:
@@ -74,6 +128,14 @@ def element_all_text(elem: ET.Element) -> str:
     for run in elem.iter(f'{{{W}}}r'):
         parts.append(run_text_content(run))
     return ''.join(parts)
+
+
+def _flush_pending_deletion(changes: list[dict], pending_deletion: dict | None) -> None:
+    """Append a pending deletion to changes, removing transient bookkeeping."""
+    if pending_deletion is None:
+        return
+    pending_deletion.pop('_change_index', None)
+    changes.append(pending_deletion)
 
 
 # ── Core extraction ──
@@ -109,13 +171,18 @@ def extract_changes_from_body(body: ET.Element) -> tuple[list[dict], list[str], 
 
                 # Flush any pending deletion that wasn't followed by an insertion
                 if pending_deletion is not None:
-                    changes.append(pending_deletion)
+                    _flush_pending_deletion(changes, pending_deletion)
                     pending_deletion = None
 
             elif name == 'del':
                 author = get_attr_local(child, 'author') or ''
                 date = get_attr_local(child, 'date') or ''
-                deleted_text = element_all_text(child)
+                change_index = change_counter
+                deleted_text_raw = element_all_text(child)
+                deleted_text, del_matches = _sanitize_untrusted_text(
+                    deleted_text_raw,
+                    context=f'change[{change_index}].deleted_text',
+                )
 
                 original_parts.append(deleted_text)
                 # Do NOT add to accepted_parts (it's deleted)
@@ -123,7 +190,7 @@ def extract_changes_from_body(body: ET.Element) -> tuple[list[dict], list[str], 
                 # Hold as pending — if next sibling is w:ins from same author,
                 # merge into a replacement
                 pending_deletion = {
-                    'change_id': f'chg-{change_counter:03d}',
+                    'change_id': f'chg-{change_index:03d}',
                     'type': 'deletion',
                     'revision_id': get_attr_local(child, 'id') or '',
                     'author': author,
@@ -132,13 +199,29 @@ def extract_changes_from_body(body: ET.Element) -> tuple[list[dict], list[str], 
                     'text': deleted_text,
                     'context_before': ''.join(original_parts[:-1])[-40:] if original_parts[:-1] else '',
                     'context_after': '',  # filled later
+                    'sanitize_matches': del_matches,
+                    '_change_index': change_index,
                 }
                 change_counter += 1
 
             elif name == 'ins':
                 author = get_attr_local(child, 'author') or ''
                 date = get_attr_local(child, 'date') or ''
-                inserted_text = element_all_text(child)
+
+                if pending_deletion is not None and pending_deletion['author'] == author:
+                    change_index = pending_deletion.get('_change_index', change_counter)
+                    inserted_text_raw = element_all_text(child)
+                    inserted_text, ins_matches = _sanitize_untrusted_text(
+                        inserted_text_raw,
+                        context=f'change[{change_index}].inserted_text',
+                    )
+                else:
+                    change_index = change_counter
+                    inserted_text_raw = element_all_text(child)
+                    inserted_text, ins_matches = _sanitize_untrusted_text(
+                        inserted_text_raw,
+                        context=f'change[{change_index}].text',
+                    )
 
                 accepted_parts.append(inserted_text)
                 # Do NOT add to original_parts (it was inserted)
@@ -159,13 +242,14 @@ def extract_changes_from_body(body: ET.Element) -> tuple[list[dict], list[str], 
                         'inserted_text': inserted_text,
                         'context_before': pending_deletion['context_before'],
                         'context_after': '',  # filled later
+                        'sanitize_matches': pending_deletion.get('sanitize_matches', []) + ins_matches,
                     }
                     changes.append(replacement)
                     pending_deletion = None
                 else:
                     # Flush pending deletion if any
                     if pending_deletion is not None:
-                        changes.append(pending_deletion)
+                        _flush_pending_deletion(changes, pending_deletion)
                         pending_deletion = None
 
                     change = {
@@ -178,6 +262,7 @@ def extract_changes_from_body(body: ET.Element) -> tuple[list[dict], list[str], 
                         'text': inserted_text,
                         'context_before': ''.join(accepted_parts[:-1])[-40:] if accepted_parts[:-1] else '',
                         'context_after': '',  # filled later
+                        'sanitize_matches': ins_matches,
                     }
                     changes.append(change)
                     change_counter += 1
@@ -186,7 +271,7 @@ def extract_changes_from_body(body: ET.Element) -> tuple[list[dict], list[str], 
 
         # Flush any trailing pending deletion
         if pending_deletion is not None:
-            changes.append(pending_deletion)
+            _flush_pending_deletion(changes, pending_deletion)
             pending_deletion = None
 
         original_lines.append(''.join(original_parts))
@@ -233,12 +318,23 @@ def extract_comments(zip_file: zipfile.ZipFile, body: ET.Element) -> list[dict]:
         cid = get_attr_local(comment_elem, 'id')
         if cid is None:
             continue
+        raw_text = element_all_text(comment_elem)
+        sanitized_text, text_matches = _sanitize_untrusted_text(
+            raw_text,
+            context=f'comment[{cid}].text',
+        )
+        raw_author = get_attr_local(comment_elem, 'author') or ''
+        sanitized_author, author_matches = _sanitize_untrusted_text(
+            raw_author,
+            context=f'comment[{cid}].author',
+        )
         comment_bodies[cid] = {
             'comment_id': cid,
-            'author': get_attr_local(comment_elem, 'author') or '',
+            'author': sanitized_author,
             'initials': get_attr_local(comment_elem, 'initials') or '',
             'date': get_attr_local(comment_elem, 'date') or '',
-            'text': element_all_text(comment_elem),
+            'text': sanitized_text,
+            'sanitize_matches': text_matches + author_matches,
         }
 
     # Map comment ranges to paragraphs
@@ -392,11 +488,18 @@ def extract_redlines(docx_path: str, output_dir: str) -> dict:
 
     # Build report
     report = build_extraction_report(source_file, changes, comments, total_paragraphs)
+    all_matches = []
+    for change in changes:
+        all_matches.extend(change.get('sanitize_matches', []))
+    for comment in comments:
+        all_matches.extend(comment.get('sanitize_matches', []))
+    report['prompt_injection_suspected'] = bool(all_matches)
+    extracted_at = datetime.now(timezone.utc).isoformat()
 
     # Write changes.json
     changes_data = {
         'version': 1,
-        'extracted_at': datetime.now(timezone.utc).isoformat(),
+        'extracted_at': extracted_at,
         'source_file': source_file,
         'total_changes': len(changes),
         'changes': changes,
@@ -407,13 +510,25 @@ def extract_redlines(docx_path: str, output_dir: str) -> dict:
     # Write comments.json
     comments_data = {
         'version': 1,
-        'extracted_at': datetime.now(timezone.utc).isoformat(),
+        'extracted_at': extracted_at,
         'source_file': source_file,
         'total_comments': len(comments),
         'comments': comments,
     }
     with open(os.path.join(output_dir, 'comments.json'), 'w', encoding='utf-8') as f:
         json.dump(comments_data, f, indent=2, ensure_ascii=False)
+
+    # Write redline_audit.json
+    audit_data = {
+        'version': 1,
+        'extracted_at': extracted_at,
+        'source_file': source_file,
+        'prompt_injection_suspected': bool(all_matches),
+        'total_matches': len(all_matches),
+        'matches': all_matches,
+    }
+    with open(os.path.join(output_dir, 'redline_audit.json'), 'w', encoding='utf-8') as f:
+        json.dump(audit_data, f, indent=2, ensure_ascii=False)
 
     # Write extraction-report.json
     with open(os.path.join(output_dir, 'extraction-report.json'), 'w', encoding='utf-8') as f:
@@ -423,6 +538,15 @@ def extract_redlines(docx_path: str, output_dir: str) -> dict:
     original_md = lines_to_markdown(original_lines)
     with open(os.path.join(output_dir, 'original.md'), 'w', encoding='utf-8') as f:
         f.write(original_md)
+
+    if all_matches:
+        print(
+            f"WARNING: {len(all_matches)} prompt-injection pattern match(es) "
+            f"detected in {docx_path}. See {output_dir}/redline_audit.json. "
+            f"Downstream review should treat redline_record as "
+            f"prompt_injection_suspected.",
+            file=sys.stderr,
+        )
 
     return report
 
