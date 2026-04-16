@@ -27,30 +27,6 @@ and negotiation recommendations** — all generated directly in DOCX.
 > - **[How to Use](./docs/en/HOW-TO-USE.md)** — setup, environment, and step-by-step guide
 > - **[Seed Calibration Playbook](./docs/en/SEED-CALIBRATION-PLAYBOOK.md)** — advanced operating guide for maintaining synthetic library baselines over time
 
----
-
-## Example Outputs
-
-<table>
-<tr>
-<th width="120">Language</th>
-<th>Redlined DOCX</th>
-<th>Review Report</th>
-</tr>
-<tr>
-<td><strong>English</strong></td>
-<td><a href="https://docs.google.com/document/d/1KIIW5lY-H-LddPgUGWLiA1kcFQxbJECq/edit?usp=sharing&ouid=105178834220477378953&rtpof=true&sd=true">Redlined DOCX</a></td>
-<td><a href="https://docs.google.com/document/d/1QinVyQHdyb5VxxkjpmFVdVYgFoxgwX0e/edit?usp=sharing&ouid=105178834220477378953&rtpof=true&sd=true">Client Memo</a></td>
-</tr>
-<tr>
-<td><strong>한국어</strong></td>
-<td><a href="https://docs.google.com/document/d/1g6AFUqiJp8fCb_3NayHfNhqRDFAq6c0Q/edit?usp=sharing&ouid=105178834220477378953&rtpof=true&sd=true">레드라인 DOCX</a></td>
-<td><a href="https://docs.google.com/document/d/1y_iMJBNwlvubzs1wfcLq1q8lNL3pQxXQ/edit?usp=sharing&ouid=105178834220477378953&rtpof=true&sd=true">검토 메모</a></td>
-</tr>
-</table>
-
----
-
 ## What It Does
 
 <table>
@@ -105,26 +81,10 @@ Policy files control how the agent classifies and reviews contracts. They ship w
 
 On first run, default policies are automatically copied from `policies.default/` to `policies/`. Your customizations in `policies/` are gitignored — they won't be overwritten by `git pull`.
 
-Ask Claude Code directly — in the terminal or the extension chat panel:
-
-```text
-Rewrite the policy files to match the contract types I work with.
-
-Contract types I handle:
-- NDA, license, IP assignment, content distribution, game development, ...
-```
-
-Claude Code will rewrite all six policy files (contract families, clause taxonomy, review modes, retrieval rules, etc.) in one pass. You can also [edit the YAML files manually](#-policy-files).
+Ask Claude Code directly — in the terminal or the extension chat panel. It can rewrite all six policy files (contract families, clause taxonomy, review modes, retrieval rules, etc.) in one pass. You can also [edit the YAML files manually](#-policy-files).
 
 > [!TIP]
-> **Not sure how to configure policies yet?** Skip to Step 3 first. Ingest your house templates, then come back and ask Claude Code to customize the policies based on the ingested contracts:
->
-> ```text
-> ingest된 계약서 유형에 맞게 policies파일 수정해줘.
-> Rewrite policies to match the contract types already in my library.
-> ```
->
-> This is often easier than writing policy specs from scratch — let your actual contracts drive the configuration.
+> **Not sure how to configure policies yet?** Skip to Step 3 first. Ingest your house templates, then come back and ask Claude Code to customize the policies based on the ingested contracts. This is often easier than writing policy specs from scratch — let your actual contracts drive the configuration.
 
 ### Step 3 — Seed Your Library
 
@@ -157,13 +117,6 @@ Drop the contract you want reviewed into the [`input/`](./input/) folder at the 
 Results (redlined DOCX, analysis report, etc.) are saved to the [`output/`](./output/) folder.
 
 Both `input/` and `output/` are excluded from version control — your contract files never leave your local PC.
-
-Natural language also works:
-
-```text
-이 SaaS 계약서 moderate 모드로 검토해줘.
-Review this NDA strictly.
-```
 
 ---
 
@@ -218,19 +171,6 @@ Natural language works too — the orchestrator routes to the right workflow.
     DOCX      DOCX      DOCX
 ```
 
-<details>
-<summary><strong>Example Output</strong> — see what the deliverables actually look like</summary>
-<br/>
-
-| Deliverable | Language | Link |
-|-------------|----------|------|
-| Client Memo | English | [View on Google Docs](https://docs.google.com/document/d/1QinVyQHdyb5VxxkjpmFVdVYgFoxgwX0e/edit?usp=sharing&ouid=105178834220477378953&rtpof=true&sd=true) |
-| Contract Redlined | English | [View on Google Docs](https://docs.google.com/document/d/1KIIW5lY-H-LddPgUGWLiA1kcFQxbJECq/edit?usp=sharing&ouid=105178834220477378953&rtpof=true&sd=true) |
-| 검토 메모 | 한국어 | [Google Docs에서 보기](https://docs.google.com/document/d/1y_iMJBNwlvubzs1wfcLq1q8lNL3pQxXQ/edit?usp=sharing&ouid=105178834220477378953&rtpof=true&sd=true) |
-| 계약서 검토본 | 한국어 | [Google Docs에서 보기](https://docs.google.com/document/d/1g6AFUqiJp8fCb_3NayHfNhqRDFAq6c0Q/edit?usp=sharing&ouid=105178834220477378953&rtpof=true&sd=true) |
-
-</details>
-
 ### Review Modes
 
 | Mode | When to use | Redline scope |
@@ -239,7 +179,7 @@ Natural language works too — the orchestrator routes to the right workflow.
 | **`moderate`** | Standard commercial deals | Critical + High risk |
 | **`loose`** | Low leverage, quick assessments, LOI/MOU | Critical only |
 
-Default is `moderate`. Override per-review: `"이거 엄격하게 검토해줘"` or `"do a loose review"`.
+Default is `moderate`. You can override it per review with a natural-language request.
 
 ### Library Ingestion
 
@@ -261,7 +201,7 @@ Auto-approval is on by default for templates, precedents, and redline records. N
 
 ### Adding Reference Sources
 
-Beyond contract templates, you can build a **reference library** of statutes, court decisions, law firm analyses, sample forms, and more. These are converted to structured Markdown and used as context during reviews.
+Beyond contract templates, you can build a **reference library** of statutes, court decisions, law firm analyses, forms, and more. These are converted to structured Markdown and used as context during reviews.
 
 1. Drop any file (PDF, DOCX, etc.) into `contract-review/library/inbox/raw/`
 2. Tell the agent: `/ingest` or "참조 자료 넣었어"
@@ -272,8 +212,7 @@ Beyond contract templates, you can build a **reference library** of statutes, co
    - Update search indexes
 
 > **Note:** Dropping files alone does not trigger processing.
-> You must run `/ingest` or tell the agent (e.g. "inbox에 자료 넣었어")
-> to start the parsing pipeline.
+> You must run `/ingest` or tell the agent to start the parsing pipeline.
 
 ### Retrieval Strategy
 
@@ -312,7 +251,7 @@ Fully auditable. Every match is traceable.
 │   │   │   ├── precedents/      #   Precedent agreements
 │   │   │   └── redline-records/ #   Ingested redlined contracts (review pattern data)
 │   │   ├── quarantine/          # Failed / rejected (gitignored)
-│   │   ├── sources/             # Reference sources (statutes, precedents, sample forms, etc.)
+│   │   ├── sources/             # Reference sources (statutes, precedents, and other supporting materials)
 │   │   ├── indexes/             # JSON indexes (auto-managed)
 │   │   ├── policies/            # Your customized config (gitignored)
 │   │   ├── policies.default/    # Shipped defaults (do not edit)
@@ -342,12 +281,12 @@ Six YAML files under `contract-review/library/policies/` control the agent's beh
 
 | File | Controls | Edit? |
 |------|----------|-------|
-| `contract-families.yaml` | Supported agreement types (29 families: NDA, SPA, game dev, publishing, employment, lease, ...) | **Yes** |
-| `clause-taxonomy.yaml` | Clause classification hierarchy (M&A, IP, content, game dev categories, ...) | **Yes** |
+| `contract-families.yaml` | Supported agreement types (29 families) | **Yes** |
+| `clause-taxonomy.yaml` | Clause classification hierarchy | **Yes** |
 | `review-mode.yaml` | Strict / moderate / loose review settings + recommended modes per deal type | **Yes** |
 | `approval-rules.yaml` | Auto-approval toggle and per-asset-type rules | **Yes** |
 | `retrieval-priority.yaml` | Search ranking, language preference, freshness handling, and affinity fallback | Optional |
-| `metadata-schema.yaml` | Metadata field definitions (bilingual support, industry tags, ...) | Optional |
+| `metadata-schema.yaml` | Metadata field definitions | Optional |
 
 Policies are **read-only for the agent** — only you edit them. The agent manages `indexes/` automatically.
 
