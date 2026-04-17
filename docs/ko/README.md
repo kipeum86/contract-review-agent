@@ -364,7 +364,7 @@ inbox/raw/  ──>  validate  ──>  classify  ──>  segment  ──>  app
 선택 사항: `pymupdf` 또는 `pypdf` (PDF 지원), `pandoc` (향상된 DOCX 변환).
 
 > [!IMPORTANT]
-> `jq`는 도메인 레퍼런스 forced-load hook(`.claude/hooks/inject-domain-references.sh`)과 loader script 동작에 필요합니다. 설치되어 있지 않으면 hook이 stderr에 에러를 남기고 주입을 건너뛰므로, `review-guide.md`가 LLM 컨텍스트에 들어가지 않고 검토가 사전 학습 지식에만 의존하는 상태로 조용히 되돌아갑니다. 아키텍처 상세는 [`docs/ko/domain-reference-forced-load.md`](./domain-reference-forced-load.md) 참고.
+> `jq`는 도메인 레퍼런스 forced-load hook(`.claude/hooks/inject-domain-references.sh`)과 loader script 동작에 필요합니다. 설치되어 있지 않으면 hook이 stderr에 에러를 남기고 주입을 건너뛰므로, `review-guide.md`가 LLM 컨텍스트에 들어가지 않고 검토가 사전 학습 지식에만 의존하는 상태로 조용히 되돌아갑니다. 아키텍처 상세 노트는 로컬 전용 워크스페이스에만 보관합니다.
 
 ---
 
@@ -426,7 +426,8 @@ inbox/raw/  ──>  validate  ──>  classify  ──>  segment  ──>  app
 
 - [사용 방법](./HOW-TO-USE.md) — 설정 가이드와 단계별 워크스루
 - [CLAUDE.md](../../CLAUDE.md) — 오케스트레이터 라우팅과 안전 규칙
-- [구현 노트](./implementation-notes.md) — 저장소 구현 세부사항
+
+내부 구현 노트는 로컬 전용 워크스페이스에만 두고 공개 저장소에는 포함하지 않습니다.
 
 ## Jinju Legal Orchestrator
 

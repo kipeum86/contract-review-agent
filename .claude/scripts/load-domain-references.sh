@@ -7,7 +7,7 @@
 # to contract-review/library/runs/sessions/{session_id}/loaded.json.
 #
 # Part of the Domain Reference Forced-Load Architecture (v2.1).
-# See: docs/ko/domain-reference-forced-load.md (when migrated from output/)
+# Detailed architecture history is kept in the local-only workspace docs.
 #
 # Usage:
 #   bash .claude/scripts/load-domain-references.sh <workflow>
