@@ -158,3 +158,6 @@ release-note-*.md
 .gstack/
 /logs/*
 !/logs/.gitkeep
+
+# Local-only planning docs
+/docs/plans/security-hardening-batch-1-codex.md
