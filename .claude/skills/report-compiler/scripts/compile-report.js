@@ -128,7 +128,7 @@ function normalizeList(value) {
 //   never writes this line. sha256 + canary heading in the JSON cannot be
 //   guessed without actually running the loader against the real files.
 //
-// See: docs/ko/domain-reference-forced-load.md (Section 9.3)
+// See local-only architecture notes for the baseline trace design history.
 // ─────────────────────────────────────────────────────────────────────────────
 function injectBaselineTrace(data, matterWorkingDir) {
   // Backward compat: if caller did not provide matter dir, do nothing.
@@ -220,8 +220,7 @@ function resolveReportLanguage(data) {
   // incident was caused by treating an English contract as an English report
   // request even when the user asked for a Korean memorandum. Do not
   // reintroduce this fallback without rethinking the Pre-Pipeline language
-  // intake flow. See docs/ko/domain-reference-forced-load.md incident
-  // history.
+  // intake flow. See the local-only incident history notes for background.
   const explicitLanguage = firstNonEmpty(
     data.report_language,
     data.language,

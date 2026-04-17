@@ -41,7 +41,7 @@ Claude Code는 대화형 에이전트로 동작합니다. 자연어 지시나 �
 | **jq** | 1.6+ | `brew install jq` (macOS) · `apt-get install jq` (Linux). 도메인 레퍼런스 forced-load hook에서 사용 |
 | **shasum / sha256sum** | — | macOS 및 대부분의 Linux 배포판에 기본 포함 |
 
-> **왜 jq가 필요한가요?** `.claude/hooks/inject-domain-references.sh` hook과 `.claude/scripts/load-domain-references.sh` loader가 hook의 stdin JSON을 파싱하고, `additionalContext` 주입 페이로드를 생성하고, 포렌식 트레이스 파일(`contract-review/library/runs/sessions/*/loaded.json`)을 쓸 때 `jq`를 사용합니다. `jq`가 없으면 hook이 stderr에 에러를 남기고 빈 주입으로 fall-through되며, 이 경우 `review-guide.md`가 LLM 컨텍스트에 **주입되지 않고** 검토가 사전 학습 지식에만 기반한 상태로 조용히 회귀합니다. 아키텍처 상세는 [`domain-reference-forced-load.md`](./domain-reference-forced-load.md) 참고.
+> **왜 jq가 필요한가요?** `.claude/hooks/inject-domain-references.sh` hook과 `.claude/scripts/load-domain-references.sh` loader가 hook의 stdin JSON을 파싱하고, `additionalContext` 주입 페이로드를 생성하고, 포렌식 트레이스 파일(`contract-review/library/runs/sessions/*/loaded.json`)을 쓸 때 `jq`를 사용합니다. `jq`가 없으면 hook이 stderr에 에러를 남기고 빈 주입으로 fall-through되며, 이 경우 `review-guide.md`가 LLM 컨텍스트에 **주입되지 않고** 검토가 사전 학습 지식에만 기반한 상태로 조용히 회귀합니다. 아키텍처 상세 노트는 로컬 전용 워크스페이스에만 보관합니다.
 
 선택 설치 항목:
 

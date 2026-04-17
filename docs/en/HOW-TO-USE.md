@@ -41,7 +41,7 @@ Both methods support the same slash commands and natural language — choose whi
 | **jq** | 1.6+ | `brew install jq` (macOS) · `apt-get install jq` (Linux). Required by the domain reference forced-load hook. |
 | **shasum / sha256sum** | — | Preinstalled on macOS and most Linux distros |
 
-> **Why jq?** The `.claude/hooks/inject-domain-references.sh` hook and the `.claude/scripts/load-domain-references.sh` loader both use `jq` to parse hook input JSON, build `additionalContext` injections, and write forensic trace files (`contract-review/library/runs/sessions/*/loaded.json`). Without `jq`, the hook logs an error to stderr and falls through to an empty injection, which means `review-guide.md` is **not** injected and reviews silently regress to pretrained knowledge. See [`domain-reference-forced-load.md`](./domain-reference-forced-load.md) for the full architecture.
+> **Why jq?** The `.claude/hooks/inject-domain-references.sh` hook and the `.claude/scripts/load-domain-references.sh` loader both use `jq` to parse hook input JSON, build `additionalContext` injections, and write forensic trace files (`contract-review/library/runs/sessions/*/loaded.json`). Without `jq`, the hook logs an error to stderr and falls through to an empty injection, which means `review-guide.md` is **not** injected and reviews silently regress to pretrained knowledge. Full architecture notes are kept in the local-only workspace.
 
 Optional dependencies:
 

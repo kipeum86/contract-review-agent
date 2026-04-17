@@ -305,7 +305,7 @@ Policies are **read-only for the agent** — only you edit them. The agent manag
 Optional: `pymupdf` or `pypdf` (PDF support), `pandoc` (enhanced DOCX conversion).
 
 > [!IMPORTANT]
-> `jq` is required by the domain reference forced-load hook (`.claude/hooks/inject-domain-references.sh`) and the loader script. Without it, the hook will log an error to stderr and silently fall through to an empty injection — meaning `review-guide.md` will not be injected into the LLM context and reviews will silently regress to pretrained knowledge only. See [`docs/en/domain-reference-forced-load.md`](./docs/en/domain-reference-forced-load.md) for the architecture.
+> `jq` is required by the domain reference forced-load hook (`.claude/hooks/inject-domain-references.sh`) and the loader script. Without it, the hook will log an error to stderr and silently fall through to an empty injection — meaning `review-guide.md` will not be injected into the LLM context and reviews will silently regress to pretrained knowledge only. Detailed architecture notes are kept in the local-only workspace.
 
 ---
 
@@ -367,7 +367,8 @@ The agent is composed of three specialized sub-agents coordinated by an orchestr
 
 - [How to Use](./docs/en/HOW-TO-USE.md) — setup guide and step-by-step walkthrough
 - [CLAUDE.md](./CLAUDE.md) — orchestrator routing and safety rules
-- [Implementation Notes](./docs/en/implementation-notes.md) — repository implementation details
+
+Internal implementation notes are kept in the local-only workspace and are intentionally omitted from the public repository.
 
 ## Part of Jinju Legal Orchestrator
 

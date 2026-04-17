@@ -160,4 +160,4 @@ release-note-*.md
 !/logs/.gitkeep
 
 # Local-only planning docs
-/docs/plans/security-hardening-batch-1-codex.md
+/docs/plans/*-codex.md
