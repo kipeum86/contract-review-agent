@@ -83,7 +83,7 @@ Execute these steps in order. Save pipeline state after each step. If a step fai
 ```yaml
 doc_class: redline_record
 base_template_id: "0-safe-conditional-equity"
-reviewer: "고덕수"
+reviewer: "Contract Review Specialist"
 negotiation_round: 1
 counterparty: "상대방 회사명"
 deal_context: "Series A 투자계약"

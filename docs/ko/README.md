@@ -2,9 +2,9 @@
 
 # Contract Review Agent
 
-### Claude Code 기반 Jinju Legal Orchestrator 계약 검토 워크플로우
+### Claude Code 기반 KP Legal Orchestrator 계약 검토 워크플로우
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](../../LICENSE)
+[![License: Apache 2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](../../LICENSE)
 [![Claude Code](https://img.shields.io/badge/Built_with-Claude_Code-blueviolet)](https://claude.ai/claude-code)
 [![Node.js](https://img.shields.io/badge/Node.js-18%2B-green)](https://nodejs.org/)
 [![Python](https://img.shields.io/badge/Python-3.10%2B-yellow)](https://www.python.org/)
@@ -91,7 +91,7 @@
 ### Step 1 — 설치
 
 ```bash
-git clone https://github.com/lowtidebuild/contract-review-agent.git
+git clone <repository-url> contract-review-agent
 cd contract-review-agent
 npm install
 python -m pip install pyyaml
@@ -429,20 +429,21 @@ inbox/raw/  ──>  validate  ──>  classify  ──>  segment  ──>  app
 
 내부 구현 노트는 로컬 전용 워크스페이스에만 두고 공개 저장소에는 포함하지 않습니다.
 
-## Jinju Legal Orchestrator
+## KP Legal Orchestrator
 
-**Jinju Legal Orchestrator** 소속 전문 법률 워크플로우 에이전트 시리즈:
+**KP Legal Orchestrator** 소속 전문 법률 워크플로우 에이전트 시리즈입니다.
+대표 리포지토리는 계정명 대신 저장소 식별자 기준으로 정리합니다:
 
-| 에이전트 | 페르소나 | 전문 분야 |
+| 저장소 식별자 | 역할 | 전문 분야 |
 |---------|----------|----------|
-| [game-legal-research](https://github.com/lowtidebuild/game-legal-research) | 심진주 — 게임 산업 스페셜리스트 | 게임 산업법 |
-| [legal-translation-agent](https://github.com/lowtidebuild/legal-translation-agent) | 변혁기 — 법률 번역 스페셜리스트 | 법률 번역 |
-| [general-legal-research](https://github.com/lowtidebuild/general-legal-research) | 김재식 — 리서치 스페셜리스트 | 법률 리서치 |
-| [PIPA-expert](https://github.com/lowtidebuild/PIPA-expert) | 정보호 — 개인정보 스페셜리스트 | 개인정보보호법 |
-| [GDPR-expert](https://github.com/lowtidebuild/GDPR-expert) | 김덕배 — GDPR 스페셜리스트 | GDPR / EU 개인정보보호 |
-| **[contract-review-agent](https://github.com/lowtidebuild/contract-review-agent)** | **고덕수 — 계약 검토 스페셜리스트** | **계약서 검토** |
-| [legal-writing-agent](https://github.com/lowtidebuild/legal-writing-agent) | 한석봉 — 법률 문서 작성 스페셜리스트 | 법률 문서 작성 |
-| [second-review-agent](https://github.com/lowtidebuild/second-review-agent) | 반성문 — 시니어 리뷰 스페셜리스트 | 품질 리뷰 |
+| `game-legal-research` | 게임 산업 법률 스페셜리스트 | 게임 산업법 |
+| `legal-translation-agent` | 법률 번역 스페셜리스트 | 법률 번역 |
+| `general-legal-research` | 법률 리서치 스페셜리스트 | 법률 리서치 |
+| `PIPA-expert` | 개인정보보호 스페셜리스트 | 개인정보보호법 |
+| `GDPR-expert` | GDPR 스페셜리스트 | GDPR / EU 개인정보보호 |
+| **`contract-review-agent`** | **계약 검토 스페셜리스트** | **계약서 검토** |
+| `legal-writing-agent` | 법률 문서 작성 스페셜리스트 | 법률 문서 작성 |
+| `second-review-agent` | 시니어 리뷰 스페셜리스트 | 품질 리뷰 |
 
 ## 라이선스
 

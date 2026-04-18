@@ -1,0 +1,46 @@
+## Highlights
+
+Security Hardening Batch 1 (CSO audit 2026-04-16) + pipeline performance improvements. Update recommended for all users.
+
+```bash
+git pull origin main
+```
+
+## 🔒 Security
+* Add `<untrusted_contract_content>` framing protocol for review-agent & ingestion-agent (bb5c9a6)
+* Sanitize prompt-injection tokens in redline extraction + audit log (EN·KO) (840c07c)
+* Security hardening batch 1 (#1)
+
+## ⚡ Performance
+* Pre-Pipeline 0.5 document size check with manual-split warning (36d89dc)
+* Redline plumbing — explicit schema references + fail-loud guard (16b300b)
+* compile-report.js `validateClauseCompleteness` assertion (86a9d59)
+
+**Tests:** 144 / 144 ✅  ·  **Migration:** not required  ·  **policies/ customizations:** preserved
+
+---
+
+<details>
+<summary><b>🇰🇷 한국어</b></summary>
+
+## 주요 변경사항
+
+CSO 감사(2026-04-16) 기반 보안 강화 1차 배치 + 파이프라인 성능 개선. 전체 사용자 업데이트 권장.
+
+```bash
+git pull origin main
+```
+
+### 🔒 보안
+* review-agent · ingestion-agent에 `<untrusted_contract_content>` 프레이밍 프로토콜 추가 (bb5c9a6)
+* Redline 추출 단계에서 프롬프트 인젝션 토큰 정화 + 감사 로그(한·영 양방향) (840c07c)
+* Security hardening batch 1 (#1)
+
+### ⚡ 성능
+* Pre-Pipeline 0.5 문서 크기 사전 점검 + 수동 분할 안내 (36d89dc)
+* Redline 파이프: 명시적 스키마 참조 + fail-loud 가드 (16b300b)
+* `compile-report.js` `validateClauseCompleteness` 단언문 (86a9d59)
+
+**테스트:** 144 / 144 ✅  ·  **마이그레이션:** 불필요  ·  **`policies/` 커스터마이즈:** 보존
+
+</details>

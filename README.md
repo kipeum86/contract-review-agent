@@ -2,7 +2,7 @@
 
 # Contract Review Agent
 
-### AI-Powered Contract Review Workflow for Jinju Legal Orchestrator
+### AI-Powered Contract Review Workflow for KP Legal Orchestrator
 
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](./LICENSE)
 [![Claude Code](https://img.shields.io/badge/Built_with-Claude_Code-blueviolet)](https://claude.ai/claude-code)
@@ -69,7 +69,7 @@ Interview-driven contract generation with self-review
 ### Step 1 — Install
 
 ```bash
-git clone https://github.com/lowtidebuild/contract-review-agent.git
+git clone <repository-url> contract-review-agent
 cd contract-review-agent
 npm install
 python -m pip install pyyaml
@@ -370,20 +370,21 @@ The agent is composed of three specialized sub-agents coordinated by an orchestr
 
 Internal implementation notes are kept in the local-only workspace and are intentionally omitted from the public repository.
 
-## Part of Jinju Legal Orchestrator
+## Part of KP Legal Orchestrator
 
-This agent is part of the **Jinju Legal Orchestrator** family of specialist legal workflow agents:
+This agent is part of the **KP Legal Orchestrator** family of specialist legal workflow agents.
+Representative repositories in the ecosystem are listed below by repository ID:
 
-| Agent | Persona | Focus |
+| Repository ID | Role | Focus |
 |-------|---------|-------|
-| [game-legal-research](https://github.com/lowtidebuild/game-legal-research) | 심진주 (Sim Jinju) — game industry specialist | Game industry law |
-| [legal-translation-agent](https://github.com/lowtidebuild/legal-translation-agent) | 변혁기 (Byeon Hyeok-gi) — legal translation specialist | Legal translation |
-| [general-legal-research](https://github.com/lowtidebuild/general-legal-research) | 김재식 (Kim Jaesik) — research specialist | Legal research |
-| [PIPA-expert](https://github.com/lowtidebuild/PIPA-expert) | 정보호 (Jeong Bo-ho) — privacy specialist | Data privacy law |
-| [GDPR-expert](https://github.com/lowtidebuild/GDPR-expert) | 김덕배 (Kim De Bruyne) — GDPR specialist | GDPR / EU data privacy law |
-| **[contract-review-agent](https://github.com/lowtidebuild/contract-review-agent)** | **고덕수 (Ko Duksoo) — contract review specialist** | **Contract review** |
-| [legal-writing-agent](https://github.com/lowtidebuild/legal-writing-agent) | 한석봉 (Han Seokbong) — legal writing specialist | Legal writing |
-| [second-review-agent](https://github.com/lowtidebuild/second-review-agent) | 반성문 (Ban Seong-mun) — senior review specialist | Quality review |
+| `game-legal-research` | Game Industry Legal Specialist | Game industry law |
+| `legal-translation-agent` | Legal Translation Specialist | Legal translation |
+| `general-legal-research` | Legal Research Specialist | Legal research |
+| `PIPA-expert` | Korea Privacy Law Specialist | Data privacy law |
+| `GDPR-expert` | GDPR Specialist | GDPR / EU data privacy law |
+| **`contract-review-agent`** | **Contract Review Specialist** | **Contract review** |
+| `legal-writing-agent` | Legal Drafting Specialist | Legal writing |
+| `second-review-agent` | Senior Review Specialist | Quality review |
 
 ## License
 

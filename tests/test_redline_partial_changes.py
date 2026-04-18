@@ -526,16 +526,16 @@ class TestEdgeCases(unittest.TestCase):
                 ["Pay within 30 days."],
                 {"mappings": [{"clause_id": "c1", "mapped": True, "paragraph_indices": [0]}]},
                 {
-                    "_meta": {"reviewer": {"author": "고덕수 변호사", "initials": "KDS"}},
+                    "_meta": {"reviewer": {"author": "Contract Review Specialist", "initials": "CRS"}},
                     "c1": {"suggested_redline": "Pay within 10 days."},
                 },
             )
             self.assertTrue(result["success"])
-            self.assertEqual(result["reviewer"]["author"], "고덕수 변호사")
-            self.assertEqual(result["reviewer"]["initials"], "KDS")
+            self.assertEqual(result["reviewer"]["author"], "Contract Review Specialist")
+            self.assertEqual(result["reviewer"]["initials"], "CRS")
 
             xml = para_xml(result["_out"], 0)
-            self.assertIn('w:author="고덕수 변호사"', xml)
+            self.assertIn('w:author="Contract Review Specialist"', xml)
 
     def test_paragraph_index_out_of_range(self):
         """Mapping points to non-existent paragraph → graceful skip."""

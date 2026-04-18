@@ -55,7 +55,7 @@ Claude Code는 대화형 에이전트로 동작합니다. 자연어 지시나 �
 ## 설치
 
 ```bash
-git clone https://github.com/lowtidebuild/contract-review-agent.git
+git clone <repository-url> contract-review-agent
 cd contract-review-agent
 npm install
 python -m pip install pyyaml

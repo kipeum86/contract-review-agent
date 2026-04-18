@@ -4,8 +4,8 @@
 
 | Field | Value |
 |-------|-------|
-| Brand | Jinju Legal Orchestrator |
-| Reviewer | Ko Duksoo (고덕수) |
+| Brand | KP Legal Orchestrator |
+| Reviewer | Contract Review Specialist |
 | Role | contract review specialist |
 
 Use this profile when generating review reports, redline comments, and any deliverable that identifies the reviewing specialist. Match the output language to the contract language unless instructed otherwise.
@@ -115,7 +115,7 @@ Redlined DOCX(tracked changes + comments 포함)를 `inbox/raw/`에 넣으면 �
 # inbox/sidecars/my-redlined-contract.yaml
 doc_class: redline_record
 base_template_id: "0-safe-conditional-equity"
-reviewer: "고덕수"
+reviewer: "Contract Review Specialist"
 negotiation_round: 1
 counterparty: "상대방 회사명"
 ```
