@@ -267,8 +267,8 @@ class SessionDAudit009CommentsTests(unittest.TestCase):
             comments_path.write_text(
                 json.dumps({
                     "_meta": {
-                        "reviewer_author": "고덕수 변호사",
-                        "reviewer_initials": "GDS",
+                        "reviewer_author": "Contract Review Specialist",
+                        "reviewer_initials": "CRS",
                     },
                     # v2 schema: array of {audience, text}
                     "clause-001": [
@@ -295,7 +295,7 @@ class SessionDAudit009CommentsTests(unittest.TestCase):
             self.assertEqual(result["total_comments"], 2)
             self.assertEqual(result["total_clause_comments"], 2)
             self.assertEqual(result["comments_applied"], 2)
-            self.assertEqual(result["reviewer"]["author"], "고덕수 변호사")
+            self.assertEqual(result["reviewer"]["author"], "Contract Review Specialist")
 
             comments_tree = ET.parse(unpacked_dir / "word" / "comments.xml")
             comments_root = comments_tree.getroot()
@@ -551,9 +551,9 @@ class SessionDAudit011ReportTests(unittest.TestCase):
                             "date": "2026-03-27",
                             "recipient": "주식회사 예시",
                             "reference": "법무팀장",
-                            "sender": "법무법인 예시",
+                            "sender": "KP Legal Orchestrator",
                             "subject": "소프트웨어 라이선스 계약 검토 의견서",
-                            "signer": "담당 변호사 홍길동",
+                            "signer": "계약 검토 스페셜리스트",
                         },
                         "background_facts": [
                             "귀사는 상대방이 제시한 소프트웨어 라이선스 계약 초안을 검토 요청하였습니다."
@@ -626,7 +626,7 @@ class SessionDAudit011ReportTests(unittest.TestCase):
             self.assertNotIn("<w:i/>", document_xml)
             self.assertNotIn("FF6600", document_xml)
             self.assertIn("일반 계약 검토 기준에 따라 작성되었습니다", document_xml)
-            self.assertIn("담당 변호사 홍길동", document_xml)
+            self.assertIn("계약 검토 스페셜리스트", document_xml)
 
     def test_compile_report_keeps_generic_renderer_for_english_reports(self):
         with tempfile.TemporaryDirectory() as tmpdir:
@@ -795,9 +795,9 @@ class SessionDAudit011ReportTests(unittest.TestCase):
                         "memo_metadata": {
                             "date": "2026-04-10",
                             "recipient": "주식회사 예시",
-                            "sender": "법무법인 예시",
+                            "sender": "KP Legal Orchestrator",
                             "subject": "EPC 공급계약 검토 의견서",
-                            "signer": "고덕수 변호사",
+                            "signer": "계약 검토 스페셜리스트",
                         },
                         "executive_summary": {
                             "overall_risk": "high",
@@ -870,9 +870,9 @@ class SessionDAudit011ReportTests(unittest.TestCase):
                         "memo_metadata": {
                             "date": "2026-04-10",
                             "recipient": "주식회사 예시",
-                            "sender": "법무법인 예시",
+                            "sender": "KP Legal Orchestrator",
                             "subject": "기존 형식 검토 의견서",
-                            "signer": "고덕수 변호사",
+                            "signer": "계약 검토 스페셜리스트",
                         },
                         "executive_summary": {
                             "overall_risk": "medium",
@@ -939,9 +939,9 @@ class SessionDAudit011ReportTests(unittest.TestCase):
                         "memo_metadata": {
                             "date": "2026-04-11",
                             "recipient": "주식회사 예시",
-                            "sender": "법무법인 예시",
+                            "sender": "KP Legal Orchestrator",
                             "subject": "영문 공급계약 검토 의견서",
-                            "signer": "고덕수 변호사",
+                            "signer": "계약 검토 스페셜리스트",
                         },
                         "executive_summary": {
                             "overall_risk": "high",
@@ -1067,9 +1067,9 @@ class SessionDAudit011ReportTests(unittest.TestCase):
                         "memo_metadata": {
                             "date": "2026-04-11",
                             "recipient": "주식회사 예시",
-                            "sender": "법무법인 예시",
+                            "sender": "KP Legal Orchestrator",
                             "subject": "EPC 계약 검토 의견서",
-                            "signer": "고덕수 변호사",
+                            "signer": "계약 검토 스페셜리스트",
                         },
                         "executive_summary": {
                             "overall_risk": "critical",

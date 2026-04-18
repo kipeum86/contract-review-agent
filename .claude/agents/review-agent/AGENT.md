@@ -353,8 +353,8 @@ Consumed by `.claude/skills/docx-redliner/scripts/apply-redlines.py`. One JSON f
 ```json
 {
   "_meta": {
-    "reviewer_author": "고덕수",
-    "reviewer_initials": "GDS"
+    "reviewer_author": "Contract Review Specialist",
+    "reviewer_initials": "CRS"
   },
   "clause-001": {
     "suggested_redline": "The Supplier shall indemnify the Purchaser for direct damages up to an aggregate cap of one hundred percent (100%) of the Contract Price..."
@@ -380,8 +380,8 @@ Consumed by `.claude/skills/docx-redliner/scripts/apply-comments.py`. One JSON f
 ```json
 {
   "_meta": {
-    "reviewer_author": "고덕수",
-    "reviewer_initials": "GDS"
+    "reviewer_author": "Contract Review Specialist",
+    "reviewer_initials": "CRS"
   },
   "clause-001": [
     {

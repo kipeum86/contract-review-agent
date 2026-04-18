@@ -2,9 +2,9 @@
 
 [English](./DISCLAIMER.md) | [한국어](../ko/DISCLAIMER.md)
 
-## Personal Project
+## Public Repository Notice
 
-This is an **independent, personal project** by Kipeum Lee. It is not sponsored, endorsed, or affiliated with any law firm, employer, or organization. All opinions, design decisions, and content are solely my own.
+This repository is an **independent, public-facing open-source project** for the **KP Legal Orchestrator** workflow. It is not sponsored, endorsed, or affiliated with any specific law firm, employer, or organization. Any specialist titles used in this repository are functional workflow labels, not references to a named individual or firm.
 
 ## Not Legal Advice
 
@@ -34,11 +34,11 @@ If you intend to use this for real legal work with confidential documents:
 
 ## No Warranty
 
-This software is provided "as is", without warranty of any kind, express or implied. See the [MIT License](../../LICENSE) for full terms. The author assumes no liability for any damages arising from the use of this software or its outputs.
+This software is provided "as is", without warranty of any kind, express or implied. See the [Apache License, Version 2.0](../../LICENSE) for full terms. The maintainers assume no liability for any damages arising from the use of this software or its outputs.
 
 ## Scope of Responsibility
 
-The author is not responsible for:
+The maintainers are not responsible for:
 
 - Any decisions made based on the agent's outputs
 - Any losses, legal consequences, or damages resulting from reliance on generated content
