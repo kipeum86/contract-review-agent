@@ -239,14 +239,14 @@ Fully auditable. Every match is traceable.
 │   ├── skills/                  # Skills: parsing, indexing, validation, redlining, etc.
 │   ├── hooks/                   # UserPromptSubmit hook (domain reference injector)
 │   ├── scripts/                 # Loader script + test scripts
-│   └── settings.json
+│   └── settings*.json           # Optional local Claude Code settings (gitignored)
 │
 ├── contract-review/
 │   ├── library/
 │   │   ├── inbox/raw/           # Drop source templates here (gitignored)
 │   │   ├── inbox/sidecars/      # Auxiliary metadata (gitignored)
 │   │   ├── staging/             # Validated, awaiting approval (gitignored)
-│   │   ├── approved/            # Published assets (gitignored)
+│   │   ├── approved/            # Published assets (local runtime assets gitignored; bundled seeds tracked)
 │   │   │   ├── templates/       #   Clean contract templates
 │   │   │   ├── precedents/      #   Precedent agreements
 │   │   │   └── redline-records/ #   Ingested redlined contracts (review pattern data)
@@ -255,7 +255,9 @@ Fully auditable. Every match is traceable.
 │   │   ├── indexes/             # JSON indexes (auto-managed)
 │   │   ├── policies/            # Your customized config (gitignored)
 │   │   ├── policies.default/    # Shipped defaults (do not edit)
-│   │   └── runs/sessions/       # Per-execution forensic traces (gitignored)
+│   │   └── runs/
+│   │       ├── ingestion/       # Local ingestion run artifacts (gitignored)
+│   │       └── sessions/        # Per-execution forensic traces (gitignored)
 │   └── matters/                 # Per-deal working directories (gitignored)
 │
 ├── logs/                        # Session logs — your conversation notes (gitignored)
@@ -305,7 +307,7 @@ Policies are **read-only for the agent** — only you edit them. The agent manag
 Optional: `pymupdf` or `pypdf` (PDF support), `pandoc` (enhanced DOCX conversion).
 
 > [!IMPORTANT]
-> `jq` is required by the domain reference forced-load hook (`.claude/hooks/inject-domain-references.sh`) and the loader script. Without it, the hook will log an error to stderr and silently fall through to an empty injection — meaning `review-guide.md` will not be injected into the LLM context and reviews will silently regress to pretrained knowledge only. Detailed architecture notes are kept in the local-only workspace.
+> `jq` is required by the domain reference forced-load hook (`.claude/hooks/inject-domain-references.sh`) and the loader script. Without it, the hook can only emit an error and no context injection, while direct loader/pre-pipeline calls exit non-zero. Install `jq` before running review workflows so digest traces and section loads are available.
 
 ---
 
@@ -335,7 +337,7 @@ The agent is composed of three specialized sub-agents coordinated by an orchestr
 - **No embeddings / no vector DB** — retrieval uses deterministic JSON index filtering + LLM judgment
 - **Pipeline state persistence** — each step writes `pipeline-state.json`, enabling resume after interruption
 - **Audience firewall** — `[INTERNAL]` and `[EXTERNAL]` comment streams are strictly separated at every stage
-- **File-based data handoff** — large payloads pass between agents as files under `matters/` or `library/runs/`, not inline
+- **File-based data handoff** — large payloads pass between agents as local files under `matters/` or `library/runs/`, not inline
 
 </details>
 

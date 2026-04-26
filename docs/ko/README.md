@@ -298,14 +298,14 @@ inbox/raw/  ──>  validate  ──>  classify  ──>  segment  ──>  app
 │   ├── skills/                  # 스킬: 파싱, 인덱싱, 검증, 레드라이닝 등
 │   ├── hooks/                   # UserPromptSubmit hook (도메인 레퍼런스 주입기)
 │   ├── scripts/                 # Loader script + 테스트 스크립트
-│   └── settings.json
+│   └── settings*.json           # 선택적 로컬 Claude Code 설정 (gitignored)
 │
 ├── contract-review/
 │   ├── library/
 │   │   ├── inbox/raw/           # 원본 템플릿을 여기에 넣습니다 (gitignored)
 │   │   ├── inbox/sidecars/      # 보조 메타데이터 (gitignored)
 │   │   ├── staging/             # 검증 완료, 승인 대기 (gitignored)
-│   │   ├── approved/            # 게시된 자산 (gitignored)
+│   │   ├── approved/            # 게시된 자산 (로컬 런타임 자산은 gitignored, 번들 seed는 추적)
 │   │   │   ├── templates/       #   클린 계약서 템플릿
 │   │   │   ├── precedents/      #   선례 계약서
 │   │   │   └── redline-records/ #   레드라인 계약서 (리뷰 패턴 데이터)
@@ -314,7 +314,9 @@ inbox/raw/  ──>  validate  ──>  classify  ──>  segment  ──>  app
 │   │   ├── indexes/             # JSON 인덱스 (자동 관리)
 │   │   ├── policies/            # 커스텀 설정 (gitignored)
 │   │   ├── policies.default/    # 기본값 (수정 금지)
-│   │   └── runs/sessions/       # 실행별 포렌식 트레이스 (gitignored)
+│   │   └── runs/
+│   │       ├── ingestion/       # 로컬 인제스트 실행 산출물 (gitignored)
+│   │       └── sessions/        # 실행별 포렌식 트레이스 (gitignored)
 │   └── matters/                 # 딜별 작업 디렉터리 (gitignored)
 │
 ├── logs/                        # 세션 로그 — 대화 기록 저장 (gitignored)
@@ -364,7 +366,7 @@ inbox/raw/  ──>  validate  ──>  classify  ──>  segment  ──>  app
 선택 사항: `pymupdf` 또는 `pypdf` (PDF 지원), `pandoc` (향상된 DOCX 변환).
 
 > [!IMPORTANT]
-> `jq`는 도메인 레퍼런스 forced-load hook(`.claude/hooks/inject-domain-references.sh`)과 loader script 동작에 필요합니다. 설치되어 있지 않으면 hook이 stderr에 에러를 남기고 주입을 건너뛰므로, `review-guide.md`가 LLM 컨텍스트에 들어가지 않고 검토가 사전 학습 지식에만 의존하는 상태로 조용히 되돌아갑니다. 아키텍처 상세 노트는 로컬 전용 워크스페이스에만 보관합니다.
+> `jq`는 도메인 레퍼런스 forced-load hook(`.claude/hooks/inject-domain-references.sh`)과 loader script 동작에 필요합니다. 설치되어 있지 않으면 hook은 오류만 남기고 컨텍스트 주입을 하지 못하며, loader/pre-pipeline 직접 호출은 non-zero로 실패합니다. 검토 워크플로를 실행하기 전에 `jq`를 설치해야 digest trace와 section load가 정상 동작합니다.
 
 ---
 
@@ -394,7 +396,7 @@ inbox/raw/  ──>  validate  ──>  classify  ──>  segment  ──>  app
 - **임베딩 / 벡터 DB 미사용** — 검색은 결정적 JSON 인덱스 필터링 + LLM 판단으로 처리합니다
 - **파이프라인 상태 저장** — 각 단계가 `pipeline-state.json`을 기록하므로 중단 후 재개가 가능합니다
 - **대상자 방화벽** — `[INTERNAL]`과 `[EXTERNAL]` 코멘트 스트림을 모든 단계에서 엄격히 분리합니다
-- **파일 기반 데이터 전달** — 대용량 페이로드는 인라인이 아닌 `matters/` 또는 `library/runs/` 하위 파일로 전달합니다
+- **파일 기반 데이터 전달** — 대용량 페이로드는 인라인이 아닌 `matters/` 또는 `library/runs/` 하위의 로컬 파일로 전달합니다
 
 </details>
 

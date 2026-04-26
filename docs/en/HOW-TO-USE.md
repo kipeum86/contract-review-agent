@@ -35,13 +35,13 @@ Both methods support the same slash commands and natural language — choose whi
 | Requirement | Version | Notes |
 |-------------|---------|-------|
 | **Claude Code** | Latest | [Installation guide](https://docs.anthropic.com/en/docs/claude-code) |
-| **Python** | 3.14+ | Required for parsing/generation scripts |
-| **Node.js** | 24+ | Required for project tooling |
+| **Python** | 3.10+ | Required for parsing/generation scripts |
+| **Node.js** | 18+ | Required for project tooling |
 | **PyYAML** | Latest | `pip install pyyaml` |
 | **jq** | 1.6+ | `brew install jq` (macOS) · `apt-get install jq` (Linux). Required by the domain reference forced-load hook. |
 | **shasum / sha256sum** | — | Preinstalled on macOS and most Linux distros |
 
-> **Why jq?** The `.claude/hooks/inject-domain-references.sh` hook and the `.claude/scripts/load-domain-references.sh` loader both use `jq` to parse hook input JSON, build `additionalContext` injections, and write forensic trace files (`contract-review/library/runs/sessions/*/loaded.json`). Without `jq`, the hook logs an error to stderr and falls through to an empty injection, which means `review-guide.md` is **not** injected and reviews silently regress to pretrained knowledge. Full architecture notes are kept in the local-only workspace.
+> **Why jq?** The `.claude/hooks/inject-domain-references.sh` hook and the `.claude/scripts/load-domain-references.sh` loader both use `jq` to parse hook input JSON, build `additionalContext` injections, and write forensic trace files (`contract-review/library/runs/sessions/*/loaded.json`). Without `jq`, the hook can only emit an error and no context injection, while direct loader/pre-pipeline calls exit non-zero. Install it before running review workflows so digest traces and section loads are available.
 
 Optional dependencies:
 
@@ -73,10 +73,10 @@ chmod +x .claude/hooks/*.sh .claude/scripts/*.sh
 The first time you launch Claude Code in this repo, you will see a permission
 dialog asking you to **allow the UserPromptSubmit hook**
 (`.claude/hooks/inject-domain-references.sh`). Click **Allow** — this is the
-hook that injects domain reference baselines into the LLM context on every
-`/contract-review`, `/rereview`, `/draft`, or `/ingest` invocation. If you
-deny it, reviews will fall back to a secondary defense path inside the
-review-agent but the primary (and fastest) path is gone.
+hook that routes workflow-specific reference loading instructions into the LLM
+context. Review workflows get a blocking digest-load precondition; draft and
+ingest workflows get lighter hints. If you deny it, reviews can still fall back
+to the review-agent Pre-Pipeline 0 loader, but the primary path is gone.
 
 ---
 

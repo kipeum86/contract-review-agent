@@ -35,7 +35,7 @@ If your session was triggered by `/ingest` or a natural-language ingest request 
 bash .claude/scripts/load-domain-references.sh ingest
 ```
 
-Running this loads `domain-policy.md` (the folder schema and ingestion policy) into your context. It is **optional** for the ingestion workflow — the pre-v2.1 behavior worked well for a year without forced loading. Run it only if you need the policy text to make a specific judgment during classification or staging; otherwise the existing `.claude/skills/ingest/SKILL.md` reference is sufficient. See `output/Domain-Reference-강제로드-아키텍처-기획-v2.md` Section 5.2 P1 for the incremental rationale.
+Running this loads `domain-policy.md` (the folder schema and ingestion policy) into your context. It is **optional** for the ingestion workflow — the pre-v2.1 behavior worked well for a year without forced loading. Run it only if you need the policy text to make a specific judgment during classification or staging; otherwise the existing `.claude/skills/ingest/SKILL.md` reference is sufficient.
 
 ## Pipeline Steps
 

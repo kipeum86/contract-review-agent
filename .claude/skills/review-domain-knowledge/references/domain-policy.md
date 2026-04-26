@@ -82,7 +82,7 @@ library/
 │   ├── retrieval-map.json
 │   └── supersession.json
 ├── policies/               # User-managed configuration
-├── runs/ingestion/         # Execution logs
+├── runs/ingestion/         # Local-only ingestion run artifacts
 └── archive/                # Archived assets
 ```
 

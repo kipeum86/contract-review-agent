@@ -40,9 +40,9 @@ Route user commands to the appropriate workflow. Accept both natural language an
 |-------|------|--------------------|-------|--------|
 | **Ingestion Agent** | `.claude/agents/ingestion-agent/AGENT.md` | Ingestion command detected | File path in `inbox/raw`; optional sidecar path | Ingestion result JSON (success/failure/staging, doc_id, summary) |
 | **Review Agent** | `.claude/agents/review-agent/AGENT.md` | Review or re-review command detected | Target file path; matter_id; optional matter context; optional prior_round | Redlined DOCX + Report DOCX + Review JSON (+ Delta DOCX for re-reviews) |
-| **Drafting Agent** | `.claude/agents/drafting-agent/AGENT.md` | Drafting command detected | User's drafting request (NL); optional detailed specs | Draft DOCX + Self-review report |
+| **Drafting Agent** | `.claude/agents/drafting-agent/AGENT.md` | Drafting command detected | User's drafting request (NL); optional detailed specs | Draft DOCX + assumptions + optional self-review notes |
 
-**Data handoff**: Pass file paths and short metadata inline. Large payloads are always file-based under `matters/{matter_id}/round_{N}/working/` or `library/runs/ingestion/`.
+**Data handoff**: Pass file paths and short metadata inline. Large payloads are always file-based under `matters/{matter_id}/round_{N}/working/` or local-only `library/runs/ingestion/`.
 
 ## Baseline Reference Load — Root Agent Dispatch Protocol (v2.2)
 
@@ -65,7 +65,7 @@ When routing a review (or re-review) request to `review-agent`, you (the root ag
 
 **Why this matters**: Recency-based trace discovery can mix concurrent review sessions. Explicit session ids keep root dispatch, review-agent fallback loads, matter-level traces, and `pipeline-state.json` aligned.
 
-For `/draft` and `/ingest`, the hook emits a lighter HINT rather than a BLOCKING instruction, and no proactive root-dispatch loader call is required — the sub-agent will decide whether to run the loader based on its own workflow. See `output/Domain-Reference-강제로드-아키텍처-기획-v2.md` Section 5.5 P1.
+For `/draft` and `/ingest`, the hook emits a lighter HINT rather than a BLOCKING instruction, and no proactive root-dispatch loader call is required. The sub-agent decides whether to run the loader based on its own workflow.
 
 ## Source Ingest (Reference Library)
 
@@ -80,7 +80,9 @@ contract-review/library/
 │   ├── sidecars/        # 선택적 메타데이터
 │   ├── _processed/      # 처리 완료 원본 보관
 │   └── _failed/         # 변환 실패 파일
-└── sources/             # 참조 소스 저장 (플랫 구조)
+└── sources/
+    ├── approved/        # 참조 소스 Markdown 저장
+    └── source-registry.json
 ```
 
 ### 워크플로우
@@ -88,9 +90,9 @@ contract-review/library/
 사용자가 참조 소스를 `inbox/`에 넣고 `/ingest` 또는 "소스 추가", "자료 넣었어" 등 요청 시:
 
 1. `.claude/skills/ingest/SKILL.md`를 읽어 워크플로우 확인
-2. inbox 내 파일을 markitdown으로 .md 변환
-3. frontmatter 생성 + `library/sources/`로 배치
-4. 인덱스 업데이트 (`indexes/source-registry.json`)
+2. inbox 내 파일을 Markdown으로 변환
+3. frontmatter 생성 + `library/sources/approved/`로 배치
+4. registry 업데이트 (`sources/source-registry.json`)
 5. 원본은 `inbox/_processed/`로 보존
 
 ### Redline Record Ingestion
@@ -147,7 +149,7 @@ if policies/ contains only .gitkeep or is empty:
 | `contract-review/library/policies/` | Yes | No | User-managed config (gitignored — defaults in `policies.default/`) |
 | `contract-review/library/policies.default/` | Yes | No | Shipped defaults — do not modify |
 | `contract-review/matters/` | Yes | Yes | Matter working directories |
-| `contract-review/library/runs/` | Yes | Yes | Execution logs |
+| `contract-review/library/runs/` | Yes | Yes | Local-only execution logs (`ingestion/`, `sessions/`) |
 
 ## Error Handling
 
