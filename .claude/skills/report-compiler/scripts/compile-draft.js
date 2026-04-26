@@ -10,6 +10,7 @@
  *   - contract_text?: { preamble, signature_blocks[] }
  *   - self_review?: { issues[] }
  *   - defined_terms?: string[]
+ *   - output_options?: { include_self_review_notes: boolean }
  */
 
 const fs = require('fs');
@@ -83,6 +84,45 @@ function createParagraph(children, options = {}) {
     indent: options.indent,
     spacing: { ...DEFAULT_PARAGRAPH_SPACING, ...(options.spacing || {}) },
   });
+}
+
+function validateDraftData(data) {
+  const errors = [];
+  if (!data || typeof data !== 'object' || Array.isArray(data)) {
+    return ['draft data must be a JSON object'];
+  }
+
+  const meta = data.draft_metadata;
+  if (!meta || typeof meta !== 'object' || Array.isArray(meta)) {
+    errors.push('draft_metadata is required');
+  } else {
+    ['title', 'contract_type', 'language', 'matter_id'].forEach((field) => {
+      if (!meta[field] || typeof meta[field] !== 'string') {
+        errors.push(`draft_metadata.${field} is required`);
+      }
+    });
+  }
+
+  if (!Array.isArray(data.sections) || data.sections.length === 0) {
+    errors.push('sections must be a non-empty array');
+  } else {
+    data.sections.forEach((section, index) => {
+      if (!section || typeof section !== 'object' || Array.isArray(section)) {
+        errors.push(`sections[${index}] must be an object`);
+        return;
+      }
+      if (!section.title || typeof section.title !== 'string') {
+        errors.push(`sections[${index}].title is required`);
+      }
+      const hasText = typeof section.text === 'string' && section.text.trim();
+      const hasSubsections = Array.isArray(section.subsections) && section.subsections.length > 0;
+      if (!hasText && !hasSubsections) {
+        errors.push(`sections[${index}] must include text or subsections`);
+      }
+    });
+  }
+
+  return errors;
 }
 
 // ── Defined Term Bolding ─────────────────────────────────────────
@@ -242,6 +282,8 @@ function buildSignatureBlocks(data, lang) {
 }
 
 function buildSelfReviewNotes(data, lang) {
+  if (data.output_options?.include_self_review_notes !== true) return [];
+
   const issues = data.self_review?.issues;
   if (!Array.isArray(issues) || !issues.length) return [];
 
@@ -281,6 +323,10 @@ function buildSelfReviewNotes(data, lang) {
 async function compileDraft(inputPath, outputPath) {
   const rawData = fs.readFileSync(inputPath, 'utf-8');
   const data = JSON.parse(rawData);
+  const validationErrors = validateDraftData(data);
+  if (validationErrors.length) {
+    throw new Error(`Invalid draft.json: ${validationErrors.join('; ')}`);
+  }
   const lang = resolveLanguage(data);
   const termsSet = buildDefinedTermSet(data);
 
@@ -319,11 +365,33 @@ async function compileDraft(inputPath, outputPath) {
     sections_count: (data.sections || []).length,
     defined_terms_count: termsSet.size,
     self_review_issues: (data.self_review?.issues || []).length,
+    self_review_notes_included: data.output_options?.include_self_review_notes === true,
     has_signature_blocks: !!(data.contract_text?.signature_blocks?.length),
   };
 }
 
 (async () => {
+  if (process.argv.includes('--help') || process.argv.includes('-h')) {
+    console.log(JSON.stringify({
+      usage: 'compile-draft.js <draft.json> <output.docx>',
+      required_fields: [
+        'draft_metadata.title',
+        'draft_metadata.contract_type',
+        'draft_metadata.language',
+        'draft_metadata.matter_id',
+        'sections[]',
+      ],
+      optional_fields: [
+        'defined_terms[]',
+        'contract_text.preamble',
+        'contract_text.signature_blocks[]',
+        'self_review.issues[]',
+        'output_options.include_self_review_notes',
+      ],
+    }, null, 2));
+    process.exit(0);
+  }
+
   if (process.argv.length < 4) {
     console.error(JSON.stringify({
       error: 'Usage: compile-draft.js <draft.json> <output.docx>',

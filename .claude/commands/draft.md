@@ -2,7 +2,7 @@
 
 You are a contract drafting specialist preparing a contract for the client. The user will describe the contract they need and provide deal context.
 
-**Output location:** Save all deliverables to the `output/` folder at the project root.
+**Output location:** Save the user-facing draft DOCX to `output/draft.docx`. Persist workflow artifacts under `contract-review/matters/{matter_id}/round_1/working/`.
 
 **Library:** Check `contract-review/library/approved/` for matching templates. Follow retrieval priority in `contract-review/library/policies/retrieval-priority.yaml`.
 
@@ -121,19 +121,28 @@ Auto-fix simple issues. Flag substantive issues with `[REVIEW NOTE]` annotations
 
 ## Phase 4: Deliverables
 
-Produce in the `output/` folder:
+Official `/draft` success requires this artifact set:
+
+```text
+contract-review/matters/{matter_id}/round_1/working/draft.json
+contract-review/matters/{matter_id}/round_1/working/draft_assumptions.md
+output/draft.docx
+contract-review/matters/{matter_id}/round_1/working/pipeline-state.json
+```
 
 ### 1. Contract Draft
 
 - Deliver the full draft text in the response
 - Persist `working/draft.json` with the complete draft data (metadata, sections, defined_terms, contract_text, self_review)
-- Generate DOCX: `node .claude/skills/report-compiler/scripts/compile-draft.js working/draft.json output/reports/{matter_id}_round_1_draft.docx`
-- Copy DOCX to `matters/{matter_id}/round_1/source/` as baseline for future re-review
-- Features: section hierarchy (제N조 / Article N), defined terms bolded, signature blocks, `[INTERNAL]` self-review annotations
+- Persist `working/draft_assumptions.md` with confirmed facts, inferred assumptions, and open items
+- Generate DOCX: `node .claude/skills/report-compiler/scripts/compile-draft.js working/draft.json output/draft.docx`
+- Save/update `working/pipeline-state.json`
+- Features: section hierarchy (제N조 / Article N), defined terms bolded, signature blocks
+- Copy DOCX to `matters/{matter_id}/round_1/source/` only when the user wants this draft tracked as the baseline for future counterparty markups
 
 ### 2. Self-Review Summary
 
-Present in terminal after the draft:
+Present in terminal after the draft. This is not a separate default DOCX artifact:
 
 | # | Issue | Section | Severity | Description |
 |---|-------|---------|----------|-------------|
@@ -143,7 +152,9 @@ Include drafting notes:
 - Template-based or scratch mode
 - Key assumptions made
 - Recommended next steps
-- Whether any draft artifacts were persisted locally
+- Paths to the official artifacts above
+
+`draft_review_memo.docx` is an optional internal add-on, not part of the default `/draft` success contract.
 
 ### Revision
 
@@ -159,5 +170,5 @@ After the counterparty returns a marked-up version, the user can initiate `/cont
 - **Market standard is the anchor.** Draft terms that a reasonable counterparty would recognize as fair. Protect the client without overreaching.
 - **Protect, don't posture.** Secure substantive protections, not maximize aggressive terms. If a balanced term adequately protects the client, prefer it.
 - **Completeness over brevity.** A missing clause is more dangerous than a long contract. Use the family checklist to ensure nothing is omitted.
-- **Internal notes are candid; the draft is professional.** `[REVIEW NOTE]` and `[INTERNAL]` annotations are for the internal specialist team only. The contract text must be professional, precise, and suitable for counterparty review.
+- **Internal notes are candid; the draft is professional.** `[REVIEW NOTE]` and `[INTERNAL]` annotations belong in `draft_assumptions.md`, `self_review`, or an explicitly internal working draft. The default `output/draft.docx` must be professional, precise, and suitable for counterparty review.
 - **Statutory compliance is non-negotiable.** Never draft a clause that violates mandatory law. Flag potential statutory issues as Critical.
