@@ -10,7 +10,7 @@ If your session was triggered by `/draft` or a natural-language drafting request
 bash .claude/scripts/load-domain-references.sh draft
 ```
 
-This loads `drafting-guide.md` (user-customized checklists + common-law drafting patterns) into your context via the Bash tool. It is **optional** for the drafting workflow (unlike review, which makes it mandatory — no drafting incident has been observed as of 2026-04-10). If the user expects their house drafting conventions to be applied, run it; otherwise you can proceed without it. See `output/Domain-Reference-강제로드-아키텍처-기획-v2.md` Section 5.2 P1 for the incremental-vs-review rationale.
+This loads `drafting-guide.md` (user-customized checklists + common-law drafting patterns) into your context via the Bash tool. It is **optional** for the drafting workflow (unlike review, which makes it mandatory). If the user expects their house drafting conventions to be applied, run it; otherwise you can proceed without it.
 
 ## Entry Paths
 
