@@ -44,8 +44,14 @@ Apply tracked changes and comments to DOCX files via XML manipulation.
 
 5. **Internal Comment Stripping** (`scripts/strip-internal-comments.py`)
    - Removes all `[INTERNAL]`-prefixed comments for external-clean version, including threaded comment metadata and stale rel/content-type entries
-   - Safety-critical: prevents internal strategy leakage
+   - Runs the external-clean scanner after repack and fails closed if forbidden markers remain
    - Usage: `python3 strip-internal-comments.py <input.docx> <output.docx>`
+
+6. **External-Clean Scanner** (`scripts/scan-docx-for-internal-markers.py`)
+   - Scans document body, headers/footers, footnotes/endnotes, comments, and tracked insertion/deletion text
+   - Uses `.claude/policies/external-clean-policy.yaml`
+   - Fails when internal markers or strategy terms remain; output includes part name and snippet
+   - Usage: `python3 scan-docx-for-internal-markers.py <external-clean.docx>`
 
 ## DOCX Processing Workflow
 
@@ -62,7 +68,7 @@ Original DOCX
     │
     ├── Repack (zipfile)        →  _redlined.docx (internal)
     │
-    └── strip-internal-comments.py → _redlined_clean.docx (external)
+    └── strip-internal-comments.py + scanner → _redlined_clean.docx (external)
 ```
 
 ## v1β Scope
@@ -86,6 +92,8 @@ Generate the external-clean DOCX **only when output 2 is selected**:
 2. **External-clean** (`_redlined_clean.docx`): `[INTERNAL]` comments stripped for counterparty delivery
 
 This is a **safety-critical feature** whenever output 2 is requested.
+
+External-clean generation is not complete until `scan-docx-for-internal-markers.py` passes. If the scan fails, do not deliver the DOCX; surface the scanner's `violations[]` with the XML part and snippet.
 
 ## Output: `redline_audit.json`
 

@@ -34,6 +34,62 @@ HEADING_STYLES = {
     'Title': '# ', 'Subtitle': '## ',
 }
 
+WRAPPER_TAG = 'untrusted_contract_content'
+
+
+def escape_wrapper_sentinels(text: str) -> str:
+    """Prevent source text from closing or forging the untrusted wrapper."""
+    return re.sub(
+        rf'</?\s*{WRAPPER_TAG}\b',
+        lambda match: match.group(0).replace('<', '&lt;'),
+        text,
+        flags=re.IGNORECASE,
+    )
+
+
+def wrap_untrusted_content(text: str, source_file: str) -> str:
+    """Wrap normalized contract text in a structural untrusted-data boundary."""
+    source_name = html.escape(os.path.basename(source_file), quote=True)
+    safe_text = escape_wrapper_sentinels(text)
+    return (
+        f'<{WRAPPER_TAG} source="{source_name}">\n'
+        f'{safe_text.rstrip()}\n'
+        f'</{WRAPPER_TAG}>\n'
+    )
+
+
+def validate_untrusted_wrapper(clean_md_path: str) -> dict:
+    """Validate that a normalized clean.md file has the required wrapper."""
+    try:
+        content = open(clean_md_path, 'r', encoding='utf-8').read()
+    except OSError as exc:
+        return {'success': False, 'error': str(exc), 'path': clean_md_path}
+
+    stripped = content.strip()
+    open_match = re.match(
+        rf'^<{WRAPPER_TAG}\s+source="[^"]+">\n',
+        stripped,
+    )
+    close_ok = stripped.endswith(f'</{WRAPPER_TAG}>')
+    if not open_match or not close_ok:
+        return {
+            'success': False,
+            'path': clean_md_path,
+            'error': 'missing_untrusted_contract_content_wrapper',
+        }
+
+    inner = stripped[open_match.end(): -len(f'</{WRAPPER_TAG}>')]
+    forged_close = re.search(rf'</\s*{WRAPPER_TAG}\b', inner, flags=re.IGNORECASE)
+    forged_open = re.search(rf'<\s*{WRAPPER_TAG}\b', inner, flags=re.IGNORECASE)
+    if forged_close or forged_open:
+        return {
+            'success': False,
+            'path': clean_md_path,
+            'error': 'forged_untrusted_contract_content_wrapper_inside_body',
+        }
+
+    return {'success': True, 'path': clean_md_path}
+
 
 def extract_docx_text(file_path: str) -> str:
     """Extract text from DOCX by parsing document.xml."""
@@ -372,11 +428,10 @@ def normalize(file_path: str, output_dir: str) -> dict:
     result['heading_count'] = heading_count
 
     # Validate output quality
-    output_len = len(md_text.encode('utf-8'))
-    result['output_length'] = output_len
+    raw_output_len = len(md_text.encode('utf-8'))
 
     if result['source_length'] > 0:
-        ratio = output_len / result['source_length']
+        ratio = raw_output_len / result['source_length']
         # For binary formats, extracted text is usually shorter
         min_ratio = 0.1 if ext in ('.docx', '.pdf') else 0.5
         if ratio < min_ratio:
@@ -387,21 +442,31 @@ def normalize(file_path: str, output_dir: str) -> dict:
     os.makedirs(output_dir, exist_ok=True)
     clean_md_path = os.path.join(output_dir, 'clean.md')
     plain_txt_path = os.path.join(output_dir, 'plain.txt')
+    wrapped_md_text = wrap_untrusted_content(md_text, file_path)
 
     with open(clean_md_path, 'w', encoding='utf-8') as f:
-        f.write(md_text)
+        f.write(wrapped_md_text)
     with open(plain_txt_path, 'w', encoding='utf-8') as f:
         f.write(plain_text)
 
     result['clean_md'] = clean_md_path
     result['plain_txt'] = plain_txt_path
+    result['output_length'] = len(wrapped_md_text.encode('utf-8'))
+    result['untrusted_wrapper'] = True
     result['success'] = True
     return result
 
 
 def main():
+    if len(sys.argv) == 3 and sys.argv[1] == '--validate-wrapper':
+        result = validate_untrusted_wrapper(sys.argv[2])
+        print(json.dumps(result, indent=2, ensure_ascii=False))
+        if not result['success']:
+            sys.exit(1)
+        return
+
     if len(sys.argv) < 3:
-        print(json.dumps({'error': 'Usage: normalize.py <file_path> <output_dir>'}))
+        print(json.dumps({'error': 'Usage: normalize.py <file_path> <output_dir> OR normalize.py --validate-wrapper <clean.md>'}))
         sys.exit(1)
 
     file_path = sys.argv[1]

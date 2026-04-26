@@ -16,8 +16,8 @@ $ARGUMENTS
    - Remove corresponding markers from `document.xml`, headers, footers, and related threaded-comment metadata parts
    - Preserve all tracked changes and `[EXTERNAL]` comments
 
-3. **Repack**: Reassemble the DOCX and save as `{original_name}_clean.docx` in `output/`.
+3. **Repack + scan**: Reassemble the DOCX and run `scan-docx-for-internal-markers.py` using `.claude/policies/external-clean-policy.yaml`.
 
-4. **Verify**: Confirm the output file is valid and report the number of internal comments stripped.
+4. **Verify**: If the scanner reports any violation, delete/do not deliver the external-clean DOCX and report the part name plus snippet. Otherwise save as `{original_name}_clean.docx` in `output/` and report the number of internal comments stripped.
 
 **This is a safety-critical operation** — the output file must contain zero internal strategy, fallback positions, or negotiation leverage information.

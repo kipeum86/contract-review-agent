@@ -31,6 +31,19 @@ library/inbox/ 에 파일 드롭
   └─ Step 4: 인덱스 업데이트
 ```
 
+Executable implementation:
+
+```bash
+python3 .claude/skills/ingest/scripts/source_ingest.py <source-file> \
+  --source-id <id> \
+  --jurisdiction KR \
+  --source-type statute \
+  --authority-level primary_law
+
+python3 .claude/skills/ingest/scripts/validate_source_registry.py \
+  contract-review/library/sources/source-registry.json
+```
+
 ### Step 1: Inbox 스캔
 
 ```
@@ -106,7 +119,7 @@ char_count: {글자수}
 
 ### Step 4: 인덱스 업데이트
 
-처리 완료 후 `library/indexes/source-registry.json`을 업데이트한다.
+처리 완료 후 `library/sources/source-registry.json`을 업데이트한다.
 
 **source-registry.json 엔트리 구조:**
 
@@ -123,6 +136,13 @@ char_count: {글자수}
 ```
 
 기존 `source-registry.json`이 없으면 새로 생성한다.
+
+Validation rules:
+
+- Duplicate `source_id` is a hard failure.
+- Missing source file path or SHA mismatch is a hard failure.
+- Stale `last_checked` is a warning in `validate_source_registry.py` and must be surfaced in review metadata when cited.
+- Review report internal metadata should preserve cited `source_id` values so stale-source warnings can be traced.
 
 ---
 

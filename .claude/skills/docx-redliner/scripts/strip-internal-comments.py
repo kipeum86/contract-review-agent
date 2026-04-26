@@ -17,6 +17,7 @@ import shutil
 import zipfile
 import posixpath
 import glob
+import importlib.util
 import xml.etree.ElementTree as ET
 
 NSMAP = {
@@ -26,6 +27,7 @@ NSMAP = {
 }
 REL_NS = 'http://schemas.openxmlformats.org/package/2006/relationships'
 CONTENT_TYPES_NS = 'http://schemas.openxmlformats.org/package/2006/content-types'
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 
 for prefix, uri in NSMAP.items():
     ET.register_namespace(prefix, uri)
@@ -51,6 +53,17 @@ def pack_docx(source_dir: str, output_path: str):
                 file_path = os.path.join(root, filename)
                 arcname = os.path.relpath(file_path, source_dir)
                 archive.write(file_path, arcname)
+
+
+def load_external_clean_scanner():
+    """Load sibling scanner module whose filename contains hyphens."""
+    scanner_path = os.path.join(SCRIPT_DIR, 'scan-docx-for-internal-markers.py')
+    spec = importlib.util.spec_from_file_location('scan_docx_for_internal_markers', scanner_path)
+    module = importlib.util.module_from_spec(spec)
+    if spec.loader is None:
+        raise RuntimeError(f'Unable to load scanner: {scanner_path}')
+    spec.loader.exec_module(module)
+    return module
 
 
 def local_name(tag: str) -> str:
@@ -498,10 +511,25 @@ def strip_internal_comments(input_docx: str, output_docx: str) -> dict:
             os.makedirs(output_dir, exist_ok=True)
         pack_docx(temp_dir, output_docx)
 
+        scan_result = load_external_clean_scanner().scan_docx(output_docx)
+        if not scan_result.get('success'):
+            if os.path.exists(output_docx):
+                os.remove(output_docx)
+            return {
+                'success': False,
+                'input_docx': input_docx,
+                'output_docx': output_docx,
+                'error': 'external_clean_scan_failed',
+                'scan_result': scan_result,
+                'internal_comments_stripped': internal_state['internal_comments_stripped'],
+                'internal_threaded_comments_stripped': threaded_result['removed_entries'],
+            }
+
         return {
             'success': True,
             'input_docx': input_docx,
             'output_docx': output_docx,
+            'external_clean_scan': scan_result,
             'internal_comments_stripped': internal_state['internal_comments_stripped'],
             'internal_threaded_comments_stripped': threaded_result['removed_entries'],
             'internal_para_ids_removed': len(internal_para_ids),
