@@ -2,17 +2,42 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "title": "Pipeline State Artifact",
   "type": "object",
-  "required": ["schema_version", "pipeline", "matter_id", "last_completed_step", "step_artifacts"],
+  "required": ["schema_version", "pipeline", "matter_id", "round", "session_id", "last_completed_step", "step_artifacts", "metrics"],
   "properties": {
-    "schema_version": {"type": "integer", "minimum": 1},
-    "pipeline": {"type": "string"},
+    "schema_version": {"type": "integer", "minimum": 2},
+    "pipeline": {"type": "string", "enum": ["ingestion", "review", "rereview", "drafting"]},
     "matter_id": {"type": "string", "minLength": 1},
     "round": {"type": "integer", "minimum": 1},
-    "session_id": {"type": "string"},
+    "session_id": {"type": "string", "minLength": 1, "pattern": "^[A-Za-z0-9_.-]+$"},
     "last_completed_step": {"type": "integer", "minimum": 0},
-    "review_mode": {"type": "string"},
-    "step_artifacts": {"type": "object"},
-    "metrics": {"type": "object"},
+    "review_mode": {"type": ["string", "null"]},
+    "step_artifacts": {
+      "type": "object",
+      "patternProperties": {
+        "^step_[0-9]+$": {
+          "type": "object",
+          "required": ["name", "status"],
+          "properties": {
+            "name": {"type": "string", "minLength": 1},
+            "status": {"type": "string", "enum": ["completed", "failed", "in_progress"]},
+            "output": {"type": ["string", "null"]},
+            "completed_at": {"type": ["string", "null"]},
+            "failed_at": {"type": "string"},
+            "validation": {"type": "object"},
+            "error": {"type": "string"}
+          }
+        }
+      }
+    },
+    "metrics": {
+      "type": "object",
+      "properties": {
+        "reference_full_load_count": {"type": "integer", "minimum": 0},
+        "reference_tokens_estimated": {"type": "integer", "minimum": 0},
+        "retrieval_tokens_estimated": {"type": "integer", "minimum": 0},
+        "hydrated_candidate_count": {"type": "integer", "minimum": 0}
+      }
+    },
     "started_at": {"type": "string"},
     "updated_at": {"type": "string"}
   }

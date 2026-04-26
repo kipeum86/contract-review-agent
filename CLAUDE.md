@@ -44,33 +44,26 @@ Route user commands to the appropriate workflow. Accept both natural language an
 
 **Data handoff**: Pass file paths and short metadata inline. Large payloads are always file-based under `matters/{matter_id}/round_{N}/working/` or `library/runs/ingestion/`.
 
-## Baseline Reference Load — Root Agent Dispatch Protocol (v2.1)
+## Baseline Reference Load — Root Agent Dispatch Protocol (v2.2)
 
 When routing a review (or re-review) request to `review-agent`, you (the root agent) should ensure baseline references are loaded before dispatch. This is the third defense-in-depth layer, on top of the `UserPromptSubmit` hook (primary) and the `review-agent` Pre-Pipeline 0 fallback (secondary).
 
 **Procedure (only for review workflows)**:
 
-1. Check whether the session already has a fresh baseline trace:
+1. Create an explicit workflow session id:
    ```bash
-   LATEST=$(ls -t contract-review/library/runs/sessions/*/loaded.json 2>/dev/null | head -1)
-   if [ -n "$LATEST" ]; then
-       AGE=$(( $(date +%s) - $(stat -f %m "$LATEST" 2>/dev/null || stat -c %Y "$LATEST" 2>/dev/null || echo 0) ))
-       [ "$AGE" -lt 300 ] && echo "BASELINE_READY" || echo "BASELINE_STALE"
-   else
-       echo "BASELINE_MISSING"
-   fi
+   SESSION_ID="review-$(date -u +%Y%m%dT%H%M%SZ)-$$"
+   echo "CONTRACT_REVIEW_SESSION_ID=$SESSION_ID"
    ```
 
-2. If `BASELINE_READY`: nothing to do, the hook path already injected references. Proceed to dispatch.
-
-3. If `BASELINE_STALE` or `BASELINE_MISSING`: run the digest loader once before dispatching. The loader's stdout enters your own context, but only as a compact digest; review-agent will re-discover the same `loaded.json` via its own `ls -t` and load specific sections on demand:
+2. Run the digest loader once before dispatching. The loader's stdout enters your own context as a compact digest and writes a trace under the explicit session id:
    ```bash
-   LOADER_SOURCE=root-dispatch bash .claude/scripts/load-domain-references.sh review --mode=digest
+   LOADER_SOURCE=root-dispatch bash .claude/scripts/load-domain-references.sh review --mode=digest --session-id="$SESSION_ID"
    ```
 
-4. Dispatch review-agent as usual. Optionally include a line in the dispatch prompt: "Baseline trace exists at the most recent `contract-review/library/runs/sessions/*/loaded.json` — review-agent will discover and verify it in Pre-Pipeline 0 / Step 1.5 / Step 5.5."
+3. Dispatch review-agent as usual and include the exact session id in the dispatch prompt: `CONTRACT_REVIEW_SESSION_ID=<session_id>`. The review-agent must use that value in Pre-Pipeline 0, pipeline state, and trace paths. Do not ask the sub-agent to discover traces by recency.
 
-**Why this matters**: Claude Code does not guarantee that the `UserPromptSubmit` hook fires when a sub-agent is dispatched (official documentation is silent on this; see Open Question 1 in `output/Domain-Reference-강제로드-아키텍처-기획-v2.md` Section 14). Test 6 measures empirically which path wins in practice. Until Test 6 has observed ≥10 runs without fallback, the root agent should proactively run the loader before dispatch.
+**Why this matters**: Recency-based trace discovery can mix concurrent review sessions. Explicit session ids keep root dispatch, review-agent fallback loads, matter-level traces, and `pipeline-state.json` aligned.
 
 For `/draft` and `/ingest`, the hook emits a lighter HINT rather than a BLOCKING instruction, and no proactive root-dispatch loader call is required — the sub-agent will decide whether to run the loader based on its own workflow. See `output/Domain-Reference-강제로드-아키텍처-기획-v2.md` Section 5.5 P1.
 
