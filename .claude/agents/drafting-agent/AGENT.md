@@ -16,6 +16,17 @@ This loads `drafting-guide.md` (user-customized checklists + common-law drafting
 
 - **Path A — Detailed instructions**: User provides comprehensive specs → skip to Step 3
 - **Path B — Minimal instructions**: User provides limited context → conduct structured interview
+- **Official `/draft` workflow**: create a drafting matter workspace and produce the official artifact set.
+- **Ad hoc drafting assistance**: only skip persistence/DOCX generation when the user explicitly asks for chat-only draft text.
+
+Official `/draft` artifacts:
+
+```text
+working/draft.json
+working/draft_assumptions.md
+output/draft.docx
+working/pipeline-state.json
+```
 
 ## Pipeline Steps
 
@@ -47,10 +58,13 @@ Assess information already provided. If insufficient, interview to gather:
 4. Iterate until confirmed
 
 ### Step 3 — Matter & Context Registration
-**Executor**: Human-guided workspace setup
-1. If a drafting matter workspace already exists, reuse it
-2. Otherwise create `matters/{matter_id}/` and `round_1/` only when the operator explicitly wants persistent artifacts
-3. Write `matter-context.yaml` only when the workspace is being persisted
+**Executor**: Workspace setup
+1. For the official `/draft` workflow, create or reuse `matters/{matter_id}/round_1/working/`
+2. Write `matter-context.yaml` with contract type, parties, posture, language, governing law, and assumptions
+3. Write `working/draft_assumptions.md` with confirmed facts, inferred facts, and open items
+4. Initialize `working/pipeline-state.json`
+
+Only ad hoc chat-only drafting may skip the workspace.
 
 ### Step 4 — Template Lookup & Clause Selection
 **Executor**: Script + LLM
@@ -76,8 +90,8 @@ Assess information already provided. If insufficient, interview to gather:
 **For both modes:**
 - Apply deal-specific language (as confirmed)
 - Ensure internal consistency: defined terms, cross-references, numbering
-- When a drafting workspace is active, write structured JSON with section hierarchy to `working/draft.json`
-- Otherwise deliver the draft text directly in the terminal/chat response for operator review
+- For the official `/draft` workflow, write structured JSON with section hierarchy to `working/draft.json`
+- For ad hoc chat-only drafting, deliver the draft text directly in the terminal/chat response for operator review
 
 ### Step 6 — Self-Review (Risk Check)
 **Executor**: LLM judgment
@@ -89,21 +103,22 @@ Check the generated draft for:
 5. **Missing protections** — standard clauses that should be present
 
 Auto-fix simple issues. Flag substantive issues for user.
-When a drafting workspace is active, write `working/self-review.json`
+For the official `/draft` workflow, store self-review findings in `working/draft.json.self_review` and summarize assumptions/open items in `working/draft_assumptions.md`. A standalone `draft_review_memo.docx` is optional and not part of the default success contract.
 
 ### Step 7 — Packaging / DOCX Export
 **Executor**: Script (`compile-draft.js`)
-1. When a drafting workspace is active, write `working/draft.json` with the full draft data (metadata, sections, defined_terms, contract_text, self_review)
-2. Run `node .claude/skills/report-compiler/scripts/compile-draft.js working/draft.json output/reports/{matter_id}_round_1_draft.docx`
-3. The DOCX includes: section hierarchy with 제N조 / Article N numbering, defined terms bolded, signature blocks, and `[INTERNAL]` self-review notes
-4. Copy the DOCX to `matters/{matter_id}/round_1/source/` as baseline for future re-review
-5. If no workspace is active, deliver draft text in terminal and skip DOCX generation
+1. For the official `/draft` workflow, write `working/draft.json` with the full draft data (metadata, sections, defined_terms, contract_text, self_review)
+2. Run `node .claude/skills/report-compiler/scripts/compile-draft.js working/draft.json output/draft.docx`
+3. The DOCX includes: section hierarchy with 제N조 / Article N numbering, defined terms bolded, and signature blocks
+4. Do not include `[INTERNAL]` self-review notes in the default draft DOCX. Set `output_options.include_self_review_notes: true` only for an explicitly internal working draft.
+5. Copy the DOCX to `matters/{matter_id}/round_1/source/` as a re-review baseline only when the user wants lifecycle tracking for counterparty markups.
+6. If no workspace is active because the user explicitly requested chat-only drafting, deliver draft text in terminal and skip DOCX generation
 
 ### Step 8 — Human Review
 Present in terminal:
 1. Contract summary (type, parties, key terms)
 2. Self-review findings (if any)
-3. File path to any persisted draft artifacts, if they were created
+3. File paths for `working/draft.json`, `working/draft_assumptions.md`, `output/draft.docx`, and `working/pipeline-state.json` for official `/draft`
 
 **Revision** → Incorporate user feedback, re-run Steps 5-7
 

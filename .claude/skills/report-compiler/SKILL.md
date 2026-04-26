@@ -19,16 +19,17 @@ Compile analysis results into professional DOCX report deliverables.
    - Sections: Negotiation Progress, New Issues, Resolved Issues, Open Items
    - Usage: `node compile-delta-report.js <delta_data.json> <output.docx>`
 
+3. **Draft Contract DOCX** (`scripts/compile-draft.js`)
+   - Generates the official WF5 draft DOCX from `working/draft.json`
+   - Renders section hierarchy, defined-term bolding, preamble, and signature blocks
+   - Does not include self-review notes by default; set `output_options.include_self_review_notes: true` only for an explicitly internal working draft
+   - Usage: `node compile-draft.js <draft.json> <output.docx>`
+
 ## When to Use
 
 - WF2 Step 10: compile analysis report
 - WF4 Step 5: compile delta report
-
-## WF5 Status
-
-- This skill currently ships only the review-report compilers above.
-- The repository does **not** yet include a dedicated Workflow 5 draft-contract DOCX packager or end-to-end drafting orchestrator.
-- For drafting, treat DOCX packaging as manual/experimental until a separate WF5 compiler is added.
+- WF5 Step 7: compile the contract draft DOCX
 
 ## Input JSON Format — Analysis Report
 
@@ -83,6 +84,41 @@ Compile analysis results into professional DOCX report deliverables.
       "internal_note": "..."
     }
   ]
+}
+```
+
+## Input JSON Format — Draft Contract
+
+```json
+{
+  "draft_metadata": {
+    "title": "Mutual Non-Disclosure Agreement",
+    "parties": ["Alpha Inc.", "Beta LLC"],
+    "contract_type": "nda",
+    "language": "en",
+    "matter_id": "draft-nda-001",
+    "date_created": "2026-04-26"
+  },
+  "defined_terms": ["Confidential Information"],
+  "contract_text": {
+    "preamble": "This Agreement is entered into by Alpha Inc. and Beta LLC.",
+    "signature_blocks": [
+      {"party": "Alpha Inc.", "date": "[Date]", "signature_line": "____________________"}
+    ]
+  },
+  "sections": [
+    {
+      "section_number": 1,
+      "title": "Confidentiality",
+      "text": "Each party shall protect Confidential Information."
+    }
+  ],
+  "self_review": {
+    "issues": []
+  },
+  "output_options": {
+    "include_self_review_notes": false
+  }
 }
 ```
 
