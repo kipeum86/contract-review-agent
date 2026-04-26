@@ -362,6 +362,20 @@ class TestPartialRedlineIntegration(unittest.TestCase):
             self.assertIn("promptly", xml0)
             self.assertIn(">10<", xml1)
 
+    def test_multi_paragraph_mismatch_fails_without_collapsing_text(self):
+        """A multi-paragraph mapping must not be silently collapsed into one paragraph."""
+        with tempfile.TemporaryDirectory() as tmpdir:
+            result = run_redline(
+                tmpdir,
+                ["Seller shall notify Buyer.", "Payment is due within 30 days."],
+                {"mappings": [{"clause_id": "c1", "mapped": True, "paragraph_indices": [0, 1]}]},
+                {"c1": {"suggested_redline": "Seller shall promptly notify Buyer."}},
+            )
+            self.assertFalse(result["success"])
+            self.assertEqual(result["failed_count"], 1)
+            self.assertEqual(result["failures"][0]["reason"], "paragraph_count_mismatch")
+            self.assertEqual(result["paragraphs_touched"], 0)
+
     def test_existing_tracked_changes_preserved(self):
         """Redline on paragraph 1 must not destroy existing w:ins on paragraph 0."""
         with tempfile.TemporaryDirectory() as tmpdir:
@@ -517,6 +531,34 @@ class TestEdgeCases(unittest.TestCase):
             self.assertEqual(result["applied_count"], 0)
             self.assertEqual(result["failed_count"], 1)
             self.assertEqual(result["total_redlines"], 1)
+
+    def test_partial_high_risk_redline_failure_halts(self):
+        """A failed Critical/High redline must halt even when other redlines apply."""
+        with tempfile.TemporaryDirectory() as tmpdir:
+            result = run_redline(
+                tmpdir,
+                ["Clause one old.", "Clause two old."],
+                {
+                    "mappings": [
+                        {"clause_id": "c1", "mapped": True, "paragraph_indices": [0]},
+                    ]
+                },
+                {
+                    "c1": {
+                        "risk_level": "low",
+                        "suggested_redline": "Clause one new.",
+                    },
+                    "c2": {
+                        "risk_level": "high",
+                        "suggested_redline": "Clause two new.",
+                    },
+                },
+            )
+            self.assertFalse(result["success"])
+            self.assertEqual(result["applied_count"], 1)
+            self.assertEqual(result["failed_count"], 1)
+            self.assertEqual(result["failed_critical_or_high"], 1)
+            self.assertEqual(result["failures"][0]["reason"], "mapping_missing")
 
     def test_reviewer_metadata_from_meta(self):
         """Reviewer author/initials come from _meta block."""

@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Pipeline State Artifact",
+  "type": "object",
+  "required": ["schema_version", "pipeline", "matter_id", "last_completed_step", "step_artifacts"],
+  "properties": {
+    "schema_version": {"type": "integer", "minimum": 1},
+    "pipeline": {"type": "string"},
+    "matter_id": {"type": "string", "minLength": 1},
+    "round": {"type": "integer", "minimum": 1},
+    "session_id": {"type": "string"},
+    "last_completed_step": {"type": "integer", "minimum": 0},
+    "review_mode": {"type": "string"},
+    "step_artifacts": {"type": "object"},
+    "metrics": {"type": "object"},
+    "started_at": {"type": "string"},
+    "updated_at": {"type": "string"}
+  }
+}

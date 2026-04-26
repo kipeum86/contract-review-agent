@@ -11,7 +11,8 @@ Compile analysis results into professional DOCX report deliverables.
      - Korean memorandum-style opinion when report language is Korean
    - Korean renderer applies A4 sizing, CJK font, minimal color, disclaimer blocks, information block, and signature block
    - Input: review data JSON with clauses, executive_summary, risk distribution, optional memorandum metadata, and optional matter working directory for baseline trace injection
-   - Usage: `node compile-report.js <review_data.json> <output.docx> [<matter_working_dir>]`
+   - Usage: `node compile-report.js <review_data.json> <output.docx> [<matter_working_dir>] [--allow-incomplete]`
+   - Default behavior fails closed when `executive_summary.risk_distribution` cannot prove that every rated clause is present; `--allow-incomplete` is for legacy recompile/debugging only
 
 2. **Delta Report** (`scripts/compile-delta-report.js`)
    - Generates DOCX for re-review delta reports
@@ -33,6 +34,7 @@ Compile analysis results into professional DOCX report deliverables.
 
 ```json
 {
+  "schema_version": 1,
   "report_language": "ko",
   "contract_info": { "title": "...", "contract_family": "nda" },
   "review_mode": "moderate",
@@ -110,8 +112,8 @@ Compile analysis results into professional DOCX report deliverables.
 
 ## Language Policy
 
-- Redline text: always in the contract's original language
-- Analysis report: follows user's prompt language or explicit language instruction
+- Canonical source: `.claude/policies/language-policy.yaml`
+- Analysis report: follows `report_language`, not the contract's own language
 - English reports render as numbered Section 1-6 output when `executive_summary.negotiation_priority` is present; otherwise the compiler falls back to the legacy flat structure for backward compatibility
 - Korean reports render as memorandum-style DOCX when `report_language`, `language`, or the supplied text indicates Korean
 - The report compiler accepts the substantive text as-is; language adaptation and memorandum metadata selection happen at render time

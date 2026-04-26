@@ -1,5 +1,7 @@
-# Review Mode — Controls analysis aggressiveness and redline generation scope
+# Review Mode — Controls analysis aggressiveness, redline scope, and comment scope
 # Users can set a global default and override per-review via natural language.
+
+policy_version: 2
 
 default_mode: moderate
 
@@ -17,6 +19,15 @@ modes:
     acceptable_playbook_tiers:
       - preferred
     comment_generation:
+      - critical
+      - high
+      - medium
+      - low
+    external_comment_scope:
+      - critical
+      - high
+      - medium
+    internal_comment_scope:
       - critical
       - high
       - medium
@@ -45,6 +56,13 @@ modes:
       - critical
       - high
       - medium
+    external_comment_scope:
+      - critical
+      - high
+    internal_comment_scope:
+      - critical
+      - high
+      - medium
     risk_tolerance: moderate
     recommended_for:
       - license
@@ -68,6 +86,11 @@ modes:
       - acceptable
       - fallback
     comment_generation:
+      - critical
+      - high
+    external_comment_scope:
+      - critical
+    internal_comment_scope:
       - critical
       - high
     risk_tolerance: high

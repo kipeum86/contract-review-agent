@@ -5,7 +5,7 @@
  * - Generic renderer: Executive Summary + per-clause analysis
  * - Korean renderer: Memorandum-style opinion aligned to the local style guide
  *
- * Usage: node compile-report.js <review_data.json> <output.docx> [<matter_working_dir>]
+ * Usage: node compile-report.js <review_data.json> <output.docx> [<matter_working_dir>] [--allow-incomplete]
  */
 
 const fs = require('fs');
@@ -1135,7 +1135,7 @@ function buildChildren(data) {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// validateClauseCompleteness (2026-04-11 hardening)
+// validateClauseCompleteness (2026-04-11 hardening, 2026-04-25 hard gate)
 // ─────────────────────────────────────────────────────────────────────────────
 // Cross-checks data.clauses.length against the sum of
 // data.executive_summary.risk_distribution counts. If they disagree, the LLM
@@ -1143,42 +1143,21 @@ function buildChildren(data) {
 // (review.json assembly) — a pattern observed in the 2026-04-10 incident
 // where 27 rated clauses silently collapsed to 10 "selected" entries.
 //
-// This does NOT halt rendering. Legal reviews must ship even when partial.
-// Instead, it prepends a visible warning to executive_summary.review_notes
-// (for numbered English reports) or summary.recommendation (for legacy and
-// Korean paths) so the warning lands in the final DOCX where the reviewer
-// will see it. The review is still usable, just annotated as incomplete.
+// Default behavior is now fail-closed. A legacy escape hatch,
+// --allow-incomplete, keeps the old visible-warning rendering path for
+// historical artifacts that need to be recompiled without claiming completeness.
 // ─────────────────────────────────────────────────────────────────────────────
-function validateClauseCompleteness(data) {
-  const clauses = data.clauses || data.analysis || [];
-  const summary = data.executive_summary || {};
-  const stats = summary.risk_distribution || {};
+function clauseCountMismatchWarning(expectedTotal, actualTotal) {
+  const delta = expectedTotal - actualTotal;
+  return delta > 0
+    ? `⚠️ CLAUSE COUNT MISMATCH: risk_distribution totals ${expectedTotal} clauses, but data.clauses contains only ${actualTotal}. ${delta} clause(s) appear to have been dropped during Step 10 assembly. Section 6 / 4. 검토의견 is INCOMPLETE. Re-run Step 10 with the full per-clause set.`
+    : `⚠️ CLAUSE COUNT MISMATCH: data.clauses contains ${actualTotal} entries but risk_distribution totals only ${expectedTotal}. The clause list and the risk table are inconsistent; the executive summary may understate risk counts.`;
+}
 
-  const expectedTotal = Object.values(stats).reduce(
-    (sum, count) => sum + (Number(count) || 0),
-    0,
-  );
-
-  // Guard: if risk_distribution is empty, we cannot compare. Skip silently.
-  if (expectedTotal === 0) {
-    return;
-  }
-
-  if (clauses.length === expectedTotal) {
-    return;
-  }
-
-  const delta = expectedTotal - clauses.length;
-  const warning = delta > 0
-    ? `⚠️ CLAUSE COUNT MISMATCH: risk_distribution totals ${expectedTotal} clauses, but data.clauses contains only ${clauses.length}. ${delta} clause(s) appear to have been dropped during Step 10 assembly. Section 6 / 4. 검토의견 is INCOMPLETE. Re-run Step 10 with the full per-clause set.`
-    : `⚠️ CLAUSE COUNT MISMATCH: data.clauses contains ${clauses.length} entries but risk_distribution totals only ${expectedTotal}. The clause list and the risk table are inconsistent; the executive summary may understate risk counts.`;
-
+function prependCompletenessWarning(data, warning) {
   console.warn(warning);
 
-  // Surface the warning in the rendered DOCX. Prefer review_notes for numbered
-  // English reports (it lands in Section 5). For legacy English and Korean
-  // paths, prepend to recommendation so it shows in the Executive Summary
-  // recommendation block (English legacy) or 4. 검토의견 intro (Korean).
+  const summary = data.executive_summary || {};
   data.executive_summary = summary;
   const useReviewNotes = resolveReportLanguage(data) === 'en' && !!summary.negotiation_priority;
 
@@ -1193,7 +1172,73 @@ function validateClauseCompleteness(data) {
   }
 }
 
-async function compileReport(inputPath, outputPath, matterWorkingDir) {
+function findDuplicateClauseIds(clauses) {
+  const seen = new Set();
+  const duplicates = new Set();
+
+  clauses.forEach((clause) => {
+    const clauseId = clause && clause.clause_id;
+    if (!clauseId) {
+      return;
+    }
+    if (seen.has(clauseId)) {
+      duplicates.add(clauseId);
+      return;
+    }
+    seen.add(clauseId);
+  });
+
+  return Array.from(duplicates);
+}
+
+function validateClauseCompleteness(data, options = {}) {
+  const { allowIncomplete = false } = options;
+  const clauses = data.clauses || data.analysis || [];
+  const summary = data.executive_summary || {};
+  const stats = summary.risk_distribution || {};
+  const duplicateClauseIds = findDuplicateClauseIds(clauses);
+
+  if (duplicateClauseIds.length > 0) {
+    throw new Error(
+      `Duplicate clause_id value(s) in review data: ${duplicateClauseIds.join(', ')}`,
+    );
+  }
+
+  const expectedTotal = Object.values(stats).reduce(
+    (sum, count) => sum + (Number(count) || 0),
+    0,
+  );
+
+  if (expectedTotal === 0) {
+    if (clauses.length === 0) {
+      return;
+    }
+    const warning = '⚠️ CLAUSE COUNT MISMATCH: executive_summary.risk_distribution is missing or totals 0, but data.clauses contains entries. The report cannot prove clause completeness.';
+    if (allowIncomplete) {
+      prependCompletenessWarning(data, warning);
+      return;
+    }
+    throw new Error(
+      'Clause completeness validation failed: executive_summary.risk_distribution is missing or totals 0 while clauses are present. Re-run Step 10 with a complete risk_distribution, or pass --allow-incomplete only for legacy recompile.',
+    );
+  }
+
+  if (clauses.length === expectedTotal) {
+    return;
+  }
+
+  const warning = clauseCountMismatchWarning(expectedTotal, clauses.length);
+  if (allowIncomplete) {
+    prependCompletenessWarning(data, warning);
+    return;
+  }
+
+  throw new Error(
+    `Clause completeness validation failed: risk_distribution totals ${expectedTotal} clauses, but data.clauses contains ${clauses.length}. Re-run Step 10 with every rated clause, or pass --allow-incomplete only for legacy recompile.`,
+  );
+}
+
+async function compileReport(inputPath, outputPath, matterWorkingDir, options = {}) {
   const rawData = fs.readFileSync(inputPath, 'utf-8');
   const data = JSON.parse(rawData);
 
@@ -1202,10 +1247,10 @@ async function compileReport(inputPath, outputPath, matterWorkingDir) {
   // matterWorkingDir is omitted (backward compat with v1 2-arg invocation).
   injectBaselineTrace(data, matterWorkingDir);
 
-  // 2026-04-11 — validate clause completeness before rendering. If the LLM
-  // dropped clauses between Step 6 and Step 10 assembly, surface a visible
-  // warning in the final DOCX instead of silently producing a partial report.
-  validateClauseCompleteness(data);
+  // 2026-04-25 — validate clause completeness before rendering. If the LLM
+  // dropped clauses between Step 6 and Step 10 assembly, fail closed by
+  // default instead of silently producing a partial report.
+  validateClauseCompleteness(data, options);
 
   const children = buildChildren(data);
 
@@ -1243,18 +1288,28 @@ async function compileReport(inputPath, outputPath, matterWorkingDir) {
 }
 
 async function main() {
-  if (process.argv.length < 4) {
+  const args = process.argv.slice(2);
+  const allowIncomplete = args.includes('--allow-incomplete');
+  const unknownFlags = args.filter((arg) => arg.startsWith('--') && arg !== '--allow-incomplete');
+  const positional = args.filter((arg) => !arg.startsWith('--'));
+
+  if (positional.length < 2 || unknownFlags.length > 0) {
     console.log(JSON.stringify({
-      error: 'Usage: compile-report.js <review_data.json> <output.docx> [<matter_working_dir>]',
+      error: 'Usage: compile-report.js <review_data.json> <output.docx> [<matter_working_dir>] [--allow-incomplete]',
     }));
     process.exit(1);
   }
 
   try {
     // Optional 3rd arg: matter working directory (for baseline trace injection).
-    // Omitting it preserves v1 behavior exactly (no injection, no warnings).
-    const matterWorkingDir = process.argv[4] || null;
-    const result = await compileReport(process.argv[2], process.argv[3], matterWorkingDir);
+    // Omitting it preserves v1 trace behavior (no baseline injection).
+    const matterWorkingDir = positional[2] || null;
+    const result = await compileReport(
+      positional[0],
+      positional[1],
+      matterWorkingDir,
+      { allowIncomplete },
+    );
     console.log(JSON.stringify(result, null, 2));
   } catch (err) {
     console.log(JSON.stringify({ error: err.message, success: false }));

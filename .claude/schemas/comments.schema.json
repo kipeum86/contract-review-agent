@@ -1,0 +1,39 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "DOCX Margin Comments Artifact",
+  "type": "object",
+  "properties": {
+    "_meta": {
+      "type": "object",
+      "properties": {
+        "reviewer_author": {"type": "string"},
+        "reviewer_initials": {"type": "string"},
+        "language_policy_version": {"type": "integer", "minimum": 1},
+        "review_mode_policy_version": {"type": "integer", "minimum": 1}
+      }
+    }
+  },
+  "patternProperties": {
+    "^(?!_meta$).+$": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["audience", "text"],
+        "properties": {
+          "audience": {"type": "string", "enum": ["EXTERNAL", "INTERNAL"]},
+          "text": {
+            "type": "string",
+            "pattern": "^\\[(EXTERNAL|INTERNAL)\\] .+"
+          },
+          "risk_level": {
+            "type": "string",
+            "enum": ["critical", "high", "medium", "low", "acceptable"]
+          }
+        },
+        "additionalProperties": true
+      }
+    }
+  },
+  "additionalProperties": false
+}
