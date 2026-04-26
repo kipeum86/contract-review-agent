@@ -29,6 +29,7 @@ ET.register_namespace('wp', 'http://schemas.openxmlformats.org/drawingml/2006/wo
 
 DEFAULT_AUTHOR = 'Reviewer'
 DEFAULT_INITIALS = 'RV'
+FAILURE_RATE_THRESHOLD = 0.10
 
 
 def local_name(tag: str) -> str:
@@ -200,8 +201,20 @@ def paragraph_has_comment_reference(paragraph: ET.Element, comment_id: int) -> b
     return False
 
 
+def comment_audience(comment: dict | None) -> str:
+    if not comment:
+        return 'unknown'
+    text = comment.get('text', '')
+    if text.startswith('[EXTERNAL]'):
+        return 'EXTERNAL'
+    if text.startswith('[INTERNAL]'):
+        return 'INTERNAL'
+    return 'unknown'
+
+
 def insert_comment_markers(document_xml_path: str, clause_map: dict,
-                           comment_assignments: dict, output_path: str) -> dict:
+                           comment_assignments: dict, output_path: str,
+                           comments_by_id: dict | None = None) -> dict:
     """Insert comment range markers into document.xml."""
     w = NSMAP['w']
 
@@ -220,13 +233,36 @@ def insert_comment_markers(document_xml_path: str, clause_map: dict,
             mapping_lookup[mapping['clause_id']] = mapping.get('paragraph_indices', [])
 
     applied = 0
+    failures = []
+
+    def record_failures(clause_id: str, comment_ids: list[int], reason: str, details: str | None = None) -> None:
+        for comment_id in comment_ids:
+            comment = (comments_by_id or {}).get(comment_id)
+            failure = {
+                'entry_id': str(comment_id),
+                'clause_id': clause_id,
+                'comment_id': comment_id,
+                'audience': comment_audience(comment),
+                'reason': reason,
+            }
+            if details:
+                failure['details'] = details
+            failures.append(failure)
+
     for clause_id, comment_ids in comment_assignments.items():
         para_indices = mapping_lookup.get(clause_id, [])
         if not para_indices:
+            record_failures(clause_id, comment_ids, 'mapping_missing')
             continue
 
         para_idx = para_indices[0]
         if para_idx >= len(all_paragraphs):
+            record_failures(
+                clause_id,
+                comment_ids,
+                'paragraph_index_out_of_range',
+                f'paragraph_index={para_idx}, paragraph_count={len(all_paragraphs)}',
+            )
             continue
 
         para = all_paragraphs[para_idx]
@@ -256,6 +292,8 @@ def insert_comment_markers(document_xml_path: str, clause_map: dict,
         'success': True,
         'output_path': output_path,
         'comments_applied': applied,
+        'failed_count': len(failures),
+        'failures': failures,
     }
 
 
@@ -403,6 +441,19 @@ def apply_comments(unpacked_dir: str, clause_map_path: str,
             ),
             'comments_applied': 0,
             'total_clause_comments': total_clause_comments,
+            'total_entries': total_clause_comments,
+            'applied_entries': 0,
+            'failed_entries': total_clause_comments,
+            'failed_critical_or_high': 0,
+            'failure_rate': 1,
+            'failures': [
+                {
+                    'entry_id': 'unknown',
+                    'clause_id': 'unknown',
+                    'audience': 'unknown',
+                    'reason': 'no_comments_built',
+                }
+            ],
         }
 
     if not all_comments:
@@ -412,6 +463,12 @@ def apply_comments(unpacked_dir: str, clause_map_path: str,
             'success': True,
             'comments_applied': 0,
             'total_clause_comments': 0,
+            'total_entries': 0,
+            'applied_entries': 0,
+            'failed_entries': 0,
+            'failed_critical_or_high': 0,
+            'failure_rate': 0,
+            'failures': [],
             'message': 'No comments to apply',
         }
 
@@ -420,12 +477,25 @@ def apply_comments(unpacked_dir: str, clause_map_path: str,
     content_type_added = ensure_comments_content_type(unpacked_dir)
 
     doc_xml_path = os.path.join(unpacked_dir, 'word', 'document.xml')
-    result = insert_comment_markers(doc_xml_path, clause_map, comment_assignments, doc_xml_path)
+    comments_by_id = {comment['id']: comment for comment in all_comments}
+    result = insert_comment_markers(
+        doc_xml_path,
+        clause_map,
+        comment_assignments,
+        doc_xml_path,
+        comments_by_id,
+    )
 
     # Fail-loud guard part 2: even if we built comments, zero may have actually
     # landed in the DOCX if every clause failed to map via docx-clause-map.json.
     # This is the Step 8 mapping failure case.
     comments_applied_count = result.get('comments_applied', 0)
+    failures = result.get('failures', [])
+    failed_count = len(failures)
+    failed_critical_or_high = len([
+        failure for failure in failures if failure.get('audience') == 'EXTERNAL'
+    ])
+    failure_rate = (failed_count / len(all_comments)) if all_comments else 0
     if len(all_comments) > 0 and comments_applied_count == 0:
         result['success'] = False
         result['error'] = (
@@ -434,9 +504,26 @@ def apply_comments(unpacked_dir: str, clause_map_path: str,
             f'for every clause that had a comment. Check docx-clause-map.json '
             f'coverage.'
         )
+    elif failed_critical_or_high > 0:
+        result['success'] = False
+        result['error'] = (
+            f'{failed_critical_or_high} EXTERNAL comment(s) failed to apply. '
+            'Pipeline must halt so Critical/High review comments are not silently dropped.'
+        )
+    elif len(all_comments) > 0 and failure_rate > FAILURE_RATE_THRESHOLD:
+        result['success'] = False
+        result['error'] = (
+            f'{failed_count} of {len(all_comments)} comments failed '
+            f'({failure_rate:.0%}), exceeding the {FAILURE_RATE_THRESHOLD:.0%} threshold.'
+        )
 
     result['total_comments'] = len(all_comments)
     result['total_clause_comments'] = total_clause_comments
+    result['total_entries'] = len(all_comments)
+    result['applied_entries'] = comments_applied_count
+    result['failed_entries'] = failed_count
+    result['failed_critical_or_high'] = failed_critical_or_high
+    result['failure_rate'] = round(failure_rate, 3)
     result['comments_xml_updated'] = comments_result
     result['comments_relationship_added'] = relationship_added
     result['comments_content_type_added'] = content_type_added

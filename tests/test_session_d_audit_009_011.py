@@ -307,6 +307,54 @@ class SessionDAudit009CommentsTests(unittest.TestCase):
             self.assertTrue(any("[EXTERNAL]" in t for t in texts))
             self.assertTrue(any("[INTERNAL]" in t for t in texts))
 
+    def test_apply_comments_partial_external_mapping_failure_halts(self):
+        """A failed EXTERNAL comment must halt even if other comments apply."""
+        with tempfile.TemporaryDirectory() as tmpdir:
+            unpacked_dir = Path(tmpdir) / "unpacked"
+            self._write_minimal_docx_package(unpacked_dir)
+
+            clause_map_path = Path(tmpdir) / "clause-map.json"
+            clause_map_path.write_text(
+                json.dumps({
+                    "mappings": [
+                        {"clause_id": "clause-001", "mapped": True, "paragraph_indices": [0]}
+                    ]
+                }, ensure_ascii=False, indent=2),
+                encoding="utf-8",
+            )
+
+            comments_path = Path(tmpdir) / "comments.json"
+            comments_path.write_text(
+                json.dumps({
+                    "clause-001": [
+                        {
+                            "audience": "INTERNAL",
+                            "text": "[INTERNAL] This mapped comment should land.",
+                        }
+                    ],
+                    "clause-002": [
+                        {
+                            "audience": "EXTERNAL",
+                            "text": "[EXTERNAL] This high-risk comment has no mapping.",
+                        }
+                    ],
+                }, ensure_ascii=False, indent=2),
+                encoding="utf-8",
+            )
+
+            result = apply_comments_module.apply_comments(
+                str(unpacked_dir),
+                str(clause_map_path),
+                str(comments_path),
+            )
+
+            self.assertFalse(result["success"], result)
+            self.assertEqual(result["comments_applied"], 1)
+            self.assertEqual(result["failed_entries"], 1)
+            self.assertEqual(result["failed_critical_or_high"], 1)
+            self.assertEqual(result["failures"][0]["clause_id"], "clause-002")
+            self.assertEqual(result["failures"][0]["reason"], "mapping_missing")
+
     def test_apply_comments_fail_loud_on_unknown_audience(self):
         """v2 schema with unknown audience values must fail loudly.
 
@@ -565,6 +613,13 @@ class SessionDAudit011ReportTests(unittest.TestCase):
                         "executive_summary": {
                             "overall_risk": "high",
                             "recommendation": "책임 제한과 해지 조항은 수정 협의가 필요할 것으로 사료됩니다.",
+                            "risk_distribution": {
+                                "critical": 0,
+                                "high": 1,
+                                "medium": 0,
+                                "low": 0,
+                                "acceptable": 0,
+                            },
                             "key_issues": [
                                 "책임 제한 예외가 과도합니다.",
                                 "상대방의 임의 해지 권한이 넓습니다."
@@ -639,6 +694,13 @@ class SessionDAudit011ReportTests(unittest.TestCase):
                         "contract_info": {"title": "SaaS Agreement", "contract_family": "saas"},
                         "executive_summary": {
                             "overall_risk": "medium",
+                            "risk_distribution": {
+                                "critical": 0,
+                                "high": 0,
+                                "medium": 1,
+                                "low": 0,
+                                "acceptable": 0,
+                            },
                             "key_issues": ["Liability cap is below market."],
                             "recommendation": "Revise liability and termination terms.",
                         },
@@ -801,6 +863,13 @@ class SessionDAudit011ReportTests(unittest.TestCase):
                         },
                         "executive_summary": {
                             "overall_risk": "high",
+                            "risk_distribution": {
+                                "critical": 0,
+                                "high": 5,
+                                "medium": 22,
+                                "low": 0,
+                                "acceptable": 0,
+                            },
                             "recommendation": "핵심 위험 조항의 수정 협의가 필요합니다.",
                             "key_issues": [
                                 "성능보증 조항이 과도합니다.",
@@ -876,6 +945,13 @@ class SessionDAudit011ReportTests(unittest.TestCase):
                         },
                         "executive_summary": {
                             "overall_risk": "medium",
+                            "risk_distribution": {
+                                "critical": 0,
+                                "high": 5,
+                                "medium": 0,
+                                "low": 0,
+                                "acceptable": 0,
+                            },
                             "recommendation": "조항별 검토 결과를 반영하시기 바랍니다.",
                             "key_issues": ["예시 이슈"],
                             # negotiation_priority intentionally omitted
@@ -945,6 +1021,13 @@ class SessionDAudit011ReportTests(unittest.TestCase):
                         },
                         "executive_summary": {
                             "overall_risk": "high",
+                            "risk_distribution": {
+                                "critical": 0,
+                                "high": 3,
+                                "medium": 0,
+                                "low": 0,
+                                "acceptable": 0,
+                            },
                             "recommendation": "본 영문 공급계약은 핵심 위험 조항의 수정이 필요합니다.",
                             "key_issues": [
                                 "성능보증 조항이 과도합니다.",
@@ -983,13 +1066,12 @@ class SessionDAudit011ReportTests(unittest.TestCase):
             self.assertNotIn("Executive Summary", document_xml)
             self.assertNotIn("Per-Clause Analysis", document_xml)
 
-    def test_clause_count_mismatch_surfaces_warning_in_numbered_english(self):
+    def test_clause_count_mismatch_fails_by_default(self):
         """Regression guard for the 2026-04-10 "Selected 10/27" symptom.
 
         When risk_distribution totals N but data.clauses has fewer than N
-        entries, the compiler must surface a visible warning in the rendered
-        DOCX so the reviewer notices the dropped clauses. This is in Section
-        5 Review Notes for numbered English reports.
+        entries, the compiler must fail closed by default instead of emitting
+        a plausible but incomplete DOCX.
         """
         with tempfile.TemporaryDirectory() as tmpdir:
             review_data_path = Path(tmpdir) / "review-data.json"
@@ -1037,22 +1119,18 @@ class SessionDAudit011ReportTests(unittest.TestCase):
                 cwd=REPO_ROOT,
                 capture_output=True,
                 text=True,
-                check=True,
             )
             result = json.loads(completed.stdout)
-            self.assertTrue(result["success"], result)
-            self.assertEqual(result["clauses_count"], 10)
+            self.assertNotEqual(completed.returncode, 0)
+            self.assertFalse(result["success"], result)
+            self.assertIn("Clause completeness validation failed", result["error"])
+            self.assertIn("27", result["error"])
+            self.assertIn("10", result["error"])
+            self.assertFalse(output_docx.exists())
 
-            document_xml = read_zip_text(output_docx, "word/document.xml")
-            self.assertIn("CLAUSE COUNT MISMATCH", document_xml)
-            self.assertIn("27", document_xml)
-            self.assertIn("10", document_xml)
-            self.assertIn("INCOMPLETE", document_xml)
-
-    def test_clause_count_mismatch_surfaces_warning_in_korean_memo(self):
-        """Korean path: warning is prepended to recommendation so it shows in
-        the 5. 결론 area of the memorandum. Existing recommendation text must
-        be preserved, not replaced."""
+    def test_clause_count_mismatch_can_render_with_allow_incomplete(self):
+        """Legacy escape hatch: warning rendering remains available only when
+        the operator explicitly passes --allow-incomplete."""
         with tempfile.TemporaryDirectory() as tmpdir:
             review_data_path = Path(tmpdir) / "review-data.json"
             output_docx = Path(tmpdir) / "report.docx"
@@ -1094,6 +1172,7 @@ class SessionDAudit011ReportTests(unittest.TestCase):
                     str(REPO_ROOT / ".claude/skills/report-compiler/scripts/compile-report.js"),
                     str(review_data_path),
                     str(output_docx),
+                    "--allow-incomplete",
                 ],
                 cwd=REPO_ROOT,
                 capture_output=True,

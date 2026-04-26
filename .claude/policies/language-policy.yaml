@@ -1,0 +1,24 @@
+# Canonical language policy for contract review artifacts.
+#
+# Decision note (2026-04-25):
+# [INTERNAL] comments use report_language. Internal comments are consumed by
+# the client/reviewer alongside the analysis memorandum, while [EXTERNAL]
+# comments and redlines remain in the contract language for counterparty use.
+
+version: 1
+decision_status: approved
+
+redlines:
+  language: contract_language
+
+external_comments:
+  language: contract_language
+
+internal_comments:
+  language: report_language
+
+analysis_report:
+  language: report_language
+
+terminal_output:
+  language: user_prompt_language

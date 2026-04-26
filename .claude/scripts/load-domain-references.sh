@@ -10,7 +10,7 @@
 # Detailed architecture history is kept in the local-only workspace docs.
 #
 # Usage:
-#   bash .claude/scripts/load-domain-references.sh <workflow>
+#   bash .claude/scripts/load-domain-references.sh <workflow> [--mode=full|digest|section] [--section=<heading>] [--file=<name>]
 #
 # Workflows:
 #   review  → review-guide.md + audience-firewall.md
@@ -45,6 +45,34 @@ if [ "$#" -lt 1 ]; then
     exit 1
 fi
 WORKFLOW="$1"
+MODE="full"
+SECTION=""
+SECTION_FILE=""
+shift
+
+for arg in "$@"; do
+    case "$arg" in
+        --mode=full|--mode=digest|--mode=section)
+            MODE="${arg#--mode=}"
+            ;;
+        --section=*)
+            SECTION="${arg#--section=}"
+            ;;
+        --file=*)
+            SECTION_FILE="${arg#--file=}"
+            ;;
+        *)
+            echo "ERROR: unknown option '$arg'" >&2
+            echo "  Usage: load-domain-references.sh <workflow> [--mode=full|digest|section] [--section=<heading>] [--file=<name>]" >&2
+            exit 1
+            ;;
+    esac
+done
+
+if [ "$MODE" = "section" ] && [ -z "$SECTION" ]; then
+    echo "ERROR: --mode=section requires --section=<heading>" >&2
+    exit 1
+fi
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="${CLAUDE_PROJECT_DIR:-$(cd "$SCRIPT_DIR/../.." && pwd)}"
@@ -110,8 +138,65 @@ compute_sha256_short() {
     echo "$sha"
 }
 
-# --- 5. Emit stdout block (cat files with markers) ---------------------------
-cat <<'EOF'
+collect_file_metadata() {
+    TRACE_ENTRIES=""
+    DIGEST_LINES=""
+    BUNDLE_INPUT=""
+
+    for f in "${FILES[@]}"; do
+        filepath="$REFS_DIR/$f"
+
+        bytes=$(wc -c < "$filepath" 2>/dev/null | tr -d ' ')
+        if [ -z "$bytes" ]; then
+            echo "WARN: could not stat $filepath" >&2
+            bytes=0
+        fi
+
+        sha256_short=$(compute_sha256_short "$filepath")
+        last_heading=$(grep '^### ' "$filepath" 2>/dev/null | tail -1 || echo "")
+        headings=$(grep -E '^#{1,3} ' "$filepath" 2>/dev/null | sed 's#^#- #' || true)
+
+        DIGEST_LINES="${DIGEST_LINES}## File: ${f} (${bytes} bytes, sha256: ${sha256_short})"$'\n'
+        if [ -n "$headings" ]; then
+            DIGEST_LINES="${DIGEST_LINES}Available headings:"$'\n'"${headings}"$'\n'
+        fi
+        DIGEST_LINES="${DIGEST_LINES}"$'\n'
+        BUNDLE_INPUT="${BUNDLE_INPUT}${f}:${sha256_short}:${bytes};"
+
+        entry=$(jq -n \
+            --arg name "$f" \
+            --arg path ".claude/skills/review-domain-knowledge/references/$f" \
+            --argjson bytes "$bytes" \
+            --arg sha "$sha256_short" \
+            --arg heading "$last_heading" \
+            '{name: $name, path: $path, byte_size: $bytes, sha256_short: $sha, last_section_heading: $heading}') || {
+            echo "WARN: failed to build trace entry for $f" >&2
+            continue
+        }
+
+        if [ -n "$TRACE_ENTRIES" ]; then
+            TRACE_ENTRIES="${TRACE_ENTRIES},${entry}"
+        else
+            TRACE_ENTRIES="$entry"
+        fi
+    done
+
+    BUNDLE_SHA=$(printf '%s' "$BUNDLE_INPUT" | {
+        if command -v shasum >/dev/null 2>&1; then
+            shasum -a 256 | cut -c1-12
+        elif command -v sha256sum >/dev/null 2>&1; then
+            sha256sum | cut -c1-12
+        elif command -v openssl >/dev/null 2>&1; then
+            openssl dgst -sha256 | awk '{print $NF}' | cut -c1-12
+        else
+            cat >/dev/null
+            echo "unknown"
+        fi
+    })
+}
+
+emit_full() {
+    cat <<'EOF'
 <!-- BEGIN AUTO-INJECTED DOMAIN REFERENCES -->
 
 **AUTHORITATIVE DOMAIN REFERENCES — LOADED VIA BASH**
@@ -126,52 +211,143 @@ specific practice.
 
 EOF
 
-echo "Workflow: $WORKFLOW"
-echo ""
-
-# Build trace JSON entries while catting the files
-TRACE_ENTRIES=""
-for f in "${FILES[@]}"; do
-    filepath="$REFS_DIR/$f"
-
-    bytes=$(wc -c < "$filepath" 2>/dev/null | tr -d ' ')
-    if [ -z "$bytes" ]; then
-        echo "WARN: could not stat $filepath" >&2
-        bytes=0
-    fi
-
-    sha256_short=$(compute_sha256_short "$filepath")
-    last_heading=$(grep '^### ' "$filepath" 2>/dev/null | tail -1 || echo "")
-
-    echo "## File: $f (${bytes} bytes, sha256: $sha256_short)"
+    echo "Workflow: $WORKFLOW"
+    echo "Loader mode: full"
     echo ""
-    cat "$filepath" || {
-        echo "ERROR: failed to cat $filepath" >&2
+
+    for f in "${FILES[@]}"; do
+        filepath="$REFS_DIR/$f"
+        bytes=$(wc -c < "$filepath" 2>/dev/null | tr -d ' ')
+        sha256_short=$(compute_sha256_short "$filepath")
+
+        echo "## File: $f (${bytes} bytes, sha256: $sha256_short)"
+        echo ""
+        cat "$filepath" || {
+            echo "ERROR: failed to cat $filepath" >&2
+            exit 2
+        }
+        echo ""
+        echo "---"
+        echo ""
+    done
+
+    echo "<!-- END AUTO-INJECTED DOMAIN REFERENCES -->"
+}
+
+emit_digest() {
+    cat <<'EOF'
+<!-- BEGIN AUTO-INJECTED DOMAIN REFERENCE DIGEST -->
+
+**AUTHORITATIVE DOMAIN REFERENCES — DIGEST ONLY**
+
+The reference bundle was verified and traced, but full content was not injected
+to conserve tokens. Load only the required sections with:
+
+`bash .claude/scripts/load-domain-references.sh <workflow> --mode=section --section="<heading>"`
+
+Use `--mode=full` only for debugging or when section retrieval is insufficient.
+
+EOF
+
+    echo "Workflow: $WORKFLOW"
+    echo "Loader mode: digest"
+    echo "Bundle sha256: $BUNDLE_SHA"
+    echo ""
+    printf '%s' "$DIGEST_LINES"
+    echo "<!-- END AUTO-INJECTED DOMAIN REFERENCE DIGEST -->"
+}
+
+emit_section_from_file() {
+    local file="$1"
+    local filepath="$REFS_DIR/$file"
+    awk -v wanted="$SECTION" '
+        function level(line,    i) {
+            for (i = 1; i <= length(line); i++) {
+                if (substr(line, i, 1) != "#") return i - 1
+            }
+            return 0
+        }
+        BEGIN {
+            in_section = 0
+            found = 0
+            section_level = 0
+            wanted_lc = tolower(wanted)
+        }
+        /^#{1,6} / {
+            current_level = level($0)
+            heading = $0
+            sub(/^#{1,6}[[:space:]]+/, "", heading)
+            heading_lc = tolower(heading)
+            if (in_section && current_level <= section_level) {
+                exit
+            }
+            if (!in_section && index(heading_lc, wanted_lc) > 0) {
+                in_section = 1
+                found = 1
+                section_level = current_level
+            }
+        }
+        in_section { print }
+        END {
+            if (!found) exit 42
+        }
+    ' "$filepath"
+}
+
+emit_section() {
+    cat <<'EOF'
+<!-- BEGIN AUTO-INJECTED DOMAIN REFERENCE SECTION -->
+
+**AUTHORITATIVE DOMAIN REFERENCE SECTION — LOADED VIA BASH**
+
+EOF
+
+    echo "Workflow: $WORKFLOW"
+    echo "Loader mode: section"
+    echo "Requested section: $SECTION"
+    echo ""
+
+    local found_any=0
+    for f in "${FILES[@]}"; do
+        if [ -n "$SECTION_FILE" ] && [ "$SECTION_FILE" != "$f" ]; then
+            continue
+        fi
+        section_output="$(emit_section_from_file "$f" 2>/dev/null || true)"
+        if [ -n "$section_output" ]; then
+            found_any=1
+            bytes=$(wc -c < "$REFS_DIR/$f" 2>/dev/null | tr -d ' ')
+            sha256_short=$(compute_sha256_short "$REFS_DIR/$f")
+            echo "## File: $f (${bytes} bytes, sha256: $sha256_short)"
+            echo ""
+            printf '%s\n' "$section_output"
+            echo ""
+            echo "---"
+            echo ""
+        fi
+    done
+
+    if [ "$found_any" -ne 1 ]; then
+        echo "ERROR: requested section not found: $SECTION" >&2
         exit 2
-    }
-    echo ""
-    echo "---"
-    echo ""
-
-    entry=$(jq -n \
-        --arg name "$f" \
-        --arg path ".claude/skills/review-domain-knowledge/references/$f" \
-        --argjson bytes "$bytes" \
-        --arg sha "$sha256_short" \
-        --arg heading "$last_heading" \
-        '{name: $name, path: $path, byte_size: $bytes, sha256_short: $sha, last_section_heading: $heading}') || {
-        echo "WARN: failed to build trace entry for $f" >&2
-        continue
-    }
-
-    if [ -n "$TRACE_ENTRIES" ]; then
-        TRACE_ENTRIES="${TRACE_ENTRIES},${entry}"
-    else
-        TRACE_ENTRIES="$entry"
     fi
-done
 
-echo "<!-- END AUTO-INJECTED DOMAIN REFERENCES -->"
+    echo "<!-- END AUTO-INJECTED DOMAIN REFERENCE SECTION -->"
+}
+
+# --- 5. Emit stdout block ----------------------------------------------------
+collect_file_metadata
+
+case "$MODE" in
+    full)
+        emit_full
+        ;;
+    digest)
+        emit_digest
+        ;;
+    section)
+        emit_section
+        ;;
+esac
 
 # --- 6. Write trace JSON ----------------------------------------------------
 SOURCE_TYPE="${LOADER_SOURCE:-bash}"
@@ -180,6 +356,8 @@ TRACE_FILE="$TRACE_DIR/loaded.json"
 jq -n \
     --arg workflow "$WORKFLOW" \
     --arg loader_version "2.1" \
+    --arg loader_mode "$MODE" \
+    --arg bundle_sha256 "$BUNDLE_SHA" \
     --arg source "$SOURCE_TYPE" \
     --arg loaded_at "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
     --arg session_id "$SESSION_ID" \
@@ -187,6 +365,8 @@ jq -n \
     '{
         workflow: $workflow,
         loader_version: $loader_version,
+        loader_mode: $loader_mode,
+        bundle_sha256: $bundle_sha256,
         source: $source,
         loaded_at: $loaded_at,
         session_id: $session_id,

@@ -33,6 +33,7 @@ ET.register_namespace('wps', 'http://schemas.microsoft.com/office/word/2010/word
 
 DEFAULT_AUTHOR = 'Reviewer'
 DEFAULT_INITIALS = 'RV'
+FAILURE_RATE_THRESHOLD = 0.10
 
 
 def local_name(tag: str) -> str:
@@ -83,6 +84,16 @@ def load_reviewer_metadata(redlines: dict) -> dict:
             or DEFAULT_INITIALS
         ),
     }
+
+
+def normalize_risk_level(value) -> str:
+    if value is None:
+        return ''
+    return str(value).strip().lower()
+
+
+def is_critical_or_high(risk_level: str) -> bool:
+    return normalize_risk_level(risk_level) in {'critical', 'high'}
 
 
 def paragraph_text(paragraph: ET.Element) -> str:
@@ -321,35 +332,80 @@ def apply_redlines(document_xml_path: str, clause_map_path: str,
     mapping_lookup = {}
     for mapping in clause_map.get('mappings', []):
         if mapping.get('mapped'):
-            mapping_lookup[mapping['clause_id']] = mapping.get('paragraph_indices', [])
+            mapping_lookup[mapping['clause_id']] = mapping
 
     applied_count = 0
-    failed_count = 0
+    failures = []
     paragraphs_touched = 0
     now = datetime.now(timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ')
     reviewer = load_reviewer_metadata(redlines)
     next_revision_id = [make_revision_id(root)]
 
+    def record_failure(clause_id: str, redline_data: dict, reason: str, details: str | None = None) -> None:
+        mapping = mapping_lookup.get(clause_id, {})
+        risk_level = (
+            redline_data.get('risk_level')
+            or redline_data.get('risk')
+            or mapping.get('risk_level')
+            or mapping.get('risk')
+            or 'unknown'
+        )
+        failure = {
+            'entry_id': clause_id,
+            'clause_id': clause_id,
+            'risk': risk_level,
+            'reason': reason,
+        }
+        if details:
+            failure['details'] = details
+        failures.append(failure)
+
     for clause_id, redline_data in redlines.items():
-        if clause_id == '_meta' or not isinstance(redline_data, dict):
+        if clause_id == '_meta':
+            continue
+
+        if not isinstance(redline_data, dict):
+            record_failure(clause_id, {}, 'malformed_entry')
             continue
 
         suggested_text = redline_data.get('suggested_redline', '')
         if not suggested_text:
+            record_failure(clause_id, redline_data, 'missing_suggested_redline')
             continue
 
-        para_indices = mapping_lookup.get(clause_id, [])
+        mapping = mapping_lookup.get(clause_id, {})
+        para_indices = mapping.get('paragraph_indices', [])
         if not para_indices:
-            failed_count += 1
+            record_failure(clause_id, redline_data, 'mapping_missing')
+            continue
+
+        confidence = mapping.get('confidence')
+        if isinstance(confidence, (int, float)) and confidence < 0.85:
+            record_failure(
+                clause_id,
+                redline_data,
+                'mapping_low_confidence',
+                f'confidence={confidence}',
+            )
             continue
 
         target_paragraphs = split_redline_paragraphs(suggested_text)
         if len(target_paragraphs) == 1 and len(para_indices) > 1:
-            target_paragraphs = [suggested_text]
-            para_indices = para_indices[:1]
+            record_failure(
+                clause_id,
+                redline_data,
+                'paragraph_count_mismatch',
+                f'suggested paragraphs=1, mapped paragraphs={len(para_indices)}',
+            )
+            continue
         elif len(target_paragraphs) != len(para_indices):
-            para_indices = para_indices[:1]
-            target_paragraphs = [suggested_text]
+            record_failure(
+                clause_id,
+                redline_data,
+                'paragraph_count_mismatch',
+                f'suggested paragraphs={len(target_paragraphs)}, mapped paragraphs={len(para_indices)}',
+            )
+            continue
 
         clause_applied = False
         try:
@@ -370,9 +426,9 @@ def apply_redlines(document_xml_path: str, clause_map_path: str,
             if clause_applied:
                 applied_count += 1
             else:
-                failed_count += 1
-        except Exception:
-            failed_count += 1
+                record_failure(clause_id, redline_data, 'no_change_detected')
+        except Exception as exc:
+            record_failure(clause_id, redline_data, 'exception', str(exc))
 
     output_dir = os.path.dirname(output_path)
     if output_dir:
@@ -380,6 +436,11 @@ def apply_redlines(document_xml_path: str, clause_map_path: str,
     tree.write(output_path, encoding='UTF-8', xml_declaration=True)
 
     total_redlines = len([key for key in redlines.keys() if key != '_meta'])
+    failed_count = len(failures)
+    failed_critical_or_high = len([
+        failure for failure in failures if is_critical_or_high(failure.get('risk', ''))
+    ])
+    failure_rate = (failed_count / total_redlines) if total_redlines else 0
 
     # Fail-loud guard: if we had redline entries but applied zero, the pipeline
     # has a silent contract violation (schema mismatch, missing
@@ -397,6 +458,18 @@ def apply_redlines(document_xml_path: str, clause_map_path: str,
             '(3) clause-map.json is empty or mismatched. '
             'Check Step 7 output schema and Step 8 mapping coverage.'
         )
+    elif failed_critical_or_high > 0:
+        success = False
+        error_message = (
+            f'{failed_critical_or_high} Critical/High redline(s) failed to apply. '
+            'Pipeline must halt so high-risk edits are not silently dropped.'
+        )
+    elif total_redlines > 0 and failure_rate > FAILURE_RATE_THRESHOLD:
+        success = False
+        error_message = (
+            f'{failed_count} of {total_redlines} redline entries failed '
+            f'({failure_rate:.0%}), exceeding the {FAILURE_RATE_THRESHOLD:.0%} threshold.'
+        )
     elif total_redlines == 0:
         # No redlines to apply at all. This is a legitimate "nothing to do"
         # case, so we warn but do not halt.
@@ -408,6 +481,12 @@ def apply_redlines(document_xml_path: str, clause_map_path: str,
         'output_path': output_path,
         'applied_count': applied_count,
         'failed_count': failed_count,
+        'total_entries': total_redlines,
+        'applied_entries': applied_count,
+        'failed_entries': failed_count,
+        'failed_critical_or_high': failed_critical_or_high,
+        'failure_rate': round(failure_rate, 3),
+        'failures': failures,
         'total_redlines': total_redlines,
         'paragraphs_touched': paragraphs_touched,
         'reviewer': reviewer,

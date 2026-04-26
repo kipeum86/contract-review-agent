@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "DOCX Redline Suggestions Artifact",
+  "type": "object",
+  "properties": {
+    "_meta": {
+      "type": "object",
+      "properties": {
+        "reviewer_author": {"type": "string"},
+        "reviewer_initials": {"type": "string"}
+      }
+    }
+  },
+  "patternProperties": {
+    "^(?!_meta$).+$": {
+      "type": "object",
+      "required": ["suggested_redline"],
+      "properties": {
+        "suggested_redline": {"type": "string", "minLength": 1},
+        "risk_level": {
+          "type": "string",
+          "enum": ["critical", "high", "medium", "low", "acceptable"]
+        }
+      },
+      "additionalProperties": true
+    }
+  },
+  "additionalProperties": false
+}

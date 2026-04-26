@@ -52,31 +52,36 @@ For each target clause matched to a library clause:
 3. Determine playbook tier: preferred | acceptable | fallback | prohibited
 4. Assess whether modification is necessary
 
-Apply review mode (from `review-mode.yaml`):
-- **strict**: flag all deviations, only preferred is acceptable
-- **moderate**: flag Critical+High, preferred+acceptable tolerated
-- **loose**: flag Critical only, fallback is tolerated
+Apply review mode from `contract-review/library/policies/review-mode.yaml`.
+If the user-customized policy lacks v2 fields, inherit missing values from
+`contract-review/library/policies.default/review-mode.yaml`.
+
+Use:
+- `redline_scope` for redline suggestions
+- `external_comment_scope` for `[EXTERNAL]` comments
+- `internal_comment_scope` for `[INTERNAL]` comments
+- `acceptable_playbook_tiers` for playbook tolerance
 
 When no playbook exists, use matched template clause as baseline and set `playbook_missing: true`.
 
 ## Comment Generation (WF2 Step 7)
 
 ### External Comments (`[EXTERNAL]`)
-- Only for Critical and High risk clauses (expanded by review mode)
+- Only for risk levels included in the selected mode's `external_comment_scope`
 - Reuse from `comment-bank/external` when available
 - **MUST NOT** contain internal strategy, fallback positions, or leverage info
 - Must pass audience firewall check (see `audience-firewall.md`)
 - Run `scripts/validate-audience-firewall.py` on the final comment set before DOCX generation
 
 ### Internal Notes (`[INTERNAL]`)
-- For any clause with substantive observations
+- For risk levels included in the selected mode's `internal_comment_scope`
 - Include reasoning, strategy notes, fallback positions
 - Reference `comment-bank/internal` when available
 
 ### Redline Suggestions
 - Propose alternative clause text from the fallback ladder
-- Scope governed by review mode
-- Text must be in the contract's original language
+- Scope governed by the selected mode's `redline_scope`
+- Text language follows `.claude/policies/language-policy.yaml` (`contract_language`)
 
 ## Drafting (WF5 Steps 5-6)
 
@@ -91,19 +96,21 @@ When generating contracts using the drafting workflow:
 
 | Mode | Redline Scope | Acceptable Tier | Comments For |
 |------|--------------|-----------------|-------------|
-| strict | All deviations | preferred only | All levels |
-| moderate | Critical+High | preferred+acceptable | Critical+High+Medium |
-| loose | Critical only | preferred+acceptable+fallback | Critical+High |
+| strict | Critical+High+Medium+Low | preferred only | External: Critical+High+Medium / Internal: Critical+High+Medium+Low |
+| moderate | Critical+High | preferred+acceptable | External: Critical+High / Internal: Critical+High+Medium |
+| loose | Critical only | preferred+acceptable+fallback | External: Critical / Internal: Critical+High |
 
 ## Language Policy
+
+Canonical source: `.claude/policies/language-policy.yaml`.
 
 | Content | Language |
 |---------|----------|
 | Redline text | Contract's original language |
 | `[EXTERNAL]` comments | Contract's original language |
 | `[INTERNAL]` comments | Report language |
-| Analysis report | User-specified or prompt language |
-| Terminal output | Prompt language |
+| Analysis report | Report language |
+| Terminal output | User prompt language |
 
 ## Matter Context
 

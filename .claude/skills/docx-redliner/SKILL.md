@@ -6,7 +6,8 @@ Apply tracked changes and comments to DOCX files via XML manipulation.
 
 1. **Clause-to-DOCX Mapping** (`scripts/map-clauses-to-docx.py`)
    - Maps analyzed clauses to `<w:p>` positions in original DOCX
-   - Uses text matching with fuzzy fallback
+   - Uses exact span / first-sentence / high-confidence fuzzy matching
+   - Emits `coverage_status` (`proceed`, `partial`, `halt`), `unmapped_clause_ids`, `confidence`, and `match_method`
    - Usage: `python3 map-clauses-to-docx.py <clauses_dir> <docx_path> <output.json>`
    - Target: ≥ 90% coverage
 
@@ -14,6 +15,8 @@ Apply tracked changes and comments to DOCX files via XML manipulation.
    - Inserts partial `<w:del>` / `<w:ins>` tracked changes while preserving unchanged prefix/suffix text
    - Reviewer author/initials can come from `redlines.json` `_meta` or `DOCX_REVIEWER_*` env vars
    - Preserves unrelated existing revisions/comments in untouched paragraphs
+   - Fails closed when any Critical/High redline fails, more than 10% of entries fail, or mapped/suggested paragraph counts do not align
+   - Emits structured `failures[]` with clause id, risk, and reason
    - Usage: `python3 apply-redlines.py <document.xml> <clause-map.json> <redlines.json> <output.xml>`
 
 3. **Comment Application** (`scripts/apply-comments.py`)
@@ -22,6 +25,8 @@ Apply tracked changes and comments to DOCX files via XML manipulation.
    - Ensures `document.xml.rels` and `[Content_Types].xml` contain the required comments part wiring
    - Reviewer author/initials can come from `comments.json` `_meta` or `DOCX_REVIEWER_*` env vars
    - Prefixes: `[INTERNAL]` or `[EXTERNAL]`
+   - Fails closed when any `[EXTERNAL]` comment fails or more than 10% of comments fail to insert
+   - Emits structured `failures[]` with clause id, comment id, audience, and reason
    - Usage: `python3 apply-comments.py <unpacked_dir> <clause-map.json> <comments.json>`
 
 4. **Redline Extraction** (`scripts/extract-redlines.py`)
@@ -69,8 +74,9 @@ Original DOCX
 
 ## Comment Placement Rules
 
-- `[EXTERNAL]`: Only on Critical and High risk clauses. No internal strategy content.
-- `[INTERNAL]`: On any clause with substantive observations. Contains reasoning, fallback positions, negotiation notes.
+- `[EXTERNAL]`: only when the selected review mode's `external_comment_scope` includes the clause risk level. No internal strategy content.
+- `[INTERNAL]`: only when the selected review mode's `internal_comment_scope` includes the clause risk level. Contains reasoning, fallback positions, negotiation notes.
+- Comment language follows `.claude/policies/language-policy.yaml`: `[EXTERNAL]` in contract language, `[INTERNAL]` in report language.
 - Not every redline needs a comment — comments are for items needing explanation.
 
 ## External-Clean Generation

@@ -18,6 +18,8 @@ Manage library indexes for document and clause retrieval.
    - Freshness rules: downrank or exclude stale records
    - Ranking honors `retrieval-priority.yaml` priority buckets, language preference, and affinity-family expansion
    - Usage: `python3 query-index.py query '{"contract_family":"nda"}'`
+   - Token-efficient review usage: `python3 query-index.py query '{"contract_family":"nda","target_clauses":[{"clause_type":"confidentiality"}],"summary_only":true,"top_k":5}'`
+   - Hydrate selected candidates only: pass `hydrate_candidate_ids:["doc_id::clause_id"]`
    - Search: `python3 query-index.py search '{"query_text":"liability","clause_type":"limitation_of_liability"}'`
    - Redline patterns: `python3 query-index.py redline-patterns '{"contract_family":"safe","clause_type":"indemnification"}'`
 
@@ -53,9 +55,10 @@ Manage library indexes for document and clause retrieval.
 
 When performing library candidate retrieval for a review:
 
-1. Call `query-index.py query` with the target's `contract_family`, optional `jurisdiction` and `governing_law`
+1. Call `query-index.py query` with the target's `contract_family`, optional `jurisdiction` and `governing_law`, plus `summary_only: true` and `top_k: 5`
 2. Pass `target_clauses` as a list of `{clause_type}` dicts for per-clause narrowing
 3. Optionally pass `language` to soft-prefer same-language candidates without excluding null-language records
 4. If exact-family coverage is thin, query expansion can include configured affinity families with a ranking penalty
 5. If `library_empty` is true, or `general_review_mode` is true, or `total_candidates == 0`, proceed in **general review mode**
-6. Pass filtered candidates to LLM for semantic matching (Stage 3)
+6. Pass compact candidate summaries to LLM for semantic matching (Stage 3)
+7. Re-query with `hydrate_candidate_ids` for only the selected candidates that need full text

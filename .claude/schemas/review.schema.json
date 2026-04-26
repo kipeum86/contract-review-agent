@@ -1,0 +1,122 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Contract Review Report Artifact",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "report_language",
+    "review_mode",
+    "contract_info",
+    "executive_summary",
+    "clauses"
+  ],
+  "properties": {
+    "schema_version": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "report_language": {
+      "type": "string",
+      "enum": ["ko", "en"]
+    },
+    "review_mode": {
+      "type": "string",
+      "enum": ["strict", "moderate", "loose"]
+    },
+    "general_review_mode": {
+      "type": "boolean"
+    },
+    "contract_info": {
+      "type": "object",
+      "required": ["title", "contract_family", "language"],
+      "properties": {
+        "title": {"type": "string", "minLength": 1},
+        "contract_family": {"type": "string", "minLength": 1},
+        "language": {"type": "string", "enum": ["ko", "en"]},
+        "jurisdiction": {"type": "string"},
+        "governing_law": {"type": "string"},
+        "parties": {"type": "array"}
+      }
+    },
+    "executive_summary": {
+      "type": "object",
+      "required": [
+        "overview",
+        "overall_risk",
+        "risk_distribution",
+        "key_issues",
+        "negotiation_priority",
+        "review_notes"
+      ],
+      "properties": {
+        "overview": {"type": "string", "minLength": 1},
+        "overall_risk": {
+          "type": "string",
+          "enum": ["critical", "high", "medium", "low", "acceptable"]
+        },
+        "risk_distribution": {
+          "type": "object",
+          "required": ["critical", "high", "medium", "low", "acceptable"],
+          "properties": {
+            "critical": {"type": "integer", "minimum": 0},
+            "high": {"type": "integer", "minimum": 0},
+            "medium": {"type": "integer", "minimum": 0},
+            "low": {"type": "integer", "minimum": 0},
+            "acceptable": {"type": "integer", "minimum": 0}
+          }
+        },
+        "key_issues": {
+          "type": "array",
+          "items": {"type": "string"}
+        },
+        "negotiation_priority": {
+          "type": "object",
+          "required": ["must_haves", "should_haves", "nice_to_haves"],
+          "properties": {
+            "must_haves": {"type": "array", "items": {"type": "string"}},
+            "should_haves": {"type": "array", "items": {"type": "string"}},
+            "nice_to_haves": {"type": "array", "items": {"type": "string"}}
+          }
+        },
+        "review_notes": {
+          "type": "array",
+          "items": {"type": "string"}
+        },
+        "recommendation": {"type": "string"}
+      }
+    },
+    "clauses": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "clause_id",
+          "heading",
+          "clause_type",
+          "risk_level",
+          "risk_rationale"
+        ],
+        "properties": {
+          "clause_id": {"type": "string", "minLength": 1},
+          "section_no": {"type": "string"},
+          "heading": {"type": "string", "minLength": 1},
+          "clause_type": {"type": "string", "minLength": 1},
+          "risk_level": {
+            "type": "string",
+            "enum": ["critical", "high", "medium", "low", "acceptable"]
+          },
+          "risk_rationale": {"type": "string", "minLength": 1},
+          "divergence": {"type": "string"},
+          "playbook_tier": {
+            "type": "string",
+            "enum": ["preferred", "acceptable", "fallback", "prohibited", "missing"]
+          },
+          "playbook_missing": {"type": "boolean"},
+          "suggested_action": {"type": "string"},
+          "suggested_redline": {"type": "string"},
+          "internal_note": {"type": "string"}
+        }
+      }
+    }
+  }
+}

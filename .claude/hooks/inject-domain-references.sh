@@ -7,9 +7,9 @@
 # (NOT file content — see Architecture v2.1 for the 10K cap rationale) into
 # the LLM context via additionalContext.
 #
-# The LLM then runs the bash command itself; the loader script's stdout
-# (full reference file content) returns through the Bash tool, which has
-# no size cap.
+# The LLM then runs the bash command itself. The default hook path uses digest
+# mode so only hashes/headings are injected; agents load specific sections on
+# demand.
 #
 # Part of the Domain Reference Forced-Load Architecture (v2.1).
 #
@@ -135,11 +135,11 @@ fi
 # unproven defensive code into well-functioning workflows.
 case "$WORKFLOW" in
     review)
-        INSTRUCTION="[BLOCKING PRECONDITION] Before ANY other action (including AskUserQuestion and Pre-Pipeline questions), you MUST run this Bash command as your very first tool call:
+        INSTRUCTION="[BLOCKING PRECONDITION] Before ANY other action (including AskUserQuestion and Pre-Pipeline questions), you MUST run this token-efficient digest Bash command as your very first tool call:
 
-bash $LOADER_REL review
+bash $LOADER_REL review --mode=digest
 
-Reason: authoritative contract review baselines (review-guide.md, audience-firewall.md) must be loaded into context before analysis. The user has customized these files for their specific practice — pretrained knowledge will diverge and is not an acceptable substitute. Do NOT skip this step. Do NOT rationalize that you already know the concepts. Run the Bash command, read the output, then proceed with Pre-Pipeline questions."
+Reason: authoritative contract review baselines (review-guide.md, audience-firewall.md) must be verified before analysis. The user has customized these files for their specific practice — pretrained knowledge will diverge and is not an acceptable substitute. Do NOT skip this step. Do NOT rationalize that you already know the concepts. Run the digest command, read the output, then proceed with Pre-Pipeline questions. Before Step 6 analysis, load only needed sections with --mode=section; use --mode=full only when section retrieval is insufficient."
         ;;
     draft)
         # Lightweight — no BLOCKING, just a hint

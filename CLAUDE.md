@@ -63,9 +63,9 @@ When routing a review (or re-review) request to `review-agent`, you (the root ag
 
 2. If `BASELINE_READY`: nothing to do, the hook path already injected references. Proceed to dispatch.
 
-3. If `BASELINE_STALE` or `BASELINE_MISSING`: run the loader once before dispatching. The loader's stdout enters your own context, but that is fine — review-agent will re-discover the same `loaded.json` via its own `ls -t`:
+3. If `BASELINE_STALE` or `BASELINE_MISSING`: run the digest loader once before dispatching. The loader's stdout enters your own context, but only as a compact digest; review-agent will re-discover the same `loaded.json` via its own `ls -t` and load specific sections on demand:
    ```bash
-   LOADER_SOURCE=root-dispatch bash .claude/scripts/load-domain-references.sh review
+   LOADER_SOURCE=root-dispatch bash .claude/scripts/load-domain-references.sh review --mode=digest
    ```
 
 4. Dispatch review-agent as usual. Optionally include a line in the dispatch prompt: "Baseline trace exists at the most recent `contract-review/library/runs/sessions/*/loaded.json` — review-agent will discover and verify it in Pre-Pipeline 0 / Step 1.5 / Step 5.5."

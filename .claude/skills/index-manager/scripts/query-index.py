@@ -38,9 +38,73 @@ def hydrate_candidates_text(candidates: dict, texts: dict) -> None:
     """Add 'text' field to each candidate from the clause-texts lookup."""
     for clause_list in candidates.values():
         for clause in clause_list:
-            key = f"{clause.get('doc_id')}::{clause.get('clause_id')}"
+            key = candidate_id(clause)
             if 'text' not in clause and key in texts:
                 clause['text'] = texts[key]
+
+
+def hydrate_selected_candidates_text(candidates: dict, texts: dict,
+                                     selected_ids: set[str]) -> None:
+    """Hydrate only explicitly selected candidate IDs."""
+    for clause_list in candidates.values():
+        for clause in clause_list:
+            key = candidate_id(clause)
+            if key in selected_ids and 'text' not in clause and key in texts:
+                clause['text'] = texts[key]
+
+
+def candidate_id(candidate: dict) -> str:
+    return f"{candidate.get('doc_id')}::{candidate.get('clause_id')}"
+
+
+def summarize_candidate(candidate: dict) -> dict:
+    """Return a compact candidate payload for LLM first-pass matching."""
+    summary_bits = [
+        candidate.get('heading') or candidate.get('title') or candidate.get('clause_id') or '',
+        candidate.get('clause_type') or '',
+        candidate.get('priority_bucket') or candidate.get('authority_level') or '',
+    ]
+    summary = ' | '.join(bit for bit in summary_bits if bit)
+    record = {
+        'candidate_id': candidate_id(candidate),
+        'doc_id': candidate.get('doc_id'),
+        'clause_id': candidate.get('clause_id'),
+        'heading': candidate.get('heading'),
+        'clause_type': candidate.get('clause_type'),
+        'contract_family': candidate.get('contract_family'),
+        'source_contract_family': candidate.get('source_contract_family'),
+        'doc_class': candidate.get('doc_class'),
+        'authority_level': candidate.get('authority_level'),
+        'approval_state': candidate.get('approval_state'),
+        'status': candidate.get('status'),
+        'priority_bucket': candidate.get('priority_bucket'),
+        'priority_rank': candidate.get('priority_rank'),
+        'family_match_type': candidate.get('family_match_type'),
+        'language': candidate.get('language'),
+        'summary': summary,
+    }
+    if 'text' in candidate:
+        record['text'] = candidate['text']
+        record['hydrated'] = True
+    else:
+        record['hydrated'] = False
+    return {key: value for key, value in record.items() if value is not None}
+
+
+def cap_candidates(candidates: dict, top_k: int | None) -> dict:
+    if not top_k or top_k <= 0:
+        return candidates
+    return {
+        clause_type: clause_list[:top_k]
+        for clause_type, clause_list in candidates.items()
+    }
+
+
+def summarize_candidates(candidates: dict) -> dict:
+    return {
+        clause_type: [summarize_candidate(candidate) for candidate in clause_list]
+        for clause_type, clause_list in candidates.items()
+    }
 
 
 def load_yaml(path: str) -> dict | None:
@@ -207,6 +271,7 @@ def enrich_candidates(candidates: list, requested_language: str | None,
     enriched = []
     for candidate in candidates:
         record = dict(candidate)
+        record['candidate_id'] = candidate_id(record)
         priority_bucket = classify_priority_bucket(record)
         record['priority_bucket'] = priority_bucket
         record['priority_rank'] = priority_ranks.get(priority_bucket, default_priority_rank)
@@ -276,7 +341,9 @@ def resolve_affinity_candidates(all_clauses: list, contract_family: str,
 
 def query(contract_family: str, target_clauses: list = None,
           jurisdiction: str = None, governing_law: str = None,
-          external_context: bool = False, language: str = None) -> dict:
+          external_context: bool = False, language: str = None,
+          summary_only: bool = False, top_k: int | None = None,
+          hydrate_candidate_ids: list[str] | None = None) -> dict:
     """Run the full retrieval pipeline.
 
     Args:
@@ -286,6 +353,9 @@ def query(contract_family: str, target_clauses: list = None,
         governing_law: optional governing law filter
         external_context: if True, exclude external_unsafe records
         language: optional requested language for soft ranking preference
+        summary_only: return compact candidate records without full text
+        top_k: cap candidates per clause type
+        hydrate_candidate_ids: selected candidate IDs to hydrate with text
 
     Returns:
         dict with candidates per clause type and overall stats
@@ -385,10 +455,14 @@ def query(contract_family: str, target_clauses: list = None,
                 per_clause = [c for c in combined_candidates if c.get('clause_type') == ct]
             # If no exact match, include the full ranked candidate set for LLM matching
             if not per_clause:
-                per_clause = combined_candidates
+                per_clause = combined_candidates[:top_k] if summary_only and top_k else combined_candidates
             candidates[ct] = per_clause
     else:
         candidates['_all'] = combined_candidates
+
+    if summary_only and (not top_k or top_k <= 0):
+        top_k = 5
+    candidates = cap_candidates(candidates, top_k)
 
     total = sum(len(v) for v in candidates.values())
     general_review_mode = total == 0
@@ -402,11 +476,20 @@ def query(contract_family: str, target_clauses: list = None,
             'Proceeding in general review mode without house position comparison.'
         )
 
-    # Hydrate text for final candidates from separate clause-texts index
+    selected_ids = set(hydrate_candidate_ids or [])
+
+    # Hydrate text for final candidates from separate clause-texts index.
+    # Summary mode stays compact unless explicit candidate IDs are selected.
     if total > 0:
         texts = load_clause_texts()
         if texts:
-            hydrate_candidates_text(candidates, texts)
+            if selected_ids:
+                hydrate_selected_candidates_text(candidates, texts, selected_ids)
+            elif not summary_only:
+                hydrate_candidates_text(candidates, texts)
+
+    if summary_only:
+        candidates = summarize_candidates(candidates)
 
     return {
         'success': True,
@@ -422,6 +505,9 @@ def query(contract_family: str, target_clauses: list = None,
         'affinity_expanded': affinity_expanded,
         'affinity_families': affinity_families,
         'total_candidates': total,
+        'summary_only': summary_only,
+        'top_k': top_k,
+        'hydrated_candidate_ids': sorted(selected_ids),
         'candidates': candidates,
     }
 
