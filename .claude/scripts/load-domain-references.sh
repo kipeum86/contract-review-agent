@@ -4,13 +4,14 @@
 #
 # Loads domain reference files (review-guide.md, audience-firewall.md, etc.)
 # into the LLM context via Bash tool stdout. Writes a forensic trace JSON
-# to contract-review/library/runs/sessions/{session_id}/loaded.json.
+# to contract-review/library/runs/sessions/{session_id}/loaded.json by default,
+# or to a caller-provided trace directory.
 #
-# Part of the Domain Reference Forced-Load Architecture (v2.1).
+# Part of the Domain Reference Forced-Load Architecture (v2.2).
 # Detailed architecture history is kept in the local-only workspace docs.
 #
 # Usage:
-#   bash .claude/scripts/load-domain-references.sh <workflow> [--mode=full|digest|section] [--section=<heading>] [--file=<name>]
+#   bash .claude/scripts/load-domain-references.sh <workflow> [--mode=full|digest|section] [--section=<heading>] [--file=<name>] [--session-id=<id>] [--trace-dir=<path>]
 #
 # Workflows:
 #   review  → review-guide.md + audience-firewall.md
@@ -20,6 +21,8 @@
 # Environment variables (optional):
 #   LOADER_SOURCE       Source label written to trace ("hook" | "agent-prepipe" |
 #                       "agent-step5.5" | "root-dispatch" | "chunk-N" | "bash")
+#   CONTRACT_REVIEW_SESSION_ID
+#                       Explicit session id when --session-id is omitted.
 #   CLAUDE_PROJECT_DIR  Override repo root detection (otherwise auto-derived)
 #
 # Exit codes:
@@ -48,6 +51,8 @@ WORKFLOW="$1"
 MODE="full"
 SECTION=""
 SECTION_FILE=""
+REQUESTED_SESSION_ID=""
+REQUESTED_TRACE_DIR=""
 shift
 
 for arg in "$@"; do
@@ -61,9 +66,15 @@ for arg in "$@"; do
         --file=*)
             SECTION_FILE="${arg#--file=}"
             ;;
+        --session-id=*)
+            REQUESTED_SESSION_ID="${arg#--session-id=}"
+            ;;
+        --trace-dir=*)
+            REQUESTED_TRACE_DIR="${arg#--trace-dir=}"
+            ;;
         *)
             echo "ERROR: unknown option '$arg'" >&2
-            echo "  Usage: load-domain-references.sh <workflow> [--mode=full|digest|section] [--section=<heading>] [--file=<name>]" >&2
+            echo "  Usage: load-domain-references.sh <workflow> [--mode=full|digest|section] [--section=<heading>] [--file=<name>] [--session-id=<id>] [--trace-dir=<path>]" >&2
             exit 1
             ;;
     esac
@@ -97,13 +108,28 @@ case "$WORKFLOW" in
         ;;
 esac
 
-# --- 3. Self-generated session ID (no env var dependency) --------------------
-# We deliberately do NOT rely on $CONTRACT_REVIEW_SESSION_ID or any Claude Code
-# session identifier — those do not propagate reliably across sub-agent dispatch.
-# Each invocation creates its own timestamped + PID + random session dir.
-# AGENT.md Step 1.5 uses `ls -t` to discover the most recent loaded.json.
-SESSION_ID="$(date -u +%Y%m%dT%H%M%SZ)-$$-${RANDOM:-0}"
-TRACE_DIR="$REPO_ROOT/contract-review/library/runs/sessions/$SESSION_ID"
+# --- 3. Session ID + trace directory -----------------------------------------
+# Callers should pass --session-id and --trace-dir once the matter working
+# directory exists. The env var is a fallback for shell-only workflows; the
+# generated ID preserves backward-compatible manual usage.
+SESSION_ID="${REQUESTED_SESSION_ID:-${CONTRACT_REVIEW_SESSION_ID:-}}"
+if [ -z "$SESSION_ID" ]; then
+    SESSION_ID="$(date -u +%Y%m%dT%H%M%SZ)-$$-${RANDOM:-0}"
+fi
+
+if [[ ! "$SESSION_ID" =~ ^[A-Za-z0-9_.-]+$ ]]; then
+    echo "ERROR: invalid session id '$SESSION_ID' (allowed: A-Z a-z 0-9 _ . -)" >&2
+    exit 1
+fi
+
+if [ -n "$REQUESTED_TRACE_DIR" ]; then
+    case "$REQUESTED_TRACE_DIR" in
+        /*) TRACE_DIR="$REQUESTED_TRACE_DIR" ;;
+        *) TRACE_DIR="$REPO_ROOT/$REQUESTED_TRACE_DIR" ;;
+    esac
+else
+    TRACE_DIR="$REPO_ROOT/contract-review/library/runs/sessions/$SESSION_ID"
+fi
 mkdir -p "$TRACE_DIR" || {
     echo "ERROR: failed to create trace dir $TRACE_DIR" >&2
     exit 2
@@ -355,7 +381,7 @@ TRACE_FILE="$TRACE_DIR/loaded.json"
 
 jq -n \
     --arg workflow "$WORKFLOW" \
-    --arg loader_version "2.1" \
+    --arg loader_version "2.2" \
     --arg loader_mode "$MODE" \
     --arg bundle_sha256 "$BUNDLE_SHA" \
     --arg source "$SOURCE_TYPE" \

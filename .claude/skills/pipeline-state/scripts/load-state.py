@@ -3,8 +3,12 @@
 
 import json
 import os
+import re
 import sys
+from datetime import datetime, timezone
 
+
+SCHEMA_VERSION = 2
 
 # Total steps per pipeline type
 PIPELINE_STEPS = {
@@ -13,6 +17,57 @@ PIPELINE_STEPS = {
     'rereview': 7,
     'drafting': 8,
 }
+
+
+def sanitize_session_part(value: object) -> str:
+    cleaned = re.sub(r"[^A-Za-z0-9_.-]+", "-", str(value or "unknown")).strip("-")
+    return cleaned or "unknown"
+
+
+def generate_session_id(pipeline: str, matter_id: str, round_num: int) -> str:
+    timestamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
+    parts = [
+        sanitize_session_part(pipeline),
+        sanitize_session_part(matter_id),
+        f"round-{int(round_num or 1)}",
+        timestamp,
+        str(os.getpid()),
+    ]
+    return "-".join(parts)
+
+
+def migrate_state(state: dict) -> tuple[dict, bool]:
+    """Return a v2-compatible state object and whether migration was needed."""
+    migrated = dict(state or {})
+    original_version = migrated.get("schema_version")
+    pipeline = migrated.get("pipeline") or "review"
+    matter_id = migrated.get("matter_id") or "unknown"
+    round_num = int(migrated.get("round") or 1)
+
+    migrated["schema_version"] = SCHEMA_VERSION
+    migrated["pipeline"] = pipeline
+    migrated["matter_id"] = matter_id
+    migrated["round"] = round_num
+    migrated["last_completed_step"] = int(migrated.get("last_completed_step", 0) or 0)
+    migrated["step_artifacts"] = (
+        migrated.get("step_artifacts")
+        if isinstance(migrated.get("step_artifacts"), dict)
+        else {}
+    )
+    migrated["metrics"] = (
+        migrated.get("metrics")
+        if isinstance(migrated.get("metrics"), dict)
+        else {}
+    )
+    migrated["session_id"] = (
+        migrated.get("session_id")
+        or generate_session_id(pipeline, matter_id, round_num)
+    )
+    now = datetime.now(timezone.utc).isoformat()
+    migrated["started_at"] = migrated.get("started_at") or now
+    migrated["updated_at"] = migrated.get("updated_at") or now
+
+    return migrated, original_version != SCHEMA_VERSION
 
 
 def resolve_output_path(state_path: str, output_path: str) -> str:
@@ -132,6 +187,13 @@ def load_state(state_path: str) -> dict:
         "verified_through_step": 0,
         "is_complete": False,
         "message": None,
+        "schema_version": None,
+        "session_id": None,
+        "migration": {
+            "migrated": False,
+            "from_schema_version": None,
+            "to_schema_version": SCHEMA_VERSION,
+        },
         "artifact_verification": {
             "checked_steps": 0,
             "failed_checks": 0,
@@ -154,7 +216,16 @@ def load_state(state_path: str) -> dict:
         return result
 
     result["exists"] = True
+    from_schema_version = state.get("schema_version")
+    state, migrated = migrate_state(state)
     result["state"] = state
+    result["schema_version"] = state["schema_version"]
+    result["session_id"] = state["session_id"]
+    result["migration"] = {
+        "migrated": migrated,
+        "from_schema_version": from_schema_version,
+        "to_schema_version": SCHEMA_VERSION,
+    }
 
     pipeline = state.get("pipeline", "review")
     total_steps = PIPELINE_STEPS.get(pipeline, 12)
@@ -168,7 +239,13 @@ def load_state(state_path: str) -> dict:
 
     earliest_invalid_step = verification["earliest_invalid_step"]
     if earliest_invalid_step is not None:
-        invalid_check = verification["checks"][-1]
+        invalid_check = next(
+            (
+                check for check in verification["checks"]
+                if check["step"] == earliest_invalid_step
+            ),
+            verification["checks"][-1],
+        )
         result["resume_from"] = earliest_invalid_step
         result["message"] = (
             f"Pipeline '{pipeline}' recorded completion through Step {last_completed}, "

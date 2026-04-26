@@ -8,9 +8,12 @@ Manage pipeline state persistence for resume support and round-level diffs.
    - Writes/updates `pipeline-state.json` after each step completion
    - Usage: `python3 save-state.py '<json_params>'`
    - Parameters: `state_path`, `pipeline`, `matter_id`, `round_num`, `step`, `step_name`, `status`, `output`, `review_mode`
+   - Optional v2 parameters: `session_id`, `validation`, `metrics`, `error`
+   - Reads v1 state and writes back v2-compatible state without changing the file name
 
 2. **Load State** (`scripts/load-state.py`)
    - Reads state and determines resume point
+   - Migrates v1 state in memory for resume decisions
    - Usage: `python3 load-state.py <state_path>`
    - Exit code 2 = resumable pipeline found
 
@@ -29,9 +32,11 @@ Manage pipeline state persistence for resume support and round-level diffs.
 
 ```json
 {
+  "schema_version": 2,
   "pipeline": "review",
   "matter_id": "deal-2026-001",
   "round": 1,
+  "session_id": "review-deal-2026-001-round-1-20260306T100000Z",
   "last_completed_step": 7,
   "review_mode": "moderate",
   "step_artifacts": {
@@ -39,8 +44,17 @@ Manage pipeline state persistence for resume support and round-level diffs.
       "name": "Target document normalization",
       "status": "completed",
       "output": "working/normalized/clean.md",
-      "completed_at": "2026-03-06T10:00:00Z"
+      "completed_at": "2026-03-06T10:00:00Z",
+      "validation": {
+        "artifact_exists": true
+      }
     }
+  },
+  "metrics": {
+    "reference_full_load_count": 0,
+    "reference_tokens_estimated": 1200,
+    "retrieval_tokens_estimated": 900,
+    "hydrated_candidate_count": 3
   },
   "started_at": "2026-03-06T10:00:00Z",
   "updated_at": "2026-03-06T10:45:00Z"
@@ -62,3 +76,5 @@ Manage pipeline state persistence for resume support and round-level diffs.
 ## State Save Timing
 
 Save state **after** each step completes successfully, **before** moving to the next step. State save failure is non-blocking — log a warning and proceed.
+
+For failed steps, save `status: "failed"` with `error` and any available `validation` summary before halting. Use the same `session_id` for `pipeline-state.json`, reference loader traces, and matter-level `working/traces/<session_id>/loaded.json`.
