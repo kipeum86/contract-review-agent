@@ -1,0 +1,31 @@
+version: 1
+description: Patterns that must not remain in an external-clean DOCX.
+blocked_patterns:
+  - id: internal_marker
+    category: audience_marker
+    pattern: "\\[INTERNAL\\]"
+    reason: "internal audience marker remains"
+  - id: internal_only
+    category: internal_strategy
+    pattern: "\\binternal\\s+only\\b"
+    reason: "internal-only wording remains"
+  - id: fallback
+    category: negotiation_strategy
+    pattern: "\\bfallback\\b"
+    reason: "fallback position language remains"
+  - id: leverage
+    category: negotiation_strategy
+    pattern: "\\bleverage\\b"
+    reason: "leverage language remains"
+  - id: concession
+    category: negotiation_strategy
+    pattern: "\\bconcession\\b"
+    reason: "concession language remains"
+  - id: client_only
+    category: internal_strategy
+    pattern: "\\bclient[-\\s]+only\\b"
+    reason: "client-only wording remains"
+  - id: negotiation_strategy
+    category: negotiation_strategy
+    pattern: "\\bnegotiation\\s+strategy\\b"
+    reason: "negotiation strategy language remains"
