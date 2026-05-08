@@ -438,11 +438,9 @@ inbox/raw/  ──>  validate  ──>  classify  ──>  segment  ──>  app
 
 | 저장소 식별자 | 역할 | 전문 분야 |
 |---------|----------|----------|
-| `game-legal-research` | 게임 산업 법률 스페셜리스트 | 게임 산업법 |
+| `legal-research-agent` | 법률 리서치 스페셜리스트 | 법률 리서치 |
 | `legal-translation-agent` | 법률 번역 스페셜리스트 | 법률 번역 |
-| `general-legal-research` | 법률 리서치 스페셜리스트 | 법률 리서치 |
-| `PIPA-expert` | 개인정보보호 스페셜리스트 | 개인정보보호법 |
-| `GDPR-expert` | GDPR 스페셜리스트 | GDPR / EU 개인정보보호 |
+| `data-protection-agent` | 데이터 보호 스페셜리스트 | 데이터 보호 |
 | **`contract-review-agent`** | **계약 검토 스페셜리스트** | **계약서 검토** |
 | `legal-writing-agent` | 법률 문서 작성 스페셜리스트 | 법률 문서 작성 |
 | `second-review-agent` | 시니어 리뷰 스페셜리스트 | 품질 리뷰 |

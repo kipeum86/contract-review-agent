@@ -379,11 +379,9 @@ Representative repositories in the ecosystem are listed below by repository ID:
 
 | Repository ID | Role | Focus |
 |-------|---------|-------|
-| `game-legal-research` | Game Industry Legal Specialist | Game industry law |
+| `legal-research-agent` | Legal Research Specialist | Legal research |
 | `legal-translation-agent` | Legal Translation Specialist | Legal translation |
-| `general-legal-research` | Legal Research Specialist | Legal research |
-| `PIPA-expert` | Korea Privacy Law Specialist | Data privacy law |
-| `GDPR-expert` | GDPR Specialist | GDPR / EU data privacy law |
+| `data-protection-agent` | Data Protection Specialist | Data protection |
 | **`contract-review-agent`** | **Contract Review Specialist** | **Contract review** |
 | `legal-writing-agent` | Legal Drafting Specialist | Legal writing |
 | `second-review-agent` | Senior Review Specialist | Quality review |
