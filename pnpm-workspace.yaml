@@ -1,0 +1,16 @@
+packages:
+  - .
+minimumReleaseAge: 10080
+blockExoticSubdeps: true
+strictDepBuilds: true
+trustPolicy: no-downgrade
+ignoreScripts: false
+allowBuilds:
+  "@swc/core": true
+  esbuild: true
+  sharp: true
+  unrs-resolver: true
+  "@google/genai": false
+  ljharb-monorepo-symlink-test: false
+  msw: false
+  protobufjs: false
