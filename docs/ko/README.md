@@ -317,7 +317,7 @@ inbox/raw/  ──>  validate  ──>  classify  ──>  segment  ──>  app
 │   │   │   └── redline-records/ #   레드라인 계약서 (리뷰 패턴 데이터)
 │   │   ├── quarantine/          # 실패 / 거절된 항목 (gitignored)
 │   │   ├── sources/             # 참조 소스 (법령, 판례, 샘플 양식 등)
-│   │   ├── indexes/             # JSON 인덱스 (자동 관리)
+│   │   ├── indexes/             # 로컬 생성 JSON 인덱스 (gitignored)
 │   │   ├── policies/            # 커스텀 설정 (gitignored)
 │   │   ├── policies.default/    # 기본값 (수정 금지)
 │   │   └── runs/
@@ -355,7 +355,7 @@ inbox/raw/  ──>  validate  ──>  classify  ──>  segment  ──>  app
 | `retrieval-priority.yaml` | 검색 랭킹, 계약군 간 매칭을 위한 친화 그룹 | 선택 |
 | `metadata-schema.yaml` | 메타데이터 필드 정의 (이중언어 지원, 산업 태그 등) | 선택 |
 
-정책 파일은 에이전트에게 **읽기 전용**입니다. 수정은 사용자만 하며, `indexes/`는 에이전트가 자동으로 관리합니다.
+정책 파일은 에이전트에게 **읽기 전용**입니다. 수정은 사용자만 하며, `indexes/`는 에이전트가 로컬 생성 산출물로 자동 관리합니다. 인덱스 JSON은 로컬 라이브러리 자산에서 파생된 본문/메타데이터를 포함할 수 있어 gitignore 처리됩니다.
 
 ---
 

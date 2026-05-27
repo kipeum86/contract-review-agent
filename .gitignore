@@ -135,6 +135,11 @@ __pycache__/
 /contract-review/library/quarantine/*
 !/contract-review/library/quarantine/.gitkeep
 
+# Generated library indexes (local-only; rebuild from local approved assets)
+/contract-review/library/indexes/*.json
+!/contract-review/library/indexes/.gitkeep
+!/contract-review/library/indexes/README.md
+
 # User-customized policies (gitignored — defaults ship in policies.default/)
 /contract-review/library/policies/*
 !/contract-review/library/policies/.gitkeep

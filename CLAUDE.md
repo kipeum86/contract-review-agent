@@ -149,7 +149,7 @@ Source `.claude/scripts/workspace-paths.sh` before runtime filesystem work. New 
 | `contract-review/library/staging/` | Yes | Yes | Ingestion intermediate storage |
 | `contract-review/library/quarantine/` | Yes | Yes | Failed/rejected assets |
 | `contract-review/library/approved/` | Yes | Yes (publish only) | Only via publish step (templates, precedents, redline-records) |
-| `contract-review/library/indexes/` | Yes | Yes | Index build/rebuild |
+| `contract-review/library/indexes/` | Yes | Yes | Local generated index build/rebuild; JSON outputs are gitignored |
 | `contract-review/library/policies/` | Yes | No | User-managed config (gitignored — defaults in `policies.default/`) |
 | `contract-review/library/policies.default/` | Yes | No | Shipped defaults — do not modify |
 | `contract-review/workspace/matters/` | Yes | Yes | Preferred matter working directories |
@@ -164,5 +164,6 @@ Source `.claude/scripts/workspace-paths.sh` before runtime filesystem work. New 
 | Script runtime error | Log error, show message to user, halt pipeline |
 | LLM parse failure | Retry ×1 with format emphasis. Second failure → escalate to user |
 | Filesystem error | Log error, halt, request path verification |
+| Missing/empty local index | Proceed in general review mode; advise rebuild only when local approved assets should be available |
 | Index corruption | Advise user to run `/library rebuild-index` |
 | Unexpected error | Log, explain situation, request manual intervention |
