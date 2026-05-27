@@ -4,8 +4,9 @@
 #
 # Loads domain reference files (review-guide.md, audience-firewall.md, etc.)
 # into the LLM context via Bash tool stdout. Writes a forensic trace JSON
-# to contract-review/library/runs/sessions/{session_id}/loaded.json by default,
-# or to a caller-provided trace directory.
+# to $CRA_RUNS_DIR/sessions/{session_id}/loaded.json by default, or to a
+# caller-provided trace directory. The workspace-paths helper keeps legacy
+# contract-review/library/runs/ fallback behavior during the bridge period.
 #
 # Part of the Domain Reference Forced-Load Architecture (v2.2).
 # Detailed architecture history is kept in the local-only workspace docs.
@@ -24,6 +25,7 @@
 #   CONTRACT_REVIEW_SESSION_ID
 #                       Explicit session id when --session-id is omitted.
 #   CLAUDE_PROJECT_DIR  Override repo root detection (otherwise auto-derived)
+#   CRA_RUNS_DIR        Override default runtime trace root.
 #
 # Exit codes:
 #   0  success
@@ -87,6 +89,13 @@ fi
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="${CLAUDE_PROJECT_DIR:-$(cd "$SCRIPT_DIR/../.." && pwd)}"
+if [ -f "$SCRIPT_DIR/workspace-paths.sh" ]; then
+    # shellcheck source=.claude/scripts/workspace-paths.sh
+    source "$SCRIPT_DIR/workspace-paths.sh"
+    REPO_ROOT="$CRA_PROJECT_ROOT"
+else
+    CRA_RUNS_DIR="${CRA_RUNS_DIR:-$REPO_ROOT/contract-review/library/runs}"
+fi
 REFS_DIR="$REPO_ROOT/.claude/skills/review-domain-knowledge/references"
 
 # --- 2. Resolve workflow → files ---------------------------------------------
@@ -128,7 +137,7 @@ if [ -n "$REQUESTED_TRACE_DIR" ]; then
         *) TRACE_DIR="$REPO_ROOT/$REQUESTED_TRACE_DIR" ;;
     esac
 else
-    TRACE_DIR="$REPO_ROOT/contract-review/library/runs/sessions/$SESSION_ID"
+    TRACE_DIR="${CRA_RUNS_DIR:-$REPO_ROOT/contract-review/library/runs}/sessions/$SESSION_ID"
 fi
 mkdir -p "$TRACE_DIR" || {
     echo "ERROR: failed to create trace dir $TRACE_DIR" >&2

@@ -41,7 +41,7 @@ Both methods support the same slash commands and natural language — choose whi
 | **jq** | 1.6+ | `brew install jq` (macOS) · `apt-get install jq` (Linux). Required by the domain reference forced-load hook. |
 | **shasum / sha256sum** | — | Preinstalled on macOS and most Linux distros |
 
-> **Why jq?** The `.claude/hooks/inject-domain-references.sh` hook and the `.claude/scripts/load-domain-references.sh` loader both use `jq` to parse hook input JSON, build `additionalContext` injections, and write forensic trace files (`contract-review/library/runs/sessions/*/loaded.json`). Without `jq`, the hook can only emit an error and no context injection, while direct loader/pre-pipeline calls exit non-zero. Install it before running review workflows so digest traces and section loads are available.
+> **Why jq?** The `.claude/hooks/inject-domain-references.sh` hook and the `.claude/scripts/load-domain-references.sh` loader both use `jq` to parse hook input JSON, build `additionalContext` injections, and write forensic trace files (`contract-review/workspace/runs/sessions/*/loaded.json` by default, with legacy `contract-review/library/runs/sessions/*/loaded.json` fallback). Without `jq`, the hook can only emit an error and no context injection, while direct loader/pre-pipeline calls exit non-zero. Install it before running review workflows so digest traces and section loads are available.
 
 Optional dependencies:
 
@@ -125,15 +125,15 @@ Templates and precedents are **auto-approved** by default. Playbooks and comment
 
 ### 3. Review a Contract
 
-Drop the contract you want reviewed into the [`input/`](../../input/) folder at the project root, then type (in the terminal or extension chat):
+Drop the contract you want reviewed into [`contract-review/workspace/input/`](../../contract-review/workspace/input/) (preferred) or the legacy [`input/`](../../input/) folder, then type (in the terminal or extension chat):
 
 ```text
 /contract-review
 ```
 
-Results (redlined DOCX, analysis report, etc.) are saved to the [`output/`](../../output/) folder.
+Results (redlined DOCX, analysis report, etc.) are saved to [`contract-review/workspace/output/`](../../contract-review/workspace/output/) by default. The legacy [`output/`](../../output/) folder remains supported for existing workflows.
 
-Both `input/` and `output/` are excluded from version control — your contract files never leave your local PC.
+Both the workspace folders and legacy `input/` / `output/` folders are excluded from version control — your contract files never leave your local PC.
 
 Natural language also works:
 
@@ -144,7 +144,7 @@ Review this NDA strictly.
 
 ### 4. Re-review a Revised Draft
 
-When the counterparty sends back a revised version, drop it into `input/` and type:
+When the counterparty sends back a revised version, drop it into `contract-review/workspace/input/` or legacy `input/` and type:
 
 ```text
 /rereview
@@ -185,7 +185,7 @@ Here is what a typical session looks like:
 2. **Open the Claude Code panel** (`Ctrl+Shift+P` → "Claude Code: Open", or click the Claude icon in the sidebar).
 3. **Type your instructions** in the chat input — slash commands or natural language, in English or Korean.
 4. **Watch Claude Code work** — progress and results appear directly in the chat panel.
-5. **Review the results** — output files are clickable in the chat; you can also open them from the `output/` folder.
+5. **Review the results** — output files are clickable in the chat; you can also open them from `contract-review/workspace/output/` or the legacy `output/` folder.
 6. **Iterate** — continue the conversation in the same panel.
 
 Both options produce identical results. The extension panel is often easier for first-time users since there is no terminal setup step.

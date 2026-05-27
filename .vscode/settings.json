@@ -1,3 +1,41 @@
 {
-    "chatgpt.openOnStartup": false
+  "chatgpt.openOnStartup": false,
+  "files.watcherExclude": {
+    "**/.git/**": true,
+    "**/.pytest_cache/**": true,
+    "**/__pycache__/**": true,
+    "**/node_modules/**": true,
+    "input/**": true,
+    "output/**": true,
+    "logs/**": true,
+    "contract-review/workspace/input/**": true,
+    "contract-review/workspace/output/**": true,
+    "contract-review/workspace/logs/**": true,
+    "contract-review/workspace/matters/**": true,
+    "contract-review/workspace/runs/**": true,
+    "contract-review/matters/**": true,
+    "contract-review/library/runs/**": true,
+    "contract-review/library/inbox/_processed/**": true,
+    "contract-review/library/inbox/_failed/**": true,
+    "contract-review/library/approved/**/normalized/**": true,
+    "contract-review/library/approved/**/quality/**": true
+  },
+  "search.exclude": {
+    "**/.git/**": true,
+    "**/.pytest_cache/**": true,
+    "**/__pycache__/**": true,
+    "**/node_modules/**": true,
+    "input/**": true,
+    "output/**": true,
+    "logs/**": true,
+    "contract-review/workspace/input/**": true,
+    "contract-review/workspace/output/**": true,
+    "contract-review/workspace/logs/**": true,
+    "contract-review/workspace/matters/**": true,
+    "contract-review/workspace/runs/**": true,
+    "contract-review/matters/**": true,
+    "contract-review/library/runs/**": true,
+    "contract-review/library/inbox/_processed/**": true,
+    "contract-review/library/inbox/_failed/**": true
+  }
 }

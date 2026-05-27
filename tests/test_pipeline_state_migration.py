@@ -184,6 +184,60 @@ class PipelineStateMigrationTests(unittest.TestCase):
             self.assertTrue(trace_b.exists())
             self.assertNotEqual(trace_a, trace_b)
 
+    @unittest.skipIf(shutil.which("jq") is None, "jq is required by the loader script")
+    def test_reference_loader_default_trace_uses_workspace_runs_with_legacy_fallback(self):
+        script = REPO_ROOT / ".claude" / "scripts" / "load-domain-references.sh"
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            temp_root = Path(tmpdir)
+            self.write_reference_bundle(temp_root)
+            env = {**os.environ, "CLAUDE_PROJECT_DIR": str(temp_root)}
+
+            result = subprocess.run(
+                [
+                    "bash",
+                    str(script),
+                    "review",
+                    "--mode=digest",
+                    "--session-id=default-workspace",
+                ],
+                env=env,
+                text=True,
+                capture_output=True,
+                check=False,
+            )
+
+            self.assertEqual(result.returncode, 0, result.stderr)
+            expected = temp_root / "contract-review" / "workspace" / "runs" / "sessions" / "default-workspace" / "loaded.json"
+            self.assertTrue(expected.exists())
+            self.assertIn(f"TRACE: {expected}", result.stdout)
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            temp_root = Path(tmpdir)
+            self.write_reference_bundle(temp_root)
+            legacy_runs = temp_root / "contract-review" / "library" / "runs"
+            legacy_runs.mkdir(parents=True)
+            env = {**os.environ, "CLAUDE_PROJECT_DIR": str(temp_root)}
+
+            result = subprocess.run(
+                [
+                    "bash",
+                    str(script),
+                    "review",
+                    "--mode=digest",
+                    "--session-id=legacy-fallback",
+                ],
+                env=env,
+                text=True,
+                capture_output=True,
+                check=False,
+            )
+
+            self.assertEqual(result.returncode, 0, result.stderr)
+            expected = legacy_runs / "sessions" / "legacy-fallback" / "loaded.json"
+            self.assertTrue(expected.exists())
+            self.assertIn(f"TRACE: {expected}", result.stdout)
+
 
 if __name__ == "__main__":
     unittest.main()

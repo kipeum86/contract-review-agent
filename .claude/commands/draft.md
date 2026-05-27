@@ -2,7 +2,9 @@
 
 You are a contract drafting specialist preparing a contract for the client. The user will describe the contract they need and provide deal context.
 
-**Output location:** Save the user-facing draft DOCX to `output/draft.docx`. Persist workflow artifacts under `contract-review/matters/{matter_id}/round_1/working/`.
+**Workspace paths:** Source `.claude/scripts/workspace-paths.sh` before filesystem work. During the bridge period, prefer `contract-review/workspace/output/` and `contract-review/workspace/matters/`, while legacy `output/` and `contract-review/matters/` remain valid for existing workflows.
+
+**Output location:** Save the user-facing draft DOCX to `$CRA_OUTPUT_DIR/draft.docx` (legacy-compatible path: `output/draft.docx`). Persist workflow artifacts under `$CRA_MATTERS_DIR/{matter_id}/round_1/working/`.
 
 **Library:** Check `contract-review/library/approved/` for matching templates. Follow retrieval priority in `contract-review/library/policies/retrieval-priority.yaml`.
 
@@ -124,10 +126,10 @@ Auto-fix simple issues. Flag substantive issues with `[REVIEW NOTE]` annotations
 Official `/draft` success requires this artifact set:
 
 ```text
-contract-review/matters/{matter_id}/round_1/working/draft.json
-contract-review/matters/{matter_id}/round_1/working/draft_assumptions.md
-output/draft.docx
-contract-review/matters/{matter_id}/round_1/working/pipeline-state.json
+$CRA_MATTERS_DIR/{matter_id}/round_1/working/draft.json
+$CRA_MATTERS_DIR/{matter_id}/round_1/working/draft_assumptions.md
+$CRA_OUTPUT_DIR/draft.docx (legacy: output/draft.docx)
+$CRA_MATTERS_DIR/{matter_id}/round_1/working/pipeline-state.json
 ```
 
 ### 1. Contract Draft
@@ -135,10 +137,10 @@ contract-review/matters/{matter_id}/round_1/working/pipeline-state.json
 - Deliver the full draft text in the response
 - Persist `working/draft.json` with the complete draft data (metadata, sections, defined_terms, contract_text, self_review)
 - Persist `working/draft_assumptions.md` with confirmed facts, inferred assumptions, and open items
-- Generate DOCX: `node .claude/skills/report-compiler/scripts/compile-draft.js working/draft.json output/draft.docx`
+- Generate DOCX: `node .claude/skills/report-compiler/scripts/compile-draft.js working/draft.json "$CRA_OUTPUT_DIR/draft.docx"` (legacy-compatible target: `output/draft.docx`)
 - Save/update `working/pipeline-state.json`
 - Features: section hierarchy (제N조 / Article N), defined terms bolded, signature blocks
-- Copy DOCX to `matters/{matter_id}/round_1/source/` only when the user wants this draft tracked as the baseline for future counterparty markups
+- Copy DOCX to `$CRA_MATTERS_DIR/{matter_id}/round_1/source/` only when the user wants this draft tracked as the baseline for future counterparty markups
 
 ### 2. Self-Review Summary
 
@@ -170,5 +172,5 @@ After the counterparty returns a marked-up version, the user can initiate `/cont
 - **Market standard is the anchor.** Draft terms that a reasonable counterparty would recognize as fair. Protect the client without overreaching.
 - **Protect, don't posture.** Secure substantive protections, not maximize aggressive terms. If a balanced term adequately protects the client, prefer it.
 - **Completeness over brevity.** A missing clause is more dangerous than a long contract. Use the family checklist to ensure nothing is omitted.
-- **Internal notes are candid; the draft is professional.** `[REVIEW NOTE]` and `[INTERNAL]` annotations belong in `draft_assumptions.md`, `self_review`, or an explicitly internal working draft. The default `output/draft.docx` must be professional, precise, and suitable for counterparty review.
+- **Internal notes are candid; the draft is professional.** `[REVIEW NOTE]` and `[INTERNAL]` annotations belong in `draft_assumptions.md`, `self_review`, or an explicitly internal working draft. The default `$CRA_OUTPUT_DIR/draft.docx` (legacy: `output/draft.docx`) must be professional, precise, and suitable for counterparty review.
 - **Statutory compliance is non-negotiable.** Never draft a clause that violates mandatory law. Flag potential statutory issues as Critical.
