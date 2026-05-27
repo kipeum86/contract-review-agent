@@ -83,6 +83,48 @@ class GeneratedIndexHandlingTests(unittest.TestCase):
         self.assertEqual(ignored.returncode, 0)
         self.assertNotEqual(scaffold.returncode, 0)
 
+    def test_planning_notes_are_local_only_except_readme(self):
+        plan_path = "docs/plans/example-implementation-plan.md"
+        readme_path = "docs/plans/README.md"
+
+        ignored = subprocess.run(
+            ["git", "check-ignore", "--no-index", "--quiet", plan_path],
+            cwd=REPO_ROOT,
+            check=False,
+        )
+        readme = subprocess.run(
+            ["git", "check-ignore", "--no-index", "--quiet", readme_path],
+            cwd=REPO_ROOT,
+            check=False,
+        )
+
+        self.assertEqual(ignored.returncode, 0)
+        self.assertNotEqual(readme.returncode, 0)
+
+    def test_public_seed_allowlist_uses_generic_pattern(self):
+        seed_path = (
+            "contract-review/library/approved/templates/nda/"
+            "0-nda-mutual-seed/manifest.yaml"
+        )
+        local_asset_path = (
+            "contract-review/library/approved/templates/ssa/"
+            "standard-investment-agreement/manifest.yaml"
+        )
+
+        seed = subprocess.run(
+            ["git", "check-ignore", "--no-index", "--quiet", seed_path],
+            cwd=REPO_ROOT,
+            check=False,
+        )
+        local_asset = subprocess.run(
+            ["git", "check-ignore", "--no-index", "--quiet", local_asset_path],
+            cwd=REPO_ROOT,
+            check=False,
+        )
+
+        self.assertNotEqual(seed.returncode, 0)
+        self.assertEqual(local_asset.returncode, 0)
+
 
 if __name__ == "__main__":
     unittest.main()
