@@ -989,7 +989,7 @@ class SessionDAudit011ReportTests(unittest.TestCase):
             self.assertNotIn("나. 조항별 분석", document_xml)
 
     def test_contract_language_en_does_not_force_english_report(self):
-        """Regression guard for the 2026-04-10 incident.
+        """Regression guard for report-language fallback drift.
 
         If the review JSON has contract_info.language = "en" (the CONTRACT's
         own language set by Step 2) but no report_language, the resolver
@@ -1067,7 +1067,7 @@ class SessionDAudit011ReportTests(unittest.TestCase):
             self.assertNotIn("Per-Clause Analysis", document_xml)
 
     def test_clause_count_mismatch_fails_by_default(self):
-        """Regression guard for the 2026-04-10 "Selected 10/27" symptom.
+        """Regression guard for silently truncated clause output.
 
         When risk_distribution totals N but data.clauses has fewer than N
         entries, the compiler must fail closed by default instead of emitting

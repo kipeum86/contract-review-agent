@@ -421,11 +421,11 @@ def apply_comments(unpacked_dir: str, clause_map_path: str,
         comments_data, comments_xml_path
     )
 
-    # Fail-loud guard (2026-04-11 hardening): if the input JSON had comment
+    # Fail-loud guard: if the input JSON had comment
     # entries but zero were built (all skipped due to schema mismatch or
-    # malformed entries), do not return success. The 2026-04-10 incident
-    # included a "memos 0건" symptom alongside the redline 0건 symptom, and
-    # apply-comments.py was previously the silent counterpart to
+    # malformed entries), do not return success. Prior regressions included a
+    # zero-comment symptom alongside zero applied redlines, and apply-comments.py
+    # was previously the silent counterpart to
     # apply-redlines.py's silent success path. Matching apply-redlines.py
     # behavior: explicitly error out so Step 9 halts instead of producing a
     # DOCX with zero comments applied despite the LLM having written entries.
