@@ -258,7 +258,7 @@ Fully auditable. Every match is traceable.
 │   │   │   └── redline-records/ #   Ingested redlined contracts (review pattern data)
 │   │   ├── quarantine/          # Failed / rejected (gitignored)
 │   │   ├── sources/             # Reference sources (statutes, precedents, and other supporting materials)
-│   │   ├── indexes/             # JSON indexes (auto-managed)
+│   │   ├── indexes/             # Local generated JSON indexes (gitignored)
 │   │   ├── policies/            # Your customized config (gitignored)
 │   │   ├── policies.default/    # Shipped defaults (do not edit)
 │   │   └── runs/
@@ -296,7 +296,7 @@ Six YAML files under `contract-review/library/policies/` control the agent's beh
 | `retrieval-priority.yaml` | Search ranking, language preference, freshness handling, and affinity fallback | Optional |
 | `metadata-schema.yaml` | Metadata field definitions | Optional |
 
-Policies are **read-only for the agent** — only you edit them. The agent manages `indexes/` automatically.
+Policies are **read-only for the agent** — only you edit them. The agent manages `indexes/` automatically as local generated artifacts; index JSON files are gitignored because they can contain text derived from local library assets.
 
 ---
 

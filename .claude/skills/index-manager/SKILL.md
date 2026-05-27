@@ -41,6 +41,10 @@ Manage library indexes for document and clause retrieval.
 
 ## Index Files
 
+Index JSON files are generated local artifacts under `library/indexes/`.
+They may contain clause text or metadata derived from local library assets, so
+they are ignored by git and should be rebuilt from local approved assets.
+
 | File | Content | Location |
 |------|---------|----------|
 | `documents.json` | All approved document metadata | `library/indexes/` |
@@ -59,6 +63,6 @@ When performing library candidate retrieval for a review:
 2. Pass `target_clauses` as a list of `{clause_type}` dicts for per-clause narrowing
 3. Optionally pass `language` to soft-prefer same-language candidates without excluding null-language records
 4. If exact-family coverage is thin, query expansion can include configured affinity families with a ranking penalty
-5. If `library_empty` is true, or `general_review_mode` is true, or `total_candidates == 0`, proceed in **general review mode**
+5. If `library_empty` is true, or `general_review_mode` is true, or `total_candidates == 0`, proceed in **general review mode** and rebuild local indexes only if local approved assets should be available
 6. Pass compact candidate summaries to LLM for semantic matching (Stage 3)
 7. Re-query with `hydrate_candidate_ids` for only the selected candidates that need full text

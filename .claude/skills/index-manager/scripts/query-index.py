@@ -17,6 +17,11 @@ PROJECT_ROOT = os.path.abspath(os.path.join(SCRIPT_DIR, '..', '..', '..', '..'))
 LIBRARY_DIR = os.path.join(PROJECT_ROOT, 'contract-review', 'library')
 INDEXES_DIR = os.path.join(LIBRARY_DIR, 'indexes')
 POLICIES_DIR = os.path.join(LIBRARY_DIR, 'policies')
+REBUILD_INDEX_COMMAND = 'python3 .claude/skills/index-manager/scripts/build-index.py rebuild'
+INDEX_REBUILD_HINT = (
+    f'Rebuild local indexes with `{REBUILD_INDEX_COMMAND}` after ingesting '
+    'and approving local library assets.'
+)
 
 
 def load_json(path: str) -> dict | None:
@@ -364,10 +369,14 @@ def query(contract_family: str, target_clauses: list = None,
     if not clauses_index or not clauses_index.get('clauses'):
         return {
             'success': True,
+            'index_missing': clauses_index is None,
             'library_empty': True,
             'general_review_mode': True,
             'fallback_reason': 'library_empty',
-            'message': 'Library is empty. Proceeding in general review mode.',
+            'message': (
+                f'Library indexes are missing or empty. {INDEX_REBUILD_HINT} '
+                'Proceeding in general review mode.'
+            ),
             'candidates': {},
             'total_candidates': 0,
         }
@@ -381,12 +390,13 @@ def query(contract_family: str, target_clauses: list = None,
     if not active_approved_clauses:
         return {
             'success': True,
+            'index_missing': False,
             'library_empty': True,
             'general_review_mode': True,
             'fallback_reason': 'no_active_approved_library_records',
             'message': (
                 'No active approved library records are available for retrieval. '
-                'Proceeding in general review mode.'
+                f'{INDEX_REBUILD_HINT} Proceeding in general review mode.'
             ),
             'candidates': {},
             'total_candidates': 0,
@@ -493,6 +503,7 @@ def query(contract_family: str, target_clauses: list = None,
 
     return {
         'success': True,
+        'index_missing': False,
         'library_empty': False,
         'general_review_mode': general_review_mode,
         'fallback_reason': fallback_reason,
@@ -519,49 +530,60 @@ def search(query_text: str = None, clause_type: str = None,
     Returns matching results for display to the user.
     """
     results = {'documents': [], 'clauses': []}
+    docs_index = load_json(os.path.join(INDEXES_DIR, 'documents.json'))
+    clauses_index = load_json(os.path.join(INDEXES_DIR, 'clauses.json'))
+    docs_records = docs_index.get('documents', []) if docs_index else []
+    clause_records = clauses_index.get('clauses', []) if clauses_index else []
+    index_missing = docs_index is None and clauses_index is None
+    library_empty = not docs_records and not clause_records
 
     # Search documents
-    docs_index = load_json(os.path.join(INDEXES_DIR, 'documents.json'))
-    if docs_index:
-        for doc in docs_index.get('documents', []):
-            match = True
-            if contract_family and doc.get('contract_family') != contract_family:
+    for doc in docs_records:
+        match = True
+        if contract_family and doc.get('contract_family') != contract_family:
+            match = False
+        if doc_class and doc.get('doc_class') != doc_class:
+            match = False
+        if query_text:
+            searchable = ' '.join(str(v) for v in doc.values() if v).lower()
+            if query_text.lower() not in searchable:
                 match = False
-            if doc_class and doc.get('doc_class') != doc_class:
-                match = False
-            if query_text:
-                searchable = ' '.join(str(v) for v in doc.values() if v).lower()
-                if query_text.lower() not in searchable:
-                    match = False
-            if match:
-                results['documents'].append(doc)
+        if match:
+            results['documents'].append(doc)
 
     # Search clauses
-    clauses_index = load_json(os.path.join(INDEXES_DIR, 'clauses.json'))
     clause_texts = load_clause_texts() if query_text else {}
-    if clauses_index:
-        for clause in clauses_index.get('clauses', []):
-            match = True
-            if clause_type and clause.get('clause_type') != clause_type:
+    for clause in clause_records:
+        match = True
+        if clause_type and clause.get('clause_type') != clause_type:
+            match = False
+        if contract_family and clause.get('contract_family') != contract_family:
+            match = False
+        if query_text:
+            text_key = f"{clause.get('doc_id')}::{clause.get('clause_id')}"
+            clause_text = clause_texts.get(text_key, '')
+            searchable = ' '.join(str(v) for v in clause.values() if v).lower()
+            searchable += ' ' + clause_text.lower()
+            if query_text.lower() not in searchable:
                 match = False
-            if contract_family and clause.get('contract_family') != contract_family:
-                match = False
-            if query_text:
-                text_key = f"{clause.get('doc_id')}::{clause.get('clause_id')}"
-                clause_text = clause_texts.get(text_key, '')
-                searchable = ' '.join(str(v) for v in clause.values() if v).lower()
-                searchable += ' ' + clause_text.lower()
-                if query_text.lower() not in searchable:
-                    match = False
-            if match:
-                text_key = f"{clause.get('doc_id')}::{clause.get('clause_id')}"
-                if text_key in clause_texts:
-                    clause = dict(clause)
-                    clause['text'] = clause_texts[text_key]
-                results['clauses'].append(clause)
+        if match:
+            text_key = f"{clause.get('doc_id')}::{clause.get('clause_id')}"
+            if text_key in clause_texts:
+                clause = dict(clause)
+                clause['text'] = clause_texts[text_key]
+            results['clauses'].append(clause)
+
+    message = None
+    if index_missing:
+        message = f'Library indexes are missing. {INDEX_REBUILD_HINT}'
+    elif library_empty:
+        message = f'Library indexes are empty. {INDEX_REBUILD_HINT}'
 
     return {
         'success': True,
+        'index_missing': index_missing,
+        'library_empty': library_empty,
+        'message': message,
         'documents_found': len(results['documents']),
         'clauses_found': len(results['clauses']),
         'results': results,
@@ -586,7 +608,7 @@ def query_redline_patterns(contract_family: str = None,
             'total_entries': 0,
             'total_records': 0,
             'entries': [],
-            'message': 'No redline patterns in index.',
+            'message': f'No redline patterns in local generated index. {INDEX_REBUILD_HINT}',
         }
 
     entries = patterns_index['entries']
