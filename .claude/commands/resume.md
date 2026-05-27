@@ -8,7 +8,7 @@ $ARGUMENTS
 
 ## Process
 
-1. **Scan for pipeline states**: Search all `contract-review/matters/*/round_*/pipeline-state.json` files for incomplete pipelines (where `last_completed_step < final_step`).
+1. **Scan for pipeline states**: Source `.claude/scripts/workspace-paths.sh`, then search all `$CRA_MATTERS_DIR/*/round_*/pipeline-state.json` files and any distinct legacy `contract-review/matters/*/round_*/pipeline-state.json` files for incomplete pipelines (where `last_completed_step < final_step`).
 
 2. **If no interrupted pipelines found**: Inform the user that no resumable pipelines exist.
 

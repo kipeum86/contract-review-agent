@@ -143,6 +143,18 @@ __pycache__/
 /contract-review/matters/*
 !/contract-review/matters/.gitkeep
 
+# Unified local runtime workspace (confidential - do not commit)
+/contract-review/workspace/input/*
+!/contract-review/workspace/input/.gitkeep
+/contract-review/workspace/output/*
+!/contract-review/workspace/output/.gitkeep
+/contract-review/workspace/logs/*
+!/contract-review/workspace/logs/.gitkeep
+/contract-review/workspace/matters/*
+!/contract-review/workspace/matters/.gitkeep
+/contract-review/workspace/runs/*
+!/contract-review/workspace/runs/.gitkeep
+
 # Domain-reference loader session traces (per-execution forensic, never committed)
 # See internal domain-reference loader documentation
 /contract-review/library/runs/ingestion/*

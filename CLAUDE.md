@@ -42,7 +42,7 @@ Route user commands to the appropriate workflow. Accept both natural language an
 | **Review Agent** | `.claude/agents/review-agent/AGENT.md` | Review or re-review command detected | Target file path; matter_id; optional matter context; optional prior_round | Redlined DOCX + Report DOCX + Review JSON (+ Delta DOCX for re-reviews) |
 | **Drafting Agent** | `.claude/agents/drafting-agent/AGENT.md` | Drafting command detected | User's drafting request (NL); optional detailed specs | Draft DOCX + assumptions + optional self-review notes |
 
-**Data handoff**: Pass file paths and short metadata inline. Large payloads are always file-based under `matters/{matter_id}/round_{N}/working/` or local-only `library/runs/ingestion/`.
+**Data handoff**: Pass file paths and short metadata inline. Large payloads are always file-based under `$CRA_MATTERS_DIR/{matter_id}/round_{N}/working/` or local-only `$CRA_RUNS_DIR/ingestion/`. During the workspace bridge, legacy `contract-review/matters/` and `contract-review/library/runs/` remain valid for existing artifacts.
 
 ## Baseline Reference Load — Root Agent Dispatch Protocol (v2.2)
 
@@ -136,10 +136,14 @@ if policies/ contains only .gitkeep or is empty:
 
 ## Folder Access Rules
 
+Source `.claude/scripts/workspace-paths.sh` before runtime filesystem work. New local runtime artifacts should use `contract-review/workspace/` by default; legacy root paths remain readable/writable during the bridge period so existing workflows keep working.
+
 | Folder | Read | Write | Notes |
 |--------|------|-------|-------|
-| `input/` | Yes | No (user drops files) | Review target contracts |
-| `output/` | Yes | Yes | Final deliverables (redlined DOCX, reports) |
+| `contract-review/workspace/input/` | Yes | No (user drops files) | Preferred review target drop zone |
+| `input/` | Yes | No (user drops files) | Legacy review target drop zone during bridge |
+| `contract-review/workspace/output/` | Yes | Yes | Preferred final deliverables folder |
+| `output/` | Yes | Yes | Legacy deliverables folder during bridge |
 | `contract-review/library/inbox/` | Yes | No (user drops files) | Library source templates & reference sources |
 | `contract-review/library/sources/` | Yes | Yes (ingest only) | 참조 소스 (법령, 판례, 해설, 샘플 양식 등) |
 | `contract-review/library/staging/` | Yes | Yes | Ingestion intermediate storage |
@@ -148,8 +152,10 @@ if policies/ contains only .gitkeep or is empty:
 | `contract-review/library/indexes/` | Yes | Yes | Index build/rebuild |
 | `contract-review/library/policies/` | Yes | No | User-managed config (gitignored — defaults in `policies.default/`) |
 | `contract-review/library/policies.default/` | Yes | No | Shipped defaults — do not modify |
-| `contract-review/matters/` | Yes | Yes | Matter working directories |
-| `contract-review/library/runs/` | Yes | Yes | Local-only execution logs (`ingestion/`, `sessions/`) |
+| `contract-review/workspace/matters/` | Yes | Yes | Preferred matter working directories |
+| `contract-review/matters/` | Yes | Yes | Legacy matter working directories during bridge |
+| `contract-review/workspace/runs/` | Yes | Yes | Preferred local-only execution logs |
+| `contract-review/library/runs/` | Yes | Yes | Legacy execution logs (`ingestion/`, `sessions/`) |
 
 ## Error Handling
 

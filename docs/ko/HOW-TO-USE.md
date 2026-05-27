@@ -41,7 +41,7 @@ Claude Code는 대화형 에이전트로 동작합니다. 자연어 지시나 �
 | **jq** | 1.6+ | `brew install jq` (macOS) · `apt-get install jq` (Linux). 도메인 레퍼런스 forced-load hook에서 사용 |
 | **shasum / sha256sum** | — | macOS 및 대부분의 Linux 배포판에 기본 포함 |
 
-> **왜 jq가 필요한가요?** `.claude/hooks/inject-domain-references.sh` hook과 `.claude/scripts/load-domain-references.sh` loader가 hook의 stdin JSON을 파싱하고, `additionalContext` 주입 페이로드를 생성하고, 포렌식 트레이스 파일(`contract-review/library/runs/sessions/*/loaded.json`)을 쓸 때 `jq`를 사용합니다. `jq`가 없으면 hook은 오류만 남기고 컨텍스트 주입을 하지 못하며, loader/pre-pipeline 직접 호출은 non-zero로 실패합니다. 검토 워크플로를 실행하기 전에 설치해야 digest trace와 section load가 정상 동작합니다.
+> **왜 jq가 필요한가요?** `.claude/hooks/inject-domain-references.sh` hook과 `.claude/scripts/load-domain-references.sh` loader가 hook의 stdin JSON을 파싱하고, `additionalContext` 주입 페이로드를 생성하고, 포렌식 트레이스 파일(기본 `contract-review/workspace/runs/sessions/*/loaded.json`, legacy fallback `contract-review/library/runs/sessions/*/loaded.json`)을 쓸 때 `jq`를 사용합니다. `jq`가 없으면 hook은 오류만 남기고 컨텍스트 주입을 하지 못하며, loader/pre-pipeline 직접 호출은 non-zero로 실패합니다. 검토 워크플로를 실행하기 전에 설치해야 digest trace와 section load가 정상 동작합니다.
 
 선택 설치 항목:
 
@@ -118,15 +118,15 @@ Claude Code는 계약군, 조항 분류 체계, 검토 모드, 검색 규칙 등
 
 ### 3. 계약서 검토하기
 
-검토할 계약서를 프로젝트 루트의 [`input/`](../../input/) 폴더에 넣은 뒤, 터미널이나 확장 프로그램 채팅에서 다음을 입력하세요:
+검토할 계약서를 [`contract-review/workspace/input/`](../../contract-review/workspace/input/) 폴더에 넣는 것을 권장합니다. 기존 방식대로 프로젝트 루트의 [`input/`](../../input/) 폴더에 넣어도 bridge 기간 동안 계속 인식됩니다. 그 뒤 터미널이나 확장 프로그램 채팅에서 다음을 입력하세요:
 
 ```text
 /contract-review
 ```
 
-결과물(레드라인 DOCX, 분석 보고서 등)은 [`output/`](../../output/) 폴더에 저장됩니다.
+결과물(레드라인 DOCX, 분석 보고서 등)은 기본적으로 [`contract-review/workspace/output/`](../../contract-review/workspace/output/) 폴더에 저장됩니다. 기존 워크플로의 [`output/`](../../output/) 폴더도 계속 지원됩니다.
 
-`input/`과 `output/`은 모두 버전 관리에서 제외되므로 계약 파일이 로컬 PC 밖으로 나가지 않습니다.
+workspace 폴더와 기존 `input/` / `output/` 폴더는 모두 버전 관리에서 제외되므로 계약 파일이 로컬 PC 밖으로 나가지 않습니다.
 
 자연어도 사용할 수 있습니다:
 
@@ -137,7 +137,7 @@ Review this NDA strictly.
 
 ### 4. 수정본 재검토하기
 
-상대방이 수정본을 보내오면 `input/`에 넣고 다음을 입력하세요:
+상대방이 수정본을 보내오면 `contract-review/workspace/input/` 또는 기존 `input/`에 넣고 다음을 입력하세요:
 
 ```text
 /rereview
@@ -178,7 +178,7 @@ Review this NDA strictly.
 2. **Claude Code 패널을 엽니다** (`Ctrl+Shift+P` → "Claude Code: Open", 또는 사이드바의 Claude 아이콘 클릭).
 3. 채팅 입력창에 슬래시 명령이나 자연어로, 영어 또는 한국어로 **지시를 입력합니다**.
 4. **Claude Code가 작업하는 과정을 확인합니다**. 진행 상황과 결과가 채팅 패널에 직접 표시됩니다.
-5. **결과를 검토합니다**. 출력 파일은 채팅에서 클릭할 수 있고, `output/` 폴더에서 직접 열 수도 있습니다.
+5. **결과를 검토합니다**. 출력 파일은 채팅에서 클릭할 수 있고, `contract-review/workspace/output/` 또는 기존 `output/` 폴더에서 직접 열 수도 있습니다.
 6. **반복합니다**. 같은 패널에서 계속 대화를 이어가면 됩니다.
 
 두 방식의 실행 결과는 동일합니다. 처음 사용하는 경우에는 별도의 터미널 설정이 필요 없는 확장 프로그램 패널이 더 접근하기 쉽습니다.

@@ -108,15 +108,15 @@ Templates and precedents are **auto-approved** by default. Playbooks and comment
 
 ### Step 4 — Review a Contract
 
-Drop the contract you want reviewed into the [`input/`](./input/) folder at the project root, then type:
+Drop the contract you want reviewed into [`contract-review/workspace/input/`](./contract-review/workspace/input/) (preferred) or the legacy [`input/`](./input/) folder, then type:
 
 ```text
 /contract-review
 ```
 
-Results (redlined DOCX, analysis report, etc.) are saved to the [`output/`](./output/) folder.
+Results (redlined DOCX, analysis report, etc.) are saved to [`contract-review/workspace/output/`](./contract-review/workspace/output/) by default. The legacy [`output/`](./output/) folder remains supported for existing workflows.
 
-Both `input/` and `output/` are excluded from version control — your contract files never leave your local PC.
+Both the workspace folders and legacy `input/` / `output/` folders are excluded from version control — your contract files never leave your local PC.
 
 ---
 
@@ -231,8 +231,8 @@ Fully auditable. Every match is traceable.
 
 ```
 .
-├── input/                       # Drop contracts to review here (gitignored)
-├── output/                      # Review results appear here (gitignored)
+├── input/                       # Legacy contract drop zone (gitignored)
+├── output/                      # Legacy review results (gitignored)
 │
 ├── .claude/
 │   ├── agents/                  # Sub-agents: ingestion, review, drafting
@@ -242,6 +242,12 @@ Fully auditable. Every match is traceable.
 │   └── settings*.json           # Optional local Claude Code settings (gitignored)
 │
 ├── contract-review/
+│   ├── workspace/               # Preferred local runtime workspace (gitignored)
+│   │   ├── input/               # Drop contracts to review here
+│   │   ├── output/              # Review results appear here
+│   │   ├── logs/                # Session notes
+│   │   ├── matters/             # Matter working directories
+│   │   └── runs/                # Runtime traces
 │   ├── library/
 │   │   ├── inbox/raw/           # Drop source templates here (gitignored)
 │   │   ├── inbox/sidecars/      # Auxiliary metadata (gitignored)
@@ -258,7 +264,7 @@ Fully auditable. Every match is traceable.
 │   │   └── runs/
 │   │       ├── ingestion/       # Local ingestion run artifacts (gitignored)
 │   │       └── sessions/        # Per-execution forensic traces (gitignored)
-│   └── matters/                 # Per-deal working directories (gitignored)
+│   └── matters/                 # Legacy per-deal working directories (gitignored)
 │
 ├── logs/                        # Session logs — your conversation notes (gitignored)
 ├── docs/
@@ -337,7 +343,7 @@ The agent is composed of three specialized sub-agents coordinated by an orchestr
 - **No embeddings / no vector DB** — retrieval uses deterministic JSON index filtering + LLM judgment
 - **Pipeline state persistence** — each step writes `pipeline-state.json`, enabling resume after interruption
 - **Audience firewall** — `[INTERNAL]` and `[EXTERNAL]` comment streams are strictly separated at every stage
-- **File-based data handoff** — large payloads pass between agents as local files under `matters/` or `library/runs/`, not inline
+- **File-based data handoff** — large payloads pass between agents as local files under `contract-review/workspace/matters/` or `contract-review/workspace/runs/` (legacy `matters/` and `library/runs/` remain supported), not inline
 
 </details>
 

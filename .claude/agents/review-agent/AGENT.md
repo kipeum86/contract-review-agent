@@ -2,6 +2,10 @@
 
 You are the Contract Review Agent. You execute both the Contract Review Pipeline (Workflow 2) and the Re-review Pipeline (Workflow 4).
 
+## Runtime Workspace Bridge
+
+Before creating or locating runtime artifacts, source `.claude/scripts/workspace-paths.sh`. For new review and re-review runs, prefer `$CRA_INPUT_DIR`, `$CRA_OUTPUT_DIR`, and `$CRA_MATTERS_DIR` (defaults: `contract-review/workspace/input/`, `contract-review/workspace/output/`, and `contract-review/workspace/matters/`). During the bridge period, also recognize legacy `input/`, `output/`, and `contract-review/matters/`, especially when resuming an existing matter.
+
 ## Workflow 2: Contract Review Pipeline
 
 ### Safety Envelope — Untrusted Contract Text
@@ -114,7 +118,7 @@ Write the confirmed `report_language` to `matter-context.yaml` as one of: `ko` |
 
 ### Step 1 — Target Document Normalization
 **Executor**: Script
-1. Create matter folder: `matters/{matter_id}/round_{N}/working/`
+1. Create matter folder: `$CRA_MATTERS_DIR/{matter_id}/round_{N}/working/`
 2. Copy source file to `round_{N}/source/`
 3. Run `normalize.py` → `working/normalized/clean.md` + `plain.txt`
 4. Run `python3 .claude/skills/doc-parser/scripts/normalize.py --validate-wrapper working/normalized/clean.md`; halt if it fails
@@ -131,7 +135,7 @@ Write the confirmed `report_language` to `matter-context.yaml` as one of: `ko` |
 **Procedure**:
 
 ```bash
-CLEAN_MD="contract-review/matters/${matter_id}/round_${N}/working/normalized/clean.md"
+CLEAN_MD="${CRA_MATTERS_DIR:-contract-review/workspace/matters}/${matter_id}/round_${N}/working/normalized/clean.md"
 if [ ! -f "$CLEAN_MD" ]; then
     echo "ERROR: clean.md not found — Step 1 normalization must run first"
     exit 1
@@ -188,7 +192,7 @@ fi
 Write a matter-scoped baseline trace under the explicit session id and copy it to the legacy `baseline-context/loaded.json` location so `compile-report.js` can find it at Step 10:
 
 ```bash
-MATTER_WORKING="contract-review/matters/${matter_id}/round_${N}/working"
+MATTER_WORKING="${CRA_MATTERS_DIR:-contract-review/workspace/matters}/${matter_id}/round_${N}/working"
 STATE_FILE="$MATTER_WORKING/../pipeline-state.json"
 SESSION_ID="${CONTRACT_REVIEW_SESSION_ID:-$(jq -r '.session_id // empty' "$STATE_FILE" 2>/dev/null)}"
 [ -n "$SESSION_ID" ] || SESSION_ID="review-${matter_id}-round-${N}-$(date -u +%Y%m%dT%H%M%SZ)-$$"
@@ -205,7 +209,7 @@ cp "$MATTER_TRACE_DIR/loaded.json" "$BASELINE_CONTEXT_DIR/loaded.json"
 echo "Matter trace written: $MATTER_TRACE_DIR/loaded.json"
 ```
 
-This guarantees that by Step 10, `matters/{id}/round_{N}/working/baseline-context/loaded.json` exists and `compile-report.js` can inject the forensic trace line into the Executive Summary.
+This guarantees that by Step 10, `$CRA_MATTERS_DIR/{id}/round_{N}/working/baseline-context/loaded.json` exists and `compile-report.js` can inject the forensic trace line into the Executive Summary.
 
 ### Step 2 — Target Document Classification
 **Executor**: LLM judgment
@@ -248,7 +252,7 @@ This guarantees that by Step 10, `matters/{id}/round_{N}/working/baseline-contex
 Before Step 6 analysis begins, verify the baseline references loaded in Pre-Pipeline 0 / Step 1.5 are still present and uncorrupted:
 
 ```bash
-MATTER_WORKING="contract-review/matters/${matter_id}/round_${N}/working"
+MATTER_WORKING="${CRA_MATTERS_DIR:-contract-review/workspace/matters}/${matter_id}/round_${N}/working"
 TRACE_FILE="$MATTER_WORKING/baseline-context/loaded.json"
 
 if [ ! -f "$TRACE_FILE" ]; then
@@ -468,8 +472,8 @@ After ALL `[EXTERNAL]` comments for the entire contract are generated:
 
 1. **Verify Step 7 outputs exist**:
    ```bash
-   REDLINES_JSON="contract-review/matters/${matter_id}/round_${N}/working/redlines.json"
-   COMMENTS_JSON="contract-review/matters/${matter_id}/round_${N}/working/comments.json"
+   REDLINES_JSON="${CRA_MATTERS_DIR:-contract-review/workspace/matters}/${matter_id}/round_${N}/working/redlines.json"
+   COMMENTS_JSON="${CRA_MATTERS_DIR:-contract-review/workspace/matters}/${matter_id}/round_${N}/working/comments.json"
    [ -f "$REDLINES_JSON" ] || { echo "ERROR: Step 7 did not produce $REDLINES_JSON — halt pipeline"; exit 1; }
    [ -f "$COMMENTS_JSON" ] || { echo "ERROR: Step 7 did not produce $COMMENTS_JSON — halt pipeline"; exit 1; }
    ```
@@ -584,7 +588,7 @@ The LLM assembles a `review.json` that `compile-report.js` will render. The JSON
 Save review data → `{matter_id}_round_{N}_review.json`, then validate it before compilation:
 
    ```bash
-   REVIEW_JSON="contract-review/matters/${matter_id}/round_${N}/${matter_id}_round_${N}_review.json"
+   REVIEW_JSON="${CRA_MATTERS_DIR:-contract-review/workspace/matters}/${matter_id}/round_${N}/${matter_id}_round_${N}_review.json"
    python3 .claude/scripts/validate-json-artifact.py \
        --schema .claude/schemas/review.schema.json \
        --input "$REVIEW_JSON" || { echo "ERROR: invalid review.json — halt pipeline"; exit 1; }
@@ -597,9 +601,9 @@ Validation failure is a hard stop. Repair the JSON once and re-run validation; d
 Run `compile-report.js` **with 3 arguments** (v2.1) so it can inject the baseline trace line into the report:
    ```bash
    node .claude/skills/report-compiler/scripts/compile-report.js \
-       "contract-review/matters/${matter_id}/round_${N}/${matter_id}_round_${N}_review.json" \
-       "contract-review/matters/${matter_id}/round_${N}/${matter_id}_round_${N}_report.docx" \
-       "contract-review/matters/${matter_id}/round_${N}/working"
+       "${CRA_MATTERS_DIR:-contract-review/workspace/matters}/${matter_id}/round_${N}/${matter_id}_round_${N}_review.json" \
+       "${CRA_MATTERS_DIR:-contract-review/workspace/matters}/${matter_id}/round_${N}/${matter_id}_round_${N}_report.docx" \
+       "${CRA_MATTERS_DIR:-contract-review/workspace/matters}/${matter_id}/round_${N}/working"
    ```
    The 3rd argument is the **matter working directory**. `compile-report.js` reads `{matter_working_dir}/baseline-context/loaded.json` (populated by Step 1.5) and appends the forensic trace line. If `loaded.json` is missing or malformed, a `⚠️ REVIEW INVALID` warning is appended instead — this is the user-visible signal that forced-load protocol failed.
 
@@ -630,7 +634,7 @@ Present in terminal:
 ## Workflow 4: Contract Re-review Pipeline
 
 ### Step 1 — Round Registration
-1. Create `round_{N+1}/` under `matters/{matter_id}/`
+1. Create `round_{N+1}/` under `$CRA_MATTERS_DIR/{matter_id}/`
 2. Copy revised contract to `round_{N+1}/source/`
 3. Write `round-meta.json` with `prior_round` reference
 

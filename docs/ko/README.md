@@ -146,15 +146,15 @@ Claude Code는 계약군, 조항 분류 체계, 검토 모드, 검색 규칙 등
 
 ### Step 4 — 계약서 검토하기
 
-검토할 계약서를 프로젝트 루트의 [`input/`](../../input/) 폴더에 넣은 뒤 다음을 입력하세요:
+검토할 계약서를 [`contract-review/workspace/input/`](../../contract-review/workspace/input/) 폴더에 넣는 것을 권장합니다. 기존 방식대로 프로젝트 루트의 [`input/`](../../input/) 폴더에 넣어도 bridge 기간 동안 계속 인식됩니다. 그 뒤 다음을 입력하세요:
 
 ```text
 /contract-review
 ```
 
-결과물(레드라인 DOCX, 분석 보고서 등)은 [`output/`](../../output/) 폴더에 저장됩니다.
+결과물(레드라인 DOCX, 분석 보고서 등)은 기본적으로 [`contract-review/workspace/output/`](../../contract-review/workspace/output/) 폴더에 저장됩니다. 기존 워크플로의 [`output/`](../../output/) 폴더도 계속 지원됩니다.
 
-`input/`과 `output/`은 모두 버전 관리에서 제외되어 있으므로 계약 파일이 로컬 PC 밖으로 나가지 않습니다.
+workspace 폴더와 기존 `input/` / `output/` 폴더는 모두 버전 관리에서 제외되어 있으므로 계약 파일이 로컬 PC 밖으로 나가지 않습니다.
 
 자연어도 사용할 수 있습니다:
 
@@ -290,8 +290,8 @@ inbox/raw/  ──>  validate  ──>  classify  ──>  segment  ──>  app
 
 ```
 .
-├── input/                       # 검토할 계약서를 여기에 넣습니다 (gitignored)
-├── output/                      # 검토 결과가 여기에 생성됩니다 (gitignored)
+├── input/                       # 기존 계약서 드롭 위치 (gitignored)
+├── output/                      # 기존 검토 결과 위치 (gitignored)
 │
 ├── .claude/
 │   ├── agents/                  # 서브 에이전트: ingestion, review, drafting
@@ -301,6 +301,12 @@ inbox/raw/  ──>  validate  ──>  classify  ──>  segment  ──>  app
 │   └── settings*.json           # 선택적 로컬 Claude Code 설정 (gitignored)
 │
 ├── contract-review/
+│   ├── workspace/               # 권장 local runtime workspace (gitignored)
+│   │   ├── input/               # 검토할 계약서를 여기에 넣습니다
+│   │   ├── output/              # 검토 결과가 여기에 생성됩니다
+│   │   ├── logs/                # 세션 노트
+│   │   ├── matters/             # 딜별 작업 디렉터리
+│   │   └── runs/                # 실행 트레이스
 │   ├── library/
 │   │   ├── inbox/raw/           # 원본 템플릿을 여기에 넣습니다 (gitignored)
 │   │   ├── inbox/sidecars/      # 보조 메타데이터 (gitignored)
@@ -317,7 +323,7 @@ inbox/raw/  ──>  validate  ──>  classify  ──>  segment  ──>  app
 │   │   └── runs/
 │   │       ├── ingestion/       # 로컬 인제스트 실행 산출물 (gitignored)
 │   │       └── sessions/        # 실행별 포렌식 트레이스 (gitignored)
-│   └── matters/                 # 딜별 작업 디렉터리 (gitignored)
+│   └── matters/                 # 기존 딜별 작업 디렉터리 (gitignored)
 │
 ├── logs/                        # 세션 로그 — 대화 기록 저장 (gitignored)
 ├── docs/
@@ -396,7 +402,7 @@ inbox/raw/  ──>  validate  ──>  classify  ──>  segment  ──>  app
 - **임베딩 / 벡터 DB 미사용** — 검색은 결정적 JSON 인덱스 필터링 + LLM 판단으로 처리합니다
 - **파이프라인 상태 저장** — 각 단계가 `pipeline-state.json`을 기록하므로 중단 후 재개가 가능합니다
 - **대상자 방화벽** — `[INTERNAL]`과 `[EXTERNAL]` 코멘트 스트림을 모든 단계에서 엄격히 분리합니다
-- **파일 기반 데이터 전달** — 대용량 페이로드는 인라인이 아닌 `matters/` 또는 `library/runs/` 하위의 로컬 파일로 전달합니다
+- **파일 기반 데이터 전달** — 대용량 페이로드는 인라인이 아닌 `contract-review/workspace/matters/` 또는 `contract-review/workspace/runs/` 하위의 로컬 파일로 전달합니다. 기존 `matters/`와 `library/runs/`도 bridge 기간 동안 계속 지원됩니다
 
 </details>
 
