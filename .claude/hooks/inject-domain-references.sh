@@ -74,8 +74,8 @@ fi
 # Priority: review > draft > ingest > none
 #
 # Rationale:
-#   - `review` wins because the 2026-04-09 incident was in the review workflow,
-#     it carries the highest analysis-quality risk, and it is the most frequent.
+#   - `review` wins because it carries the highest analysis-quality risk and
+#     has historically been the most sensitive to missing baselines.
 #     A prompt like "/draft 후 검토해" means the user wants review baselines too.
 #   - Slash commands always take priority over natural-language matching.
 #   - `none` triggers a silent `{}` (no injection) so non-workflow chatter and
@@ -130,7 +130,7 @@ fi
 
 # --- 4. Build instruction based on workflow --------------------------------
 # v2.1 P1 decision: only `review` gets the BLOCKING PRECONDITION strong
-# enforcement, because the 2026-04-09 incident was in the review workflow.
+# enforcement because review quality depends most directly on loaded baselines.
 # Draft and ingest get lighter HINT-style language to avoid over-engineering
 # unproven defensive code into well-functioning workflows.
 case "$WORKFLOW" in

@@ -216,11 +216,11 @@ function resolveReportLanguage(data) {
   //
   // NOTE: data.contract_info?.language is deliberately NOT in this chain.
   // That field describes the CONTRACT's own language (set by Step 2
-  // classification) and is orthogonal to the report language. The 2026-04-10
-  // incident was caused by treating an English contract as an English report
-  // request even when the user asked for a Korean memorandum. Do not
+  // classification) and is orthogonal to the report language. Prior regressions
+  // came from treating an English contract as an English report request even
+  // when the user asked for a Korean memorandum. Do not
   // reintroduce this fallback without rethinking the Pre-Pipeline language
-  // intake flow. See the local-only incident history notes for background.
+  // intake flow. See local maintenance notes for background.
   const explicitLanguage = firstNonEmpty(
     data.report_language,
     data.language,
@@ -1140,8 +1140,8 @@ function buildChildren(data) {
 // Cross-checks data.clauses.length against the sum of
 // data.executive_summary.risk_distribution counts. If they disagree, the LLM
 // dropped clauses somewhere between Step 6 (per-clause analysis) and Step 10
-// (review.json assembly) — a pattern observed in the 2026-04-10 incident
-// where 27 rated clauses silently collapsed to 10 "selected" entries.
+// (review.json assembly) — a prior regression pattern where rated clauses
+// silently collapsed to fewer selected entries.
 //
 // Default behavior is now fail-closed. A legacy escape hatch,
 // --allow-incomplete, keeps the old visible-warning rendering path for

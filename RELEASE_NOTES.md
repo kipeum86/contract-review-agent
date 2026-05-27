@@ -1,6 +1,6 @@
 ## Highlights
 
-Security Hardening Batch 1 (CSO audit 2026-04-16) + pipeline performance improvements. Update recommended for all users.
+Security review follow-up + pipeline performance improvements. Update recommended for all users.
 
 ```bash
 git pull origin main
@@ -9,7 +9,7 @@ git pull origin main
 ## 🔒 Security
 * Add `<untrusted_contract_content>` framing protocol for review-agent & ingestion-agent (bb5c9a6)
 * Sanitize prompt-injection tokens in redline extraction + audit log (EN·KO) (840c07c)
-* Security hardening batch 1 (#1)
+* Review workflow safety and reliability updates (#1)
 
 ## ⚡ Performance
 * Pre-Pipeline 0.5 document size check with manual-split warning (36d89dc)
@@ -25,7 +25,7 @@ git pull origin main
 
 ## 주요 변경사항
 
-CSO 감사(2026-04-16) 기반 보안 강화 1차 배치 + 파이프라인 성능 개선. 전체 사용자 업데이트 권장.
+보안 검토 후속 개선 + 파이프라인 성능 개선. 전체 사용자 업데이트 권장.
 
 ```bash
 git pull origin main
@@ -34,7 +34,7 @@ git pull origin main
 ### 🔒 보안
 * review-agent · ingestion-agent에 `<untrusted_contract_content>` 프레이밍 프로토콜 추가 (bb5c9a6)
 * Redline 추출 단계에서 프롬프트 인젝션 토큰 정화 + 감사 로그(한·영 양방향) (840c07c)
-* Security hardening batch 1 (#1)
+* 리뷰 워크플로 안전성 및 신뢰성 개선 (#1)
 
 ### ⚡ 성능
 * Pre-Pipeline 0.5 문서 크기 사전 점검 + 수동 분할 안내 (36d89dc)

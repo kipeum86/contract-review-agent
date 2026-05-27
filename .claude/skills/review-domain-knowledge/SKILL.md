@@ -24,7 +24,7 @@ The reference files above are **not background context** you should recall from 
 
 **Do not cite the four-lens framework, Common Law baselines, jurisdiction flags, or EPC block from training.** Cite them only after the relevant reference section has been loaded by `load-domain-references.sh --mode=section` or, when necessary, `--mode=full`. A digest alone proves availability; it is not a substitute for section text during substantive analysis.
 
-Detailed architecture history and incident notes are kept in the local-only workspace.
+Detailed architecture history and maintenance notes are kept in the local-only workspace.
 
 ## Safety Utilities
 
