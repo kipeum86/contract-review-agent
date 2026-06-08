@@ -1,0 +1,9 @@
+.env
+# Re-include the template — the upstream root .gitignore ignores .env.*
+!.env.example
+tmp/
+logs/
+.bindu/
+__pycache__/
+*.pyc
+.venv/

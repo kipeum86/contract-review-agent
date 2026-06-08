@@ -451,6 +451,10 @@ inbox/raw/  ──>  validate  ──>  classify  ──>  segment  ──>  app
 | `legal-writing-agent` | 법률 문서 작성 스페셜리스트 | 법률 문서 작성 |
 | `second-review-agent` | 시니어 리뷰 스페셜리스트 | 품질 리뷰 |
 
+## Bindu A2A 예제 (커뮤니티 기여)
+
+[`examples/agno-bindu/`](../../examples/agno-bindu/) 는 이 프로젝트의 검토 스킬을 [agno](https://github.com/agno-agi/agno) 에이전트로 감싸 [Bindu](https://github.com/GetBindu/Bindu) Agent-to-Agent(A2A) 프로토콜로 노출합니다 — 계약서 텍스트를 보내면 HTTP로 조항별 검토 결과를 받습니다. `.claude/skills/`를 그대로 읽어 사용하며 코어에 의존성을 추가하지 않습니다. 커뮤니티 제작물이며 본 프로젝트 메인테이너와 무관하고 공식 보증을 받지 않았습니다.
+
 ## 라이선스
 
 [Apache License, Version 2.0](../../LICENSE) 하에 배포됩니다. 자세한 내용은 [LICENSE](../../LICENSE)를 참고하세요.

@@ -392,6 +392,10 @@ Representative repositories in the ecosystem are listed below by repository ID:
 | `legal-writing-agent` | Legal Drafting Specialist | Legal writing |
 | `second-review-agent` | Senior Review Specialist | Quality review |
 
+## Bindu A2A example (community-contributed)
+
+[`examples/agno-bindu/`](./examples/agno-bindu/) exposes this project's review skills as an [agno](https://github.com/agno-agi/agno) agent over the [Bindu](https://github.com/GetBindu/Bindu) Agent-to-Agent (A2A) protocol — paste contract text, get a clause-by-clause review over HTTP. It loads `.claude/skills/` in place and adds no dependencies to the core. Community-built; not affiliated with or endorsed by this project's maintainers.
+
 ## License
 
 Licensed under the [Apache License, Version 2.0](LICENSE). See [LICENSE](./LICENSE).

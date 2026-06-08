@@ -1,0 +1,19 @@
+# Extra packages for this example. The upstream project's skills are read straight
+# from its .claude/skills/ directory (this example points agno at them in place), so
+# there is no upstream package to install.
+
+# Bindu - exposes the agent over the Agent-to-Agent (A2A) protocol.
+bindu>=2026.20
+
+# agno - the agent loop (LLM tool-calling, conversation memory) plus the Skills
+# loader that reads the upstream .claude/skills/ at runtime. Skills landed in 2.6.5.
+agno>=2.6.5,<3
+
+# Model client. OpenRouter speaks the OpenAI-compatible HTTP API.
+openai>=1.40
+
+# Loads the local .env file at startup.
+python-dotenv>=1.0
+
+# Pretty terminal output for the one-shot CLI runner (cli.py).
+rich>=13
