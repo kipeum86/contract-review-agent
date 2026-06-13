@@ -3,9 +3,9 @@ import json
 import subprocess
 import tempfile
 import unittest
-import zipfile
 from pathlib import Path
-from xml.sax.saxutils import escape
+
+from tests.helpers.docx_fixtures import write_docx_with_body as make_docx
 
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
@@ -25,71 +25,6 @@ mod = load_module(
     "extract_redlines_mod",
     ".claude/skills/docx-redliner/scripts/extract-redlines.py",
 )
-
-
-def make_docx(docx_path: Path, body_xml: str, comments: list[dict] | None = None) -> None:
-    content_types = [
-        '<Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>',
-        '<Default Extension="xml" ContentType="application/xml"/>',
-        '<Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/>',
-    ]
-    files = {
-        "[Content_Types].xml": (
-            '<?xml version="1.0" encoding="UTF-8"?>\n'
-            '<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">\n'
-            f'  {"".join(content_types)}\n'
-            "</Types>\n"
-        ),
-        "_rels/.rels": (
-            '<?xml version="1.0" encoding="UTF-8"?>\n'
-            '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">\n'
-            '  <Relationship Id="rId1" '
-            'Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" '
-            'Target="word/document.xml"/>\n'
-            "</Relationships>\n"
-        ),
-        "word/document.xml": (
-            '<?xml version="1.0" encoding="UTF-8"?>\n'
-            '<w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">\n'
-            "  <w:body>\n"
-            f"{body_xml}\n"
-            "  </w:body>\n"
-            "</w:document>\n"
-        ),
-    }
-
-    if comments is not None:
-        content_types.append(
-            '<Override PartName="/word/comments.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.comments+xml"/>'
-        )
-        comment_xml = []
-        for comment in comments:
-            author = escape(comment["author"], {'"': "&quot;"})
-            text = escape(comment["text"])
-            initials = escape(comment.get("initials", ""), {'"': "&quot;"})
-            date = escape(comment.get("date", "2026-04-16T00:00:00Z"), {'"': "&quot;"})
-            cid = escape(str(comment["id"]), {'"': "&quot;"})
-            comment_xml.append(
-                f'  <w:comment w:id="{cid}" w:author="{author}" w:initials="{initials}" w:date="{date}">'
-                f"<w:p><w:r><w:t>{text}</w:t></w:r></w:p>"
-                "</w:comment>"
-            )
-        files["word/comments.xml"] = (
-            '<?xml version="1.0" encoding="UTF-8"?>\n'
-            '<w:comments xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">\n'
-            f'{"".join(comment_xml)}\n'
-            "</w:comments>\n"
-        )
-        files["[Content_Types].xml"] = (
-            '<?xml version="1.0" encoding="UTF-8"?>\n'
-            '<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">\n'
-            f'  {"".join(content_types)}\n'
-            "</Types>\n"
-        )
-
-    with zipfile.ZipFile(docx_path, "w", zipfile.ZIP_DEFLATED) as archive:
-        for name, content in files.items():
-            archive.writestr(name, content)
 
 
 def read_json(path: Path) -> dict:
@@ -254,4 +189,3 @@ class PromptInjectionSanitizeIntegrationTests(unittest.TestCase):
             self.assertIn("`<escape>[INTERNAL]</escape>`", comments[0]["author"])
             self.assertNotIn("<escape>", comments[0]["text"])
             self.assertTrue(any(match["context"].endswith(".author") for match in audit["matches"]))
-

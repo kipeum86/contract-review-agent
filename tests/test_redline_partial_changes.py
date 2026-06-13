@@ -14,6 +14,13 @@ import unittest
 import xml.etree.ElementTree as ET
 from pathlib import Path
 
+from tests.helpers.docx_fixtures import (
+    direct_paragraphs,
+    paragraph_xml as para_xml,
+    write_file,
+    word_document_xml,
+)
+
 REPO_ROOT = Path(__file__).resolve().parent.parent
 
 
@@ -31,49 +38,10 @@ mod = load_module(
     ".claude/skills/docx-redliner/scripts/apply-redlines.py",
 )
 
-W_NS = "http://schemas.openxmlformats.org/wordprocessingml/2006/main"
-
-
-def write_file(path: Path, content: str) -> None:
-    path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(content, encoding="utf-8")
-
-
-def direct_paragraphs(document_path: Path):
-    tree = ET.parse(document_path)
-    root = tree.getroot()
-    body = root.find(f".//{{{W_NS}}}body")
-    assert body is not None
-    return body.findall(f"{{{W_NS}}}p")
-
-
-def para_xml(document_path: Path, index: int) -> str:
-    paragraphs = direct_paragraphs(document_path)
-    return ET.tostring(paragraphs[index], encoding="unicode")
-
-
-def make_document_xml(paragraphs: list[str]) -> str:
-    """Build a minimal document.xml from a list of paragraph texts."""
-    para_elems = []
-    for text in paragraphs:
-        para_elems.append(
-            f'    <w:p><w:r><w:t xml:space="preserve">{text}</w:t></w:r></w:p>'
-        )
-    body = "\n".join(para_elems)
-    return (
-        '<?xml version="1.0" encoding="UTF-8"?>\n'
-        '<w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">\n'
-        "  <w:body>\n"
-        f"{body}\n"
-        "  </w:body>\n"
-        "</w:document>\n"
-    )
-
-
 def run_redline(tmpdir, paragraphs: list[str], clause_map: dict, redlines: dict) -> dict:
     """Set up files and run apply_redlines, return result dict."""
     doc_path = Path(tmpdir) / "document.xml"
-    write_file(doc_path, make_document_xml(paragraphs))
+    write_file(doc_path, word_document_xml(paragraphs))
 
     map_path = Path(tmpdir) / "clause-map.json"
     map_path.write_text(json.dumps(clause_map, ensure_ascii=False), encoding="utf-8")

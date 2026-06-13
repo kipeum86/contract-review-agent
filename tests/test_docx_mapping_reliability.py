@@ -2,8 +2,9 @@ import importlib.util
 import json
 import tempfile
 import unittest
-import zipfile
 from pathlib import Path
+
+from tests.helpers.docx_fixtures import write_minimal_docx
 
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
@@ -22,26 +23,6 @@ mapping_module = load_module(
     "map_clauses_to_docx",
     ".claude/skills/docx-redliner/scripts/map-clauses-to-docx.py",
 )
-
-
-def make_document_xml(paragraphs: list[str]) -> str:
-    body = "\n".join(
-        f'    <w:p><w:r><w:t xml:space="preserve">{text}</w:t></w:r></w:p>'
-        for text in paragraphs
-    )
-    return (
-        '<?xml version="1.0" encoding="UTF-8"?>\n'
-        '<w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">\n'
-        "  <w:body>\n"
-        f"{body}\n"
-        "  </w:body>\n"
-        "</w:document>\n"
-    )
-
-
-def write_minimal_docx(path: Path, paragraphs: list[str]) -> None:
-    with zipfile.ZipFile(path, "w") as archive:
-        archive.writestr("word/document.xml", make_document_xml(paragraphs))
 
 
 def write_clause(path: Path, clause_id: str, text: str) -> None:
