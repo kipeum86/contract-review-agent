@@ -2,7 +2,7 @@
 
 # Contract Review Agent
 
-### AI-Powered Contract Review Workflow for KP Legal Orchestrator
+### AI-Powered Contract Review Workflow for Legal Workflow Orchestrator
 
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](./LICENSE)
 [![Claude Code](https://img.shields.io/badge/Built_with-Claude_Code-blueviolet)](https://claude.ai/claude-code)
@@ -378,9 +378,9 @@ The agent is composed of three specialized sub-agents coordinated by an orchestr
 
 Internal implementation notes are kept in the local-only workspace and are intentionally omitted from the public repository.
 
-## Part of KP Legal Orchestrator
+## Part of Legal Workflow Orchestrator
 
-This agent is part of the **KP Legal Orchestrator** family of specialist legal workflow agents.
+This agent is part of the **Legal Workflow Orchestrator** family of specialist legal workflow agents.
 Representative repositories in the ecosystem are listed below by repository ID:
 
 | Repository ID | Role | Focus |

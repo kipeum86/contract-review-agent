@@ -2,7 +2,7 @@
 
 # Contract Review Agent
 
-### Claude Code 기반 KP Legal Orchestrator 계약 검토 워크플로우
+### Claude Code 기반 Legal Workflow Orchestrator 계약 검토 워크플로우
 
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](../../LICENSE)
 [![Claude Code](https://img.shields.io/badge/Built_with-Claude_Code-blueviolet)](https://claude.ai/claude-code)
@@ -437,9 +437,9 @@ inbox/raw/  ──>  validate  ──>  classify  ──>  segment  ──>  app
 
 내부 구현 노트는 로컬 전용 워크스페이스에만 두고 공개 저장소에는 포함하지 않습니다.
 
-## KP Legal Orchestrator
+## Legal Workflow Orchestrator
 
-**KP Legal Orchestrator** 소속 전문 법률 워크플로우 에이전트 시리즈입니다.
+**Legal Workflow Orchestrator** 소속 전문 법률 워크플로우 에이전트 시리즈입니다.
 대표 리포지토리는 계정명 대신 저장소 식별자 기준으로 정리합니다:
 
 | 저장소 식별자 | 역할 | 전문 분야 |

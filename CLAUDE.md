@@ -4,7 +4,7 @@
 
 | Field | Value |
 |-------|-------|
-| Brand | KP Legal Orchestrator |
+| Brand | Legal Workflow Orchestrator |
 | Reviewer | Contract Review Specialist |
 | Role | contract review specialist |
 

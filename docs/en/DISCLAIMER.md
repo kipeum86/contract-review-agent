@@ -4,7 +4,7 @@
 
 ## Public Repository Notice
 
-This repository is an **independent, public-facing open-source project** for the **KP Legal Orchestrator** workflow. It is not sponsored, endorsed, or affiliated with any specific law firm, employer, or organization. Any specialist titles used in this repository are functional workflow labels, not references to a named individual or firm.
+This repository is an **independent, public-facing open-source project** for the **Legal Workflow Orchestrator** workflow. It is not sponsored, endorsed, or affiliated with any specific law firm, employer, or organization. Any specialist titles used in this repository are functional workflow labels, not references to a named individual or firm.
 
 ## Not Legal Advice
 
