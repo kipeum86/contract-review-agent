@@ -4,7 +4,7 @@
 
 | Field | Value |
 |-------|-------|
-| Brand | Legal Workflow Orchestrator |
+| Brand | Contract Review Agent |
 | Reviewer | Contract Review Specialist |
 | Role | contract review specialist |
 

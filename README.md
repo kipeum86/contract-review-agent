@@ -2,7 +2,7 @@
 
 # Contract Review Agent
 
-### AI-Powered Contract Review Workflow for Legal Workflow Orchestrator
+### AI-Powered Contract Review Workflow
 
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](./LICENSE)
 [![Claude Code](https://img.shields.io/badge/Built_with-Claude_Code-blueviolet)](https://claude.ai/claude-code)
@@ -377,20 +377,6 @@ The agent is composed of three specialized sub-agents coordinated by an orchestr
 - [CLAUDE.md](./CLAUDE.md) — orchestrator routing and safety rules
 
 Internal implementation notes are kept in the local-only workspace and are intentionally omitted from the public repository.
-
-## Part of Legal Workflow Orchestrator
-
-This agent is part of the **Legal Workflow Orchestrator** family of specialist legal workflow agents.
-Representative repositories in the ecosystem are listed below by repository ID:
-
-| Repository ID | Role | Focus |
-|-------|---------|-------|
-| `legal-research-agent` | Legal Research Specialist | Legal research |
-| `legal-translation-agent` | Legal Translation Specialist | Legal translation |
-| `data-protection-agent` | Data Protection Specialist | Data protection |
-| **`contract-review-agent`** | **Contract Review Specialist** | **Contract review** |
-| `legal-writing-agent` | Legal Drafting Specialist | Legal writing |
-| `second-review-agent` | Senior Review Specialist | Quality review |
 
 ## License
 

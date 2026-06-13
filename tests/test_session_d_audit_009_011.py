@@ -545,7 +545,7 @@ class SessionDAudit011ReportTests(unittest.TestCase):
                             "date": "2026-03-27",
                             "recipient": "주식회사 예시",
                             "reference": "법무팀장",
-                            "sender": "Legal Workflow Orchestrator",
+                            "sender": "Contract Review Agent",
                             "subject": "소프트웨어 라이선스 계약 검토 의견서",
                             "signer": "계약 검토 스페셜리스트",
                         },
@@ -803,7 +803,7 @@ class SessionDAudit011ReportTests(unittest.TestCase):
                         "memo_metadata": {
                             "date": "2026-04-10",
                             "recipient": "주식회사 예시",
-                            "sender": "Legal Workflow Orchestrator",
+                            "sender": "Contract Review Agent",
                             "subject": "EPC 공급계약 검토 의견서",
                             "signer": "계약 검토 스페셜리스트",
                         },
@@ -885,7 +885,7 @@ class SessionDAudit011ReportTests(unittest.TestCase):
                         "memo_metadata": {
                             "date": "2026-04-10",
                             "recipient": "주식회사 예시",
-                            "sender": "Legal Workflow Orchestrator",
+                            "sender": "Contract Review Agent",
                             "subject": "기존 형식 검토 의견서",
                             "signer": "계약 검토 스페셜리스트",
                         },
@@ -961,7 +961,7 @@ class SessionDAudit011ReportTests(unittest.TestCase):
                         "memo_metadata": {
                             "date": "2026-04-11",
                             "recipient": "주식회사 예시",
-                            "sender": "Legal Workflow Orchestrator",
+                            "sender": "Contract Review Agent",
                             "subject": "영문 공급계약 검토 의견서",
                             "signer": "계약 검토 스페셜리스트",
                         },
@@ -1091,7 +1091,7 @@ class SessionDAudit011ReportTests(unittest.TestCase):
                         "memo_metadata": {
                             "date": "2026-04-11",
                             "recipient": "주식회사 예시",
-                            "sender": "Legal Workflow Orchestrator",
+                            "sender": "Contract Review Agent",
                             "subject": "EPC 계약 검토 의견서",
                             "signer": "계약 검토 스페셜리스트",
                         },

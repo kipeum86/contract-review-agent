@@ -760,7 +760,7 @@ function resolveMemoMetadata(data) {
     date: formatKoreanDate(meta.date || data.report_date || contractInfo.date),
     recipient: firstNonEmpty(meta.recipient, contractInfo.client_name, contractInfo.recipient, '의뢰인 귀중'),
     reference: firstNonEmpty(meta.reference, contractInfo.reference),
-    sender: firstNonEmpty(meta.sender, contractInfo.sender, 'Legal Review Orchestrator'),
+    sender: firstNonEmpty(meta.sender, contractInfo.sender, 'Contract Review Agent'),
     subject: firstNonEmpty(
       meta.subject,
       contractInfo.subject,

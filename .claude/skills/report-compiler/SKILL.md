@@ -44,7 +44,7 @@ Compile analysis results into professional DOCX report deliverables.
     "date": "2026-03-27",
     "recipient": "Client Name",
     "reference": "GC",
-    "sender": "Legal Review Orchestrator",
+    "sender": "Contract Review Agent",
     "subject": "계약 검토 분석 메모",
     "signer": "담당 스페셜리스트"
   },
