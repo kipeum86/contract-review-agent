@@ -2,7 +2,7 @@
 
 # Contract Review Agent
 
-### Claude Code 기반 KP Legal Orchestrator 계약 검토 워크플로우
+### Claude Code 기반 계약 검토 워크플로우
 
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](../../LICENSE)
 [![Claude Code](https://img.shields.io/badge/Built_with-Claude_Code-blueviolet)](https://claude.ai/claude-code)
@@ -436,20 +436,6 @@ inbox/raw/  ──>  validate  ──>  classify  ──>  segment  ──>  app
 - [CLAUDE.md](../../CLAUDE.md) — 오케스트레이터 라우팅과 안전 규칙
 
 내부 구현 노트는 로컬 전용 워크스페이스에만 두고 공개 저장소에는 포함하지 않습니다.
-
-## KP Legal Orchestrator
-
-**KP Legal Orchestrator** 소속 전문 법률 워크플로우 에이전트 시리즈입니다.
-대표 리포지토리는 계정명 대신 저장소 식별자 기준으로 정리합니다:
-
-| 저장소 식별자 | 역할 | 전문 분야 |
-|---------|----------|----------|
-| `legal-research-agent` | 법률 리서치 스페셜리스트 | 법률 리서치 |
-| `legal-translation-agent` | 법률 번역 스페셜리스트 | 법률 번역 |
-| `data-protection-agent` | 데이터 보호 스페셜리스트 | 데이터 보호 |
-| **`contract-review-agent`** | **계약 검토 스페셜리스트** | **계약서 검토** |
-| `legal-writing-agent` | 법률 문서 작성 스페셜리스트 | 법률 문서 작성 |
-| `second-review-agent` | 시니어 리뷰 스페셜리스트 | 품질 리뷰 |
 
 ## 라이선스
 

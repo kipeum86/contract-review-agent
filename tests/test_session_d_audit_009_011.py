@@ -4,8 +4,17 @@ import subprocess
 import tempfile
 import unittest
 import xml.etree.ElementTree as ET
-import zipfile
 from pathlib import Path
+
+from tests.helpers.docx_fixtures import (
+    CONTENT_TYPES_NS,
+    PKG_REL_NS,
+    W_NS,
+    direct_paragraphs,
+    read_zip_text,
+    write_file,
+    write_minimal_unpacked_docx_package,
+)
 
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
@@ -28,29 +37,6 @@ apply_redlines_module = load_module(
     "apply_redlines",
     ".claude/skills/docx-redliner/scripts/apply-redlines.py",
 )
-
-W_NS = "http://schemas.openxmlformats.org/wordprocessingml/2006/main"
-PKG_REL_NS = "http://schemas.openxmlformats.org/package/2006/relationships"
-CONTENT_TYPES_NS = "http://schemas.openxmlformats.org/package/2006/content-types"
-
-
-def write_file(path: Path, content: str) -> None:
-    path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(content, encoding="utf-8")
-
-
-def read_zip_text(docx_path: Path, member: str) -> str:
-    with zipfile.ZipFile(docx_path, "r") as archive:
-        return archive.read(member).decode("utf-8")
-
-
-def direct_paragraphs(document_path: Path):
-    tree = ET.parse(document_path)
-    root = tree.getroot()
-    body = root.find(f".//{{{W_NS}}}body")
-    assert body is not None
-    return body.findall(f"{{{W_NS}}}p")
-
 
 def make_clause(index: int, *, include_action: bool = False, korean: bool = False) -> dict:
     prefix = "제" if korean else "§"
@@ -201,46 +187,6 @@ class SessionDAudit009CommentsTests(unittest.TestCase):
             ]
             self.assertIn("/word/comments.xml", overrides)
 
-    def _write_minimal_docx_package(self, unpacked_dir: Path) -> None:
-        """Helper: write a minimal DOCX package for comment tests."""
-        write_file(
-            unpacked_dir / "word" / "document.xml",
-            """<?xml version="1.0" encoding="UTF-8"?>
-<w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">
-  <w:body>
-    <w:p>
-      <w:r><w:t>Clause text for comments.</w:t></w:r>
-    </w:p>
-  </w:body>
-</w:document>
-""",
-        )
-        write_file(
-            unpacked_dir / "word" / "comments.xml",
-            """<?xml version="1.0" encoding="UTF-8"?>
-<w:comments xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">
-</w:comments>
-""",
-        )
-        write_file(
-            unpacked_dir / "word" / "_rels" / "document.xml.rels",
-            """<?xml version="1.0" encoding="UTF-8"?>
-<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
-  <Relationship Id="rIdStyles" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/>
-</Relationships>
-""",
-        )
-        write_file(
-            unpacked_dir / "[Content_Types].xml",
-            """<?xml version="1.0" encoding="UTF-8"?>
-<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">
-  <Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>
-  <Default Extension="xml" ContentType="application/xml"/>
-  <Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/>
-</Types>
-""",
-        )
-
     def test_apply_comments_accepts_v2_list_schema(self):
         """v2 schema: each clause_id maps to a list of {audience, text} entries.
 
@@ -251,7 +197,7 @@ class SessionDAudit009CommentsTests(unittest.TestCase):
         """
         with tempfile.TemporaryDirectory() as tmpdir:
             unpacked_dir = Path(tmpdir) / "unpacked"
-            self._write_minimal_docx_package(unpacked_dir)
+            write_minimal_unpacked_docx_package(unpacked_dir)
 
             clause_map_path = Path(tmpdir) / "clause-map.json"
             clause_map_path.write_text(
@@ -311,7 +257,7 @@ class SessionDAudit009CommentsTests(unittest.TestCase):
         """A failed EXTERNAL comment must halt even if other comments apply."""
         with tempfile.TemporaryDirectory() as tmpdir:
             unpacked_dir = Path(tmpdir) / "unpacked"
-            self._write_minimal_docx_package(unpacked_dir)
+            write_minimal_unpacked_docx_package(unpacked_dir)
 
             clause_map_path = Path(tmpdir) / "clause-map.json"
             clause_map_path.write_text(
@@ -366,7 +312,7 @@ class SessionDAudit009CommentsTests(unittest.TestCase):
         """
         with tempfile.TemporaryDirectory() as tmpdir:
             unpacked_dir = Path(tmpdir) / "unpacked"
-            self._write_minimal_docx_package(unpacked_dir)
+            write_minimal_unpacked_docx_package(unpacked_dir)
 
             clause_map_path = Path(tmpdir) / "clause-map.json"
             clause_map_path.write_text(
@@ -410,7 +356,7 @@ class SessionDAudit009CommentsTests(unittest.TestCase):
         may produce zero comment entries, which is not a failure."""
         with tempfile.TemporaryDirectory() as tmpdir:
             unpacked_dir = Path(tmpdir) / "unpacked"
-            self._write_minimal_docx_package(unpacked_dir)
+            write_minimal_unpacked_docx_package(unpacked_dir)
 
             clause_map_path = Path(tmpdir) / "clause-map.json"
             clause_map_path.write_text(
@@ -599,7 +545,7 @@ class SessionDAudit011ReportTests(unittest.TestCase):
                             "date": "2026-03-27",
                             "recipient": "주식회사 예시",
                             "reference": "법무팀장",
-                            "sender": "KP Legal Orchestrator",
+                            "sender": "Contract Review Agent",
                             "subject": "소프트웨어 라이선스 계약 검토 의견서",
                             "signer": "계약 검토 스페셜리스트",
                         },
@@ -857,7 +803,7 @@ class SessionDAudit011ReportTests(unittest.TestCase):
                         "memo_metadata": {
                             "date": "2026-04-10",
                             "recipient": "주식회사 예시",
-                            "sender": "KP Legal Orchestrator",
+                            "sender": "Contract Review Agent",
                             "subject": "EPC 공급계약 검토 의견서",
                             "signer": "계약 검토 스페셜리스트",
                         },
@@ -939,7 +885,7 @@ class SessionDAudit011ReportTests(unittest.TestCase):
                         "memo_metadata": {
                             "date": "2026-04-10",
                             "recipient": "주식회사 예시",
-                            "sender": "KP Legal Orchestrator",
+                            "sender": "Contract Review Agent",
                             "subject": "기존 형식 검토 의견서",
                             "signer": "계약 검토 스페셜리스트",
                         },
@@ -1015,7 +961,7 @@ class SessionDAudit011ReportTests(unittest.TestCase):
                         "memo_metadata": {
                             "date": "2026-04-11",
                             "recipient": "주식회사 예시",
-                            "sender": "KP Legal Orchestrator",
+                            "sender": "Contract Review Agent",
                             "subject": "영문 공급계약 검토 의견서",
                             "signer": "계약 검토 스페셜리스트",
                         },
@@ -1145,7 +1091,7 @@ class SessionDAudit011ReportTests(unittest.TestCase):
                         "memo_metadata": {
                             "date": "2026-04-11",
                             "recipient": "주식회사 예시",
-                            "sender": "KP Legal Orchestrator",
+                            "sender": "Contract Review Agent",
                             "subject": "EPC 계약 검토 의견서",
                             "signer": "계약 검토 스페셜리스트",
                         },

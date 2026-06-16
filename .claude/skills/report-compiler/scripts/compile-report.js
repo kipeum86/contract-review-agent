@@ -78,6 +78,7 @@ const PAGE_MARGINS = {
 };
 
 
+// Shared data helpers
 function containsHangul(value) {
   return /[\u3131-\uD79D]/.test(value || '');
 }
@@ -106,6 +107,50 @@ function normalizeList(value) {
     return Object.values(value).flatMap((item) => normalizeList(item));
   }
   return [];
+}
+
+function resolveReportLanguage(data) {
+  // Report language resolution order (2026-04-11 hardening):
+  //
+  //   1. data.report_language        ← Pre-Pipeline intake item 3 (user's
+  //                                     explicit choice, copied to review.json
+  //                                     at Step 10)
+  //   2. data.language               ← legacy alias, still honored
+  //   3. data.memo_metadata.language ← Korean memo metadata override
+  //
+  // NOTE: data.contract_info?.language is deliberately NOT in this chain.
+  // That field describes the CONTRACT's own language (set by Step 2
+  // classification) and is orthogonal to the report language. Prior regressions
+  // came from treating an English contract as an English report request even
+  // when the user asked for a Korean memorandum. Do not
+  // reintroduce this fallback without rethinking the Pre-Pipeline language
+  // intake flow. See local maintenance notes for background.
+  const explicitLanguage = firstNonEmpty(
+    data.report_language,
+    data.language,
+    data.memo_metadata?.language,
+  ).toLowerCase();
+
+  if (explicitLanguage.startsWith('ko')) {
+    return 'ko';
+  }
+  if (explicitLanguage.startsWith('en')) {
+    return 'en';
+  }
+
+  // Last-resort heuristic: if no explicit language was set, inspect the actual
+  // text the LLM populated. A review.json written against a Korean matter will
+  // naturally contain Hangul in titles, recommendations, and key issues. This
+  // only fires when the LLM forgot to set report_language AND did not populate
+  // memo_metadata.language.
+  const samples = [
+    data.contract_info?.title,
+    data.executive_summary?.overview,
+    data.executive_summary?.recommendation,
+    ...(data.executive_summary?.key_issues || []),
+  ].filter(Boolean);
+
+  return samples.some(containsHangul) ? 'ko' : 'en';
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -205,50 +250,7 @@ function injectBaselineTrace(data, matterWorkingDir) {
   appendTraceText(traceLine);
 }
 
-function resolveReportLanguage(data) {
-  // Report language resolution order (2026-04-11 hardening):
-  //
-  //   1. data.report_language        ← Pre-Pipeline intake item 3 (user's
-  //                                     explicit choice, copied to review.json
-  //                                     at Step 10)
-  //   2. data.language               ← legacy alias, still honored
-  //   3. data.memo_metadata.language ← Korean memo metadata override
-  //
-  // NOTE: data.contract_info?.language is deliberately NOT in this chain.
-  // That field describes the CONTRACT's own language (set by Step 2
-  // classification) and is orthogonal to the report language. Prior regressions
-  // came from treating an English contract as an English report request even
-  // when the user asked for a Korean memorandum. Do not
-  // reintroduce this fallback without rethinking the Pre-Pipeline language
-  // intake flow. See local maintenance notes for background.
-  const explicitLanguage = firstNonEmpty(
-    data.report_language,
-    data.language,
-    data.memo_metadata?.language,
-  ).toLowerCase();
-
-  if (explicitLanguage.startsWith('ko')) {
-    return 'ko';
-  }
-  if (explicitLanguage.startsWith('en')) {
-    return 'en';
-  }
-
-  // Last-resort heuristic: if no explicit language was set, inspect the actual
-  // text the LLM populated. A review.json written against a Korean matter will
-  // naturally contain Hangul in titles, recommendations, and key issues. This
-  // only fires when the LLM forgot to set report_language AND did not populate
-  // memo_metadata.language.
-  const samples = [
-    data.contract_info?.title,
-    data.executive_summary?.overview,
-    data.executive_summary?.recommendation,
-    ...(data.executive_summary?.key_issues || []),
-  ].filter(Boolean);
-
-  return samples.some(containsHangul) ? 'ko' : 'en';
-}
-
+// DOCX primitives
 function styledRun(text, options = {}) {
   return new TextRun({
     text,
@@ -286,6 +288,7 @@ function createRiskBadge(riskLevel) {
   });
 }
 
+// English report renderers
 function createExecutiveSummary(data) {
   const sections = [];
   const summary = data.executive_summary || {};
@@ -723,6 +726,7 @@ function createNumberedClauseAnalysis(clauses) {
   return sections;
 }
 
+// Korean memorandum renderer
 function formatKoreanDate(rawValue) {
   if (!rawValue) {
     return formatKoreanDate(new Date());
@@ -756,7 +760,7 @@ function resolveMemoMetadata(data) {
     date: formatKoreanDate(meta.date || data.report_date || contractInfo.date),
     recipient: firstNonEmpty(meta.recipient, contractInfo.client_name, contractInfo.recipient, '의뢰인 귀중'),
     reference: firstNonEmpty(meta.reference, contractInfo.reference),
-    sender: firstNonEmpty(meta.sender, contractInfo.sender, 'KP Legal Orchestrator'),
+    sender: firstNonEmpty(meta.sender, contractInfo.sender, 'Contract Review Agent'),
     subject: firstNonEmpty(
       meta.subject,
       contractInfo.subject,
@@ -1095,6 +1099,7 @@ function createKoreanMemorandum(data) {
   return sections;
 }
 
+// Renderer dispatch
 function buildChildren(data) {
   const clauses = data.clauses || data.analysis || [];
   if (resolveReportLanguage(data) === 'ko') {
@@ -1134,6 +1139,7 @@ function buildChildren(data) {
   return children;
 }
 
+// Completeness validation gate
 // ─────────────────────────────────────────────────────────────────────────────
 // validateClauseCompleteness (2026-04-11 hardening, 2026-04-25 hard gate)
 // ─────────────────────────────────────────────────────────────────────────────
@@ -1238,6 +1244,7 @@ function validateClauseCompleteness(data, options = {}) {
   );
 }
 
+// Compiler entrypoint
 async function compileReport(inputPath, outputPath, matterWorkingDir, options = {}) {
   const rawData = fs.readFileSync(inputPath, 'utf-8');
   const data = JSON.parse(rawData);
@@ -1287,6 +1294,7 @@ async function compileReport(inputPath, outputPath, matterWorkingDir, options = 
   };
 }
 
+// CLI wrapper
 async function main() {
   const args = process.argv.slice(2);
   const allowIncomplete = args.includes('--allow-incomplete');

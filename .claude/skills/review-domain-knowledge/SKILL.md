@@ -55,6 +55,7 @@ For each target clause matched to a library clause:
 Apply review mode from `contract-review/library/policies/review-mode.yaml`.
 If the user-customized policy lacks v2 fields, inherit missing values from
 `contract-review/library/policies.default/review-mode.yaml`.
+The YAML policy is canonical; Markdown tables in this skill are summaries only.
 
 Use:
 - `redline_scope` for redline suggestions
@@ -93,6 +94,10 @@ When generating contracts using the drafting workflow:
 5. **Generation rules**: Follow defined terms, cross-references, numbering, and placeholder rules in `drafting-guide.md`
 
 ## Review Mode Definitions
+
+Summary only. Do not derive thresholds from this table; load the selected mode
+from `contract-review/library/policies/review-mode.yaml`, inheriting missing
+v2 fields from `contract-review/library/policies.default/review-mode.yaml`.
 
 | Mode | Redline Scope | Acceptable Tier | Comments For |
 |------|--------------|-----------------|-------------|

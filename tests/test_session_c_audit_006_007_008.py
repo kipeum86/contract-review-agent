@@ -2,9 +2,10 @@ import importlib.util
 import json
 import tempfile
 import unittest
-import zipfile
 from pathlib import Path
 import xml.etree.ElementTree as ET
+
+from tests.helpers.docx_fixtures import W_NS, read_zip_text, write_zip_package, zip_members
 
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
@@ -31,12 +32,6 @@ strip_module = load_module(
     "strip_internal_comments",
     ".claude/skills/docx-redliner/scripts/strip-internal-comments.py",
 )
-
-
-W_NS = "http://schemas.openxmlformats.org/wordprocessingml/2006/main"
-W15_NS = "http://schemas.microsoft.com/office/word/2012/wordml"
-W16CID_NS = "http://schemas.microsoft.com/office/word/2016/wordml/cid"
-PKG_REL_NS = "http://schemas.openxmlformats.org/package/2006/relationships"
 
 
 def create_comment_fixture_docx(docx_path: Path, include_external: bool) -> None:
@@ -181,19 +176,7 @@ def create_comment_fixture_docx(docx_path: Path, include_external: bool) -> None
 """,
     }
 
-    with zipfile.ZipFile(docx_path, "w", zipfile.ZIP_DEFLATED) as archive:
-        for name, content in files.items():
-            archive.writestr(name, content)
-
-
-def read_zip_text(docx_path: Path, member: str) -> str:
-    with zipfile.ZipFile(docx_path, "r") as archive:
-        return archive.read(member).decode("utf-8")
-
-
-def zip_members(docx_path: Path) -> set[str]:
-    with zipfile.ZipFile(docx_path, "r") as archive:
-        return set(archive.namelist())
+    write_zip_package(docx_path, files)
 
 
 class SessionCAudit006Tests(unittest.TestCase):

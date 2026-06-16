@@ -325,6 +325,7 @@ For each clause:
 8. Write per-clause analysis to `working/analysis/`
 
 **Review mode application:**
+- The selected `review-mode.yaml` values are canonical. Do not infer ad hoc thresholds from prompt prose or Markdown summary tables.
 - Use `redline_scope` from the selected review mode to decide which risk levels get redline suggestions.
 - Use `external_comment_scope` to decide which risk levels receive `[EXTERNAL]` comments.
 - Use `internal_comment_scope` to decide which risk levels receive `[INTERNAL]` comments.

@@ -1,4 +1,9 @@
-# Review Mode — Controls analysis aggressiveness, redline scope, and comment scope
+# Review Mode — canonical default policy for analysis aggressiveness,
+# redline scope, and comment scope.
+#
+# Runtime should load contract-review/library/policies/review-mode.yaml when
+# present, then inherit missing v2 fields from this file. Markdown tables in
+# agent/skill docs are summaries only; thresholds come from YAML.
 # Users can set a global default and override per-review via natural language.
 
 policy_version: 2
