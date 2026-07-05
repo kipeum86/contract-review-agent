@@ -241,6 +241,12 @@ PRIVILEGE_PATTERNS = [
 ]
 
 
+COMPILED_PRIVILEGE_PATTERNS = [
+    (re.compile(spec['pattern'], re.IGNORECASE), spec)
+    for spec in PRIVILEGE_PATTERNS
+]
+
+
 def scan_for_privilege(text: str) -> list[dict]:
     """Scan text for privileged content patterns.
 
@@ -250,16 +256,14 @@ def scan_for_privilege(text: str) -> list[dict]:
     lines = text.split('\n')
 
     for line_no, line in enumerate(lines, 1):
-        for pattern_spec in PRIVILEGE_PATTERNS:
-            pattern = pattern_spec['pattern']
-            matches = list(re.finditer(pattern, line, re.IGNORECASE))
-            for match in matches:
+        for compiled, pattern_spec in COMPILED_PRIVILEGE_PATTERNS:
+            for match in compiled.finditer(line):
                 findings.append({
                     'line': line_no,
                     'column': match.start(),
                     'matched_text': match.group(),
                     'context': line.strip()[:200],
-                    'pattern': pattern,
+                    'pattern': pattern_spec['pattern'],
                     'description': pattern_spec['description'],
                     'category': pattern_spec['category'],
                     'severity': pattern_spec['severity'],
@@ -385,17 +389,35 @@ def check_package(package_dir: str) -> dict:
     return results
 
 
+def redact_result(result: dict) -> dict:
+    """Strip matched source text from findings so CLI output can be logged
+    or shared without reproducing the privileged content itself."""
+    for finding in result.get('findings', []):
+        finding.pop('matched_text', None)
+        finding.pop('context', None)
+    for file_result in result.get('file_results', []):
+        redact_result(file_result)
+    return result
+
+
 def main():
-    if len(sys.argv) < 2:
-        print(json.dumps({'error': 'Usage: check-privilege-leak.py <file_or_dir>'}))
+    argv = sys.argv[1:]
+    include_context = '--include-context' in argv
+    targets = [arg for arg in argv if arg != '--include-context']
+
+    if not targets:
+        print(json.dumps({'error': 'Usage: check-privilege-leak.py <file_or_dir> [--include-context]'}))
         sys.exit(1)
 
-    target = sys.argv[1]
+    target = targets[0]
 
     if os.path.isdir(target):
         result = check_package(target)
     else:
         result = check_file(target)
+
+    if not include_context:
+        redact_result(result)
 
     print(json.dumps(result, indent=2, ensure_ascii=False))
 

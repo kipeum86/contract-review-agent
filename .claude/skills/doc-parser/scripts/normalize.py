@@ -422,6 +422,8 @@ def normalize(file_path: str, output_dir: str) -> dict:
         plain_text = strip_markdown(md_text)
     elif plain_text and not md_text:
         md_text = plain_text
+    md_text = md_text or ''
+    plain_text = plain_text or ''
 
     # Count headings in md_text
     heading_count = len(re.findall(r'^#{1,6}\s+', md_text, re.MULTILINE))

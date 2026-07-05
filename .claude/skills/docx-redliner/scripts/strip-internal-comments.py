@@ -39,9 +39,24 @@ ET.register_namespace('wps', 'http://schemas.microsoft.com/office/word/2010/word
 ET.register_namespace('w14', 'http://schemas.microsoft.com/office/word/2010/wordml')
 
 
+MAX_ARCHIVE_MEMBERS = 10_000
+MAX_UNCOMPRESSED_BYTES = 512 * 1024 * 1024
+
+
 def unpack_docx(docx_path: str, output_dir: str):
     """Unpack a DOCX file into a directory."""
     with zipfile.ZipFile(docx_path, 'r') as archive:
+        members = archive.infolist()
+        if len(members) > MAX_ARCHIVE_MEMBERS:
+            raise ValueError(
+                f'DOCX archive has {len(members)} members (limit {MAX_ARCHIVE_MEMBERS})'
+            )
+        total_uncompressed = sum(info.file_size for info in members)
+        if total_uncompressed > MAX_UNCOMPRESSED_BYTES:
+            raise ValueError(
+                f'DOCX uncompressed size {total_uncompressed} bytes '
+                f'exceeds limit {MAX_UNCOMPRESSED_BYTES}'
+            )
         archive.extractall(output_dir)
 
 

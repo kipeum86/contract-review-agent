@@ -9,8 +9,6 @@
 [![Node.js](https://img.shields.io/badge/Node.js-18%2B-green)](https://nodejs.org/)
 [![Python](https://img.shields.io/badge/Python-3.10%2B-yellow)](https://www.python.org/)
 
-[English](./README.md)&ensp;·&ensp;[한국어](./docs/ko/README.md)
-
 ---
 
 Drop a contract in, get back a **Word file with tracked-change redlines,
@@ -25,7 +23,6 @@ and negotiation recommendations** — all generated directly in DOCX.
 > **Before you start, please read:**
 > - **[Disclaimer](./docs/en/DISCLAIMER.md)** — important limitations and data security considerations
 > - **[How to Use](./docs/en/HOW-TO-USE.md)** — setup, environment, and step-by-step guide
-> - **[Seed Calibration Playbook](./docs/en/SEED-CALIBRATION-PLAYBOOK.md)** — advanced operating guide for maintaining synthetic library baselines over time
 
 ## What It Does
 

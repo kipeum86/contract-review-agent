@@ -28,15 +28,23 @@ INDEX_VERSION = 2
 def load_yaml(path: str) -> dict | None:
     if not os.path.exists(path):
         return None
-    with open(path, 'r', encoding='utf-8') as f:
-        return yaml.safe_load(f)
+    try:
+        with open(path, 'r', encoding='utf-8') as f:
+            return yaml.safe_load(f)
+    except (yaml.YAMLError, OSError) as exc:
+        print(f"[build-index] skipping unreadable YAML {path}: {exc}", file=sys.stderr)
+        return None
 
 
 def load_json(path: str) -> dict | list | None:
     if not os.path.exists(path):
         return None
-    with open(path, 'r', encoding='utf-8') as f:
-        return json.load(f)
+    try:
+        with open(path, 'r', encoding='utf-8') as f:
+            return json.load(f)
+    except (json.JSONDecodeError, OSError) as exc:
+        print(f"[build-index] skipping unreadable JSON {path}: {exc}", file=sys.stderr)
+        return None
 
 
 def save_index(path: str, data: dict):
