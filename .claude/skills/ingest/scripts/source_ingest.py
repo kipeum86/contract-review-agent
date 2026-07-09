@@ -138,7 +138,7 @@ def build_frontmatter(entry: dict[str, Any]) -> str:
         value = entry.get(key)
         if value is None:
             value = ""
-        lines.append(f'{key}: "{str(value).replace(chr(34), chr(92) + chr(34))}"')
+        lines.append(f'{key}: {json.dumps(str(value), ensure_ascii=False)}')
     for key in ["keywords", "relevant_statutes", "contract_families_relevant"]:
         values = entry.get(key) or []
         rendered = ", ".join(json.dumps(value, ensure_ascii=False) for value in values)
@@ -167,7 +167,10 @@ def ingest_source(
     if not input_file.exists():
         return {"success": False, "error": f"file_not_found:{input_path}"}
 
-    markdown_text = convert_to_markdown(input_file)
+    try:
+        markdown_text = convert_to_markdown(input_file)
+    except (ValueError, OSError) as exc:
+        return {"success": False, "error": str(exc), "input_path": str(input_file)}
     extracted_title = title or first_heading(markdown_text, input_file.stem)
     slug = slugify(extracted_title)
     source_id = source_id or f"{slug}-{date.today().isoformat()}"

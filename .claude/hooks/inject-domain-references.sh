@@ -80,37 +80,50 @@ fi
 #   - Slash commands always take priority over natural-language matching.
 #   - `none` triggers a silent `{}` (no injection) so non-workflow chatter and
 #     non-baseline commands like /library don't suffer hook overhead.
+# Uses in-process [[ =~ ]] matching (no grep subprocesses) since this hook
+# runs on every prompt submit.
 detect_workflow() {
+    local review_slash='/contract-review|/rereview'
+    local none_slash='/library|/export-clean'
+    local review_nl='검토해|분석해|재검토|이 계약서|수정본|review|analysis|re-review|revised version'
+    local draft_nl='작성해|계약서 만들어|드래프팅|draft|create contract'
+    # Absorb existing ingest hook keywords (Code Quality #3 / Test 0.5 regression)
+    local ingest_nl='ingest|소스 추가|자료 넣|inbox|파일 올렸|파일 넣었|참조 자료|등록'
+
     # Slash commands (highest priority)
-    if printf '%s' "$USER_PROMPT" | grep -qE '/contract-review|/rereview'; then
+    if [[ "$USER_PROMPT" =~ $review_slash ]]; then
         echo "review"; return
     fi
-    if printf '%s' "$USER_PROMPT" | grep -qE '/draft'; then
+    if [[ "$USER_PROMPT" =~ /draft ]]; then
         echo "draft"; return
     fi
-    if printf '%s' "$USER_PROMPT" | grep -qE '/ingest'; then
+    if [[ "$USER_PROMPT" =~ /ingest ]]; then
         echo "ingest"; return
     fi
-    if printf '%s' "$USER_PROMPT" | grep -qE '/resume'; then
+    if [[ "$USER_PROMPT" =~ /resume ]]; then
         echo "review"; return   # default fallback (most common resume case)
     fi
 
     # Explicit "no injection" commands
-    if printf '%s' "$USER_PROMPT" | grep -qE '/library|/export-clean'; then
+    if [[ "$USER_PROMPT" =~ $none_slash ]]; then
         echo "none"; return
     fi
 
     # Natural language — same priority order: review > draft > ingest
-    if printf '%s' "$USER_PROMPT" | grep -qiE '검토해|분석해|재검토|이 계약서|수정본|review|analysis|re-review|revised version'; then
+    shopt -s nocasematch
+    if [[ "$USER_PROMPT" =~ $review_nl ]]; then
+        shopt -u nocasematch
         echo "review"; return
     fi
-    if printf '%s' "$USER_PROMPT" | grep -qiE '작성해|계약서 만들어|드래프팅|draft|create contract'; then
+    if [[ "$USER_PROMPT" =~ $draft_nl ]]; then
+        shopt -u nocasematch
         echo "draft"; return
     fi
-    # Absorb existing ingest hook keywords (Code Quality #3 / Test 0.5 regression)
-    if printf '%s' "$USER_PROMPT" | grep -qiE 'ingest|소스 추가|자료 넣|inbox|파일 올렸|파일 넣었|참조 자료|등록'; then
+    if [[ "$USER_PROMPT" =~ $ingest_nl ]]; then
+        shopt -u nocasematch
         echo "ingest"; return
     fi
+    shopt -u nocasematch
 
     echo "none"
 }

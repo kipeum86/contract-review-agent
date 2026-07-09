@@ -140,7 +140,6 @@ def verify_step_artifacts(state_path: str, state: dict, last_completed: int) -> 
             elif not output_path:
                 check["verified"] = True
                 check["reason"] = "no_output_declared"
-                verified_through_step = step
             else:
                 resolved_output = resolve_output_path(state_path, output_path)
                 check["resolved_output"] = resolved_output
