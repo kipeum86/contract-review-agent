@@ -105,6 +105,25 @@ class ClaudePreToolUseGuardTests(unittest.TestCase):
         result = run_hook({"file_path": "/tmp/outside-contract-review-agent.txt"})
         self.assertEqual(result.returncode, 2)
 
+    def test_write_tool_into_approved_blocks(self):
+        result = run_hook(
+            {"file_path": "contract-review/library/approved/templates/nda/x/clean.md"}
+        )
+        self.assertEqual(result.returncode, 2)
+        self.assertIn("approved", result.stderr)
+
+    def test_write_tool_into_matters_still_allowed(self):
+        result = run_hook(
+            {"file_path": "contract-review/workspace/matters/demo/round_1/state.json"}
+        )
+        self.assertEqual(result.returncode, 0, result.stderr)
+
+    def test_redirect_without_space_blocks(self):
+        result = run_hook(
+            {"command": "echo x >contract-review/library/approved/templates/demo/clean.md"}
+        )
+        self.assertEqual(result.returncode, 2)
+
 
 class ClaudeHookRegistrationTests(unittest.TestCase):
     """Audit A-1: hooks must actually be registered in a tracked settings file."""

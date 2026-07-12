@@ -20,7 +20,7 @@ ALLOWED_PUBLISHERS = (
     ".claude/skills/index-manager/scripts/build-index.py",
 )
 
-DIRECT_WRITE_RE = re.compile(r"\b(cp|mv|rsync|install|ditto|mkdir|tee)\b|(?:^|\s)(>|>>)(?=\s)")
+DIRECT_WRITE_RE = re.compile(r"\b(cp|mv|rsync|install|ditto|mkdir|tee|dd)\b|>{1,2}")
 
 # Claude Code blocks the tool call only on exit code 2 (exit 1 is advisory).
 BLOCK_EXIT = 2
@@ -80,12 +80,26 @@ def allowed_write_paths(root: Path) -> tuple[Path, ...]:
     )
 
 
+def protected_write_paths(root: Path) -> tuple[Path, ...]:
+    # CLAUDE.md Safety Rule 3 (No Auto-Promotion): approved/ is publish-only.
+    return (root / "contract-review" / "library" / "approved",)
+
+
 def check_file_path(data: dict, root: Path) -> int:
     file_path = data.get("file_path", "")
     if not isinstance(file_path, str) or not file_path:
         return 0
 
     abs_path = resolve_candidate(file_path, root)
+
+    if any(is_same_or_inside(abs_path, protected) for protected in protected_write_paths(root)):
+        print(
+            f"BLOCKED: Direct writes into {abs_path} are disallowed "
+            "(approved/ is publish-only — use the publish workflow).",
+            file=sys.stderr,
+        )
+        return BLOCK_EXIT
+
     if any(is_same_or_inside(abs_path, allowed) for allowed in allowed_write_paths(root)):
         return 0
 
