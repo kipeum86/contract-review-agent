@@ -46,19 +46,19 @@ class ClaudePreToolUseGuardTests(unittest.TestCase):
     def test_repo_external_write_path_blocks(self):
         result = run_hook({"file_path": "/tmp/outside-contract-review-agent.txt"})
 
-        self.assertEqual(result.returncode, 1)
+        self.assertEqual(result.returncode, 2)
         self.assertIn("outside allowed directories", result.stderr)
 
     def test_direct_approved_template_write_blocks(self):
         result = run_hook({"command": "cp seed.md contract-review/library/approved/templates/demo/clean.md"})
 
-        self.assertEqual(result.returncode, 1)
+        self.assertEqual(result.returncode, 2)
         self.assertIn("Direct Bash writes", result.stderr)
 
     def test_direct_approved_redirect_write_blocks(self):
         result = run_hook({"command": "printf x > contract-review/library/approved/templates/demo/clean.md"})
 
-        self.assertEqual(result.returncode, 1)
+        self.assertEqual(result.returncode, 2)
         self.assertIn("Direct Bash writes", result.stderr)
 
     def test_allowed_publisher_command_passes(self):
@@ -87,6 +87,23 @@ class ClaudePreToolUseGuardTests(unittest.TestCase):
         result = run_hook({"file_path": ".claude/hooks/pretooluse-guard.py"}, use_stdin=True)
 
         self.assertEqual(result.returncode, 0, result.stderr)
+
+    def test_nested_tool_input_payload_blocks(self):
+        # Claude Code sends {"tool_name": ..., "tool_input": {...}} on stdin.
+        result = run_hook(
+            {
+                "tool_name": "Write",
+                "tool_input": {"file_path": "/tmp/outside-contract-review-agent.txt"},
+            },
+            use_stdin=True,
+        )
+        self.assertEqual(result.returncode, 2)
+        self.assertIn("outside allowed directories", result.stderr)
+
+    def test_block_exit_code_is_2(self):
+        # Claude Code only blocks a tool call on exit code 2; exit 1 is advisory.
+        result = run_hook({"file_path": "/tmp/outside-contract-review-agent.txt"})
+        self.assertEqual(result.returncode, 2)
 
 
 if __name__ == "__main__":

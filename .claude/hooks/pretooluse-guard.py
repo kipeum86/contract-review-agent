@@ -22,6 +22,9 @@ ALLOWED_PUBLISHERS = (
 
 DIRECT_WRITE_RE = re.compile(r"\b(cp|mv|rsync|install|ditto|mkdir|tee)\b|(?:^|\s)(>|>>)(?=\s)")
 
+# Claude Code blocks the tool call only on exit code 2 (exit 1 is advisory).
+BLOCK_EXIT = 2
+
 
 def read_payload() -> dict:
     raw = os.environ.get("TOOL_INPUT")
@@ -36,7 +39,15 @@ def read_payload() -> dict:
     except Exception:
         return {}
 
-    return data if isinstance(data, dict) else {}
+    if not isinstance(data, dict):
+        return {}
+
+    # Claude Code PreToolUse hooks deliver {"tool_name": ..., "tool_input": {...}}.
+    # Unwrap tool_input when present; keep flat payloads working for tests/CLI.
+    tool_input = data.get("tool_input")
+    if isinstance(tool_input, dict):
+        return tool_input
+    return data
 
 
 def project_root() -> Path:
@@ -79,7 +90,7 @@ def check_file_path(data: dict, root: Path) -> int:
         return 0
 
     print(f"BLOCKED: Write to {abs_path} is outside allowed directories", file=sys.stderr)
-    return 1
+    return BLOCK_EXIT
 
 
 def check_command(data: dict) -> int:
@@ -100,7 +111,7 @@ def check_command(data: dict) -> int:
             "Use the publish workflow or index-manager service.",
             file=sys.stderr,
         )
-        return 1
+        return BLOCK_EXIT
 
     return 0
 
