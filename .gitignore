@@ -72,6 +72,7 @@ __pycache__/
 
 # Generic patterns (no file-name leakage)
 release-note-*.md
+package-lock.json
 package-lock.json.backup-*
 *quality-audit-log*
 *build-log*

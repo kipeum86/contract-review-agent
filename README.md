@@ -68,7 +68,7 @@ Interview-driven contract generation with self-review
 ```bash
 git clone <repository-url> contract-review-agent
 cd contract-review-agent
-npm install
+corepack enable && pnpm install   # or: npm install -g pnpm && pnpm install
 python -m pip install pyyaml
 ```
 
@@ -303,6 +303,7 @@ Policies are **read-only for the agent** — only you edit them. The agent manag
 |-------------|---------|---------|
 | Python | 3.10+ | — |
 | Node.js | 18+ | — |
+| pnpm | 9+ | Ships with corepack (Node 18+) — run `corepack enable` |
 | PyYAML | — | `pip install pyyaml` |
 | `jq` | 1.6+ | `brew install jq` (macOS) · `apt-get install jq` (Linux) |
 | `shasum` or `sha256sum` | — | Preinstalled on macOS / most Linux distros |

@@ -37,6 +37,7 @@ Both methods support the same slash commands and natural language — choose whi
 | **Claude Code** | Latest | [Installation guide](https://docs.anthropic.com/en/docs/claude-code) |
 | **Python** | 3.10+ | Required for parsing/generation scripts |
 | **Node.js** | 18+ | Required for project tooling |
+| pnpm | 9+ | Ships with corepack (Node 18+) — run `corepack enable` |
 | **PyYAML** | Latest | `pip install pyyaml` |
 | **jq** | 1.6+ | `brew install jq` (macOS) · `apt-get install jq` (Linux). Required by the domain reference forced-load hook. |
 | **shasum / sha256sum** | — | Preinstalled on macOS and most Linux distros |
@@ -57,7 +58,7 @@ Optional dependencies:
 ```bash
 git clone <repository-url> contract-review-agent
 cd contract-review-agent
-npm install
+corepack enable && pnpm install   # or: npm install -g pnpm && pnpm install
 python -m pip install pyyaml
 
 # Verify jq is available (used by the forced-load hook)

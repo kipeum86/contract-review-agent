@@ -37,6 +37,7 @@ Claude Code는 대화형 에이전트로 동작합니다. 자연어 지시나 �
 | **Claude Code** | Latest | [설치 가이드](https://docs.anthropic.com/en/docs/claude-code) |
 | **Python** | 3.10+ | 파싱/생성 스크립트에 필요 |
 | **Node.js** | 18+ | 프로젝트 도구에 필요 |
+| pnpm | 9+ | `corepack enable` (Node 18+ 내장) 또는 `npm install -g pnpm` |
 | **PyYAML** | Latest | `pip install pyyaml` |
 | **jq** | 1.6+ | `brew install jq` (macOS) · `apt-get install jq` (Linux). 도메인 레퍼런스 forced-load hook에서 사용 |
 | **shasum / sha256sum** | — | macOS 및 대부분의 Linux 배포판에 기본 포함 |
@@ -57,7 +58,7 @@ Claude Code는 대화형 에이전트로 동작합니다. 자연어 지시나 �
 ```bash
 git clone <repository-url> contract-review-agent
 cd contract-review-agent
-npm install
+corepack enable && pnpm install   # or: npm install -g pnpm && pnpm install
 python -m pip install pyyaml
 
 # jq 설치 확인 (forced-load hook이 사용)
