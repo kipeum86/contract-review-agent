@@ -507,6 +507,10 @@ After ALL `[EXTERNAL]` comments for the entire contract are generated:
    COMMENT_EXIT=$?
    ```
 7. If `$COMMENT_EXIT != 0`, halt with the JSON output from `apply-comments.py`. Same reasoning as step 5: any failed `[EXTERNAL]` comment or >10% comment insertion failure is a hard stop.
+7.5. **Even on success**, if `apply-comments.py` output contains a non-empty
+   `failures[]` array (tolerated ≤10% INTERNAL-comment failures), list each
+   failed `clause_id` + `reason` to the user in the Step 12 summary. Silently
+   dropped internal comments are lost reviewer strategy — the user must know.
 8. **If output 1 selected**: Repack → `{matter_id}_round_{N}_redlined.docx` (internal)
 9. **If output 2 selected**: Run `strip-internal-comments.py` → `{matter_id}_round_{N}_redlined_clean.docx` (external-clean). This script repacks the DOCX and then runs `scan-docx-for-internal-markers.py` using `.claude/policies/external-clean-policy.yaml`; if the scanner returns violations, halt and do not deliver the external-clean DOCX.
 
@@ -690,4 +694,4 @@ Same as WF2 Steps 9 and 12
 4. Run the **Cross-Clause Consistency Review** (Step 6 mandatory final sub-step) on the **merged** result — not per-chunk. The last chunk's reference injection is the one still live in your context at this point.
 5. Note in Executive Summary Section 5 (Review Notes): "Large-document chunking applied: {N} chunks" (the "Reference re-injection count" is auto-appended by `compile-report.js` via `chunk-*.json` enumeration in Step 10).
 
-**Context cost warning (200K models only)**: N chunks × ~8,500 reference tokens can push a 100+ page contract past 80% context window on 200K-cap models. 1M models (Opus 4.6 1M) have plenty of headroom. If you are running on a 200K model and see the contract approaching 150K tokens, consider reducing chunk count or asking the user to manually split the contract.
+**Context cost warning (200K models only)**: N chunks × ~8,500 reference tokens can push a 100+ page contract past 80% context window on 200K-cap models. Models with a 1M-token context window have plenty of headroom. If you are running on a 200K model and see the contract approaching 150K tokens, consider reducing chunk count or asking the user to manually split the contract.
