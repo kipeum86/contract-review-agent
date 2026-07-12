@@ -122,7 +122,7 @@ Claude Code는 계약군, 조항 분류 체계, 검토 모드, 검색 규칙 등
 | 구조 | 파일 하나당 계약서 하나 |
 | 프라이버시 | 모든 파일은 로컬 머신에만 보관되며, 외부로 전송되거나 공유되지 않습니다 |
 
-템플릿과 선례는 기본적으로 **자동 승인**됩니다. 플레이북과 코멘트 뱅크는 사람의 확인이 필요합니다. [`approval-rules.yaml`](../../contract-review/library/policies/approval-rules.yaml)을 참고하세요.
+템플릿과 선례는 기본적으로 **자동 승인**됩니다. 플레이북과 코멘트 뱅크는 사람의 확인이 필요합니다. [`approval-rules.yaml`](../../contract-review/library/policies.default/approval-rules.yaml)을 참고하세요.
 
 ### 3. 계약서 검토하기
 

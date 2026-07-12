@@ -124,7 +124,7 @@ Drop your house templates and reference contracts into [`contract-review/library
 | Structure | One agreement per file |
 | Privacy | All files stay on your local machine — never uploaded or shared anywhere |
 
-Templates and precedents are **auto-approved** by default. Playbooks and comment banks require human confirmation. See [`approval-rules.yaml`](../../contract-review/library/policies/approval-rules.yaml).
+Templates and precedents are **auto-approved** by default. Playbooks and comment banks require human confirmation. See [`approval-rules.yaml`](../../contract-review/library/policies.default/approval-rules.yaml).
 
 ### 3. Review a Contract
 
