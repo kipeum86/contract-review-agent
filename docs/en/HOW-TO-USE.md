@@ -70,13 +70,15 @@ chmod +x .claude/hooks/*.sh .claude/scripts/*.sh
 
 ### First Claude Code session after install
 
-The first time you launch Claude Code in this repo, you will see a permission
-dialog asking you to **allow the UserPromptSubmit hook**
-(`.claude/hooks/inject-domain-references.sh`). Click **Allow** — this is the
-hook that routes workflow-specific reference loading instructions into the LLM
-context. Review workflows get a blocking digest-load precondition; draft and
-ingest workflows get lighter hints. If you deny it, reviews can still fall back
-to the review-agent Pre-Pipeline 0 loader, but the primary path is gone.
+Hooks are registered in the tracked `.claude/settings.json`. The first time you
+launch Claude Code in this repo, Claude Code will ask you to review and approve
+the project's hook configuration (a `UserPromptSubmit` context injector and a
+`PreToolUse` write guard). Approve it — the injector routes workflow-specific
+reference-loading instructions into the LLM context, and the guard blocks
+accidental direct writes into `contract-review/library/approved/`. If you
+decline, reviews still fall back to the review-agent Pre-Pipeline 0 loader,
+but the primary defense layer is disabled. Your personal overrides belong in
+`.claude/settings.local.json` (gitignored).
 
 ---
 

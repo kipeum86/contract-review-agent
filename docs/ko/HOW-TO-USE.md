@@ -69,7 +69,14 @@ chmod +x .claude/hooks/*.sh .claude/scripts/*.sh
 
 ### 설치 후 Claude Code 첫 세션
 
-저장소를 clone한 뒤 Claude Code를 처음 실행하면 **UserPromptSubmit hook 실행 허용** 다이얼로그가 뜹니다 (`.claude/hooks/inject-domain-references.sh`). **Allow**를 눌러주세요. 이 hook은 워크플로별 레퍼런스 로딩 지시를 LLM 컨텍스트에 전달합니다. review 워크플로에는 blocking digest-load precondition을, draft/ingest 워크플로에는 가벼운 hint를 제공합니다. 거부하면 review-agent 내부의 2차 방어선(Pre-Pipeline 0 loader)은 여전히 작동할 수 있지만 기본 경로가 사라집니다.
+훅은 트래킹되는 `.claude/settings.json`에 등록되어 있습니다. 이 리포에서
+Claude Code를 처음 실행하면 프로젝트 훅 구성(`UserPromptSubmit` 컨텍스트
+주입기 + `PreToolUse` 쓰기 가드)을 검토·승인하라는 안내가 표시됩니다.
+승인해 주세요 — 주입기는 워크플로별 레퍼런스 로딩 지시를 LLM 컨텍스트에
+전달하고, 가드는 `contract-review/library/approved/`로의 실수 직접 쓰기를
+차단합니다. 거부하면 review-agent 내부의 2차 방어선(Pre-Pipeline 0 loader)은
+여전히 동작하지만 기본 방어층은 비활성화됩니다. 개인 설정은 gitignore되는
+`.claude/settings.local.json`에 두세요.
 
 ---
 
