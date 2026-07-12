@@ -47,7 +47,8 @@ class PolicyCanonicalizationTests(unittest.TestCase):
         agent_text = (REPO_ROOT / ".claude/agents/review-agent/AGENT.md").read_text(encoding="utf-8")
         skill_text = (REPO_ROOT / ".claude/skills/review-domain-knowledge/SKILL.md").read_text(encoding="utf-8")
 
-        for text in (command_text, agent_text, skill_text):
+        self.assertIn(".claude/agents/review-agent/AGENT.md", command_text)
+        for text in (agent_text, skill_text):
             self.assertIn(".claude/policies/language-policy.yaml", text)
 
         self.assertNotIn("internal comments in the user's prompt language", command_text)
@@ -65,7 +66,8 @@ class PolicyCanonicalizationTests(unittest.TestCase):
             self.assertIn("redline_scope", text)
             self.assertIn("contract-review/library/policies.default/review-mode.yaml", text)
 
-        for text in (command_text, agent_text, skill_text):
+        self.assertIn(".claude/agents/review-agent/AGENT.md", command_text)
+        for text in (agent_text, skill_text):
             self.assertIn("contract-review/library/policies/review-mode.yaml", text)
 
         self.assertIn("Summary only", skill_text)
