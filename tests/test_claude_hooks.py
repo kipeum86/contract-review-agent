@@ -106,5 +106,59 @@ class ClaudePreToolUseGuardTests(unittest.TestCase):
         self.assertEqual(result.returncode, 2)
 
 
+class ClaudeHookRegistrationTests(unittest.TestCase):
+    """Audit A-1: hooks must actually be registered in a tracked settings file."""
+
+    SETTINGS = REPO_ROOT / ".claude" / "settings.json"
+
+    def load_settings(self) -> dict:
+        self.assertTrue(
+            self.SETTINGS.exists(),
+            ".claude/settings.json must be tracked so cloned repos get hooks",
+        )
+        return json.loads(self.SETTINGS.read_text(encoding="utf-8"))
+
+    def test_settings_json_is_tracked_by_git(self):
+        result = subprocess.run(
+            ["git", "ls-files", "--error-unmatch", ".claude/settings.json"],
+            cwd=REPO_ROOT, capture_output=True, text=True,
+        )
+        self.assertEqual(result.returncode, 0, "settings.json is not git-tracked")
+
+    def test_user_prompt_submit_hook_registered(self):
+        settings = self.load_settings()
+        entries = settings.get("hooks", {}).get("UserPromptSubmit", [])
+        commands = [
+            hook.get("command", "")
+            for entry in entries
+            for hook in entry.get("hooks", [])
+        ]
+        self.assertTrue(
+            any("inject-domain-references.sh" in cmd for cmd in commands),
+            f"UserPromptSubmit hook missing: {commands}",
+        )
+
+    def test_pre_tool_use_guard_registered(self):
+        settings = self.load_settings()
+        entries = settings.get("hooks", {}).get("PreToolUse", [])
+        commands = [
+            hook.get("command", "")
+            for entry in entries
+            for hook in entry.get("hooks", [])
+        ]
+        self.assertTrue(
+            any("pretooluse-guard.py" in cmd for cmd in commands),
+            f"PreToolUse guard missing: {commands}",
+        )
+
+    def test_registered_hook_scripts_exist_and_executable(self):
+        for rel in (
+            ".claude/hooks/inject-domain-references.sh",
+            ".claude/hooks/pretooluse-guard.py",
+        ):
+            path = REPO_ROOT / rel
+            self.assertTrue(path.exists(), rel)
+
+
 if __name__ == "__main__":
     unittest.main()
