@@ -37,6 +37,15 @@ COMMENTS_XML_TEMPLATE = (
     "</w:comment></w:comments>"
 )
 
+CORE_PROPS_XML = (
+    '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'
+    '<cp:coreProperties'
+    ' xmlns:cp="http://schemas.openxmlformats.org/package/2006/metadata/core-properties"'
+    ' xmlns:dc="http://purl.org/dc/elements/1.1/">'
+    "<dc:title>[INTERNAL] negotiation strategy v3</dc:title>"
+    "</cp:coreProperties>"
+)
+
 
 class ExternalCleanPolicyKoreanTests(unittest.TestCase):
     def scan_comment_text(self, text: str) -> dict:
@@ -84,6 +93,19 @@ class ExternalCleanPolicyKoreanTests(unittest.TestCase):
 
     def test_existing_english_patterns_still_blocked(self):
         self.assert_blocked("[INTERNAL] fallback ladder here", "internal_marker")
+
+
+class ScannerPartCoverageTests(unittest.TestCase):
+    def test_docprops_core_is_scanned(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            docprops = Path(tmp) / "docProps"
+            docprops.mkdir(parents=True)
+            (docprops / "core.xml").write_text(CORE_PROPS_XML, encoding="utf-8")
+            result = scanner.scan_unpacked_docx(tmp)
+        self.assertEqual(result["status"], "fail", result)
+        self.assertIn(
+            "docProps/core.xml", {v["part"] for v in result["violations"]}
+        )
 
 
 if __name__ == "__main__":

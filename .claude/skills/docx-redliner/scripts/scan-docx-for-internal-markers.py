@@ -25,6 +25,18 @@ STORY_PART_RE = re.compile(
     r"^word/(?:document|comments|threadedComments|header\d+|footer\d+|footnotes|endnotes)\.xml$"
 )
 
+# Metadata parts scanned with all-text extraction (they don't use w:t tags).
+EXTRA_PART_RE = re.compile(r"^(?:docProps/core\.xml|word/glossary/document\.xml)$")
+
+
+def xml_all_text(xml_bytes: bytes) -> str:
+    try:
+        root = ET.fromstring(xml_bytes)
+    except ET.ParseError:
+        return ""
+    parts = [node.text.strip() for node in root.iter() if node.text and node.text.strip()]
+    return " ".join(parts)
+
 
 def local_name(tag: str) -> str:
     return tag.split("}")[-1] if "}" in tag else tag
@@ -88,10 +100,14 @@ def scan_unpacked_docx(source_dir: str, policy_path: str | None = None) -> dict[
         for filename in filenames:
             full_path = os.path.join(root, filename)
             part_name = os.path.relpath(full_path, source_dir).replace(os.sep, "/")
-            if not STORY_PART_RE.match(part_name):
+            if STORY_PART_RE.match(part_name):
+                extract = xml_text
+            elif EXTRA_PART_RE.match(part_name):
+                extract = xml_all_text
+            else:
                 continue
             try:
-                text = xml_text(Path(full_path).read_bytes())
+                text = extract(Path(full_path).read_bytes())
             except OSError:
                 continue
             scanned_parts += 1
@@ -117,9 +133,13 @@ def scan_docx(docx_path: str, policy_path: str | None = None) -> dict[str, Any]:
     try:
         with zipfile.ZipFile(docx_path, "r") as archive:
             for part_name in sorted(archive.namelist()):
-                if not STORY_PART_RE.match(part_name):
+                if STORY_PART_RE.match(part_name):
+                    extract = xml_text
+                elif EXTRA_PART_RE.match(part_name):
+                    extract = xml_all_text
+                else:
                     continue
-                text = xml_text(archive.read(part_name))
+                text = extract(archive.read(part_name))
                 scanned_parts += 1
                 violations.extend(scan_text(text, part_name, patterns))
     except (FileNotFoundError, zipfile.BadZipFile) as exc:
