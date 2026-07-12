@@ -526,7 +526,21 @@ def strip_internal_comments(input_docx: str, output_docx: str) -> dict:
             os.makedirs(output_dir, exist_ok=True)
         pack_docx(temp_dir, output_docx)
 
-        scan_result = load_external_clean_scanner().scan_docx(output_docx)
+        try:
+            scan_result = load_external_clean_scanner().scan_docx(output_docx)
+        except Exception as exc:
+            # Fail closed: an unscanned "_clean" file must never remain on disk.
+            if os.path.exists(output_docx):
+                os.remove(output_docx)
+            return {
+                'success': False,
+                'input_docx': input_docx,
+                'output_docx': output_docx,
+                'error': 'external_clean_scan_crashed',
+                'detail': f'{type(exc).__name__}: {exc}',
+                'internal_comments_stripped': internal_state['internal_comments_stripped'],
+                'internal_threaded_comments_stripped': threaded_result['removed_entries'],
+            }
         if not scan_result.get('success'):
             if os.path.exists(output_docx):
                 os.remove(output_docx)
