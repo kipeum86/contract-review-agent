@@ -233,7 +233,7 @@ def parse_threaded_comment_entries(part_path: str) -> tuple[ET.ElementTree | Non
             'thread_id': get_attr_local(element, 'id'),
             'parent_id': get_attr_local(element, 'parentId'),
             'para_id': get_attr_local(element, 'paraId'),
-            'is_internal': extract_text(element).strip().startswith('[INTERNAL]'),
+            'is_internal': extract_text(element).strip().upper().startswith('[INTERNAL]'),
         })
     return tree, root, entries
 
@@ -334,7 +334,7 @@ def collect_internal_comments(comments_xml_path: str) -> dict:
     for comment in root.findall(f'{{{NSMAP["w"]}}}comment'):
         comment_id = get_attr_local(comment, 'id')
         comment_text = extract_text(comment)
-        if not comment_text.strip().startswith('[INTERNAL]'):
+        if not comment_text.strip().upper().startswith('[INTERNAL]'):
             continue
 
         para_id = get_attr_local(comment, 'paraId')
