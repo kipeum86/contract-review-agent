@@ -137,6 +137,9 @@ class ClaudeHookRegistrationTests(unittest.TestCase):
         )
         return json.loads(self.SETTINGS.read_text(encoding="utf-8"))
 
+    def test_tracked_settings_contains_hooks_only(self):
+        self.assertEqual(set(self.load_settings()), {"hooks"})
+
     def test_settings_json_is_tracked_by_git(self):
         result = subprocess.run(
             ["git", "ls-files", "--error-unmatch", ".claude/settings.json"],
