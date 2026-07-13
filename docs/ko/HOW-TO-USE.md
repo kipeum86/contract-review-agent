@@ -37,6 +37,7 @@ Claude Code는 대화형 에이전트로 동작합니다. 자연어 지시나 �
 | **Claude Code** | Latest | [설치 가이드](https://docs.anthropic.com/en/docs/claude-code) |
 | **Python** | 3.10+ | 파싱/생성 스크립트에 필요 |
 | **Node.js** | 18+ | 프로젝트 도구에 필요 |
+| pnpm | 9+ | `corepack enable` (Node 18+ 내장) 또는 `npm install -g pnpm` |
 | **PyYAML** | Latest | `pip install pyyaml` |
 | **jq** | 1.6+ | `brew install jq` (macOS) · `apt-get install jq` (Linux). 도메인 레퍼런스 forced-load hook에서 사용 |
 | **shasum / sha256sum** | — | macOS 및 대부분의 Linux 배포판에 기본 포함 |
@@ -57,7 +58,7 @@ Claude Code는 대화형 에이전트로 동작합니다. 자연어 지시나 �
 ```bash
 git clone <repository-url> contract-review-agent
 cd contract-review-agent
-npm install
+corepack enable && pnpm install   # or: npm install -g pnpm && pnpm install
 python -m pip install pyyaml
 
 # jq 설치 확인 (forced-load hook이 사용)
@@ -69,7 +70,14 @@ chmod +x .claude/hooks/*.sh .claude/scripts/*.sh
 
 ### 설치 후 Claude Code 첫 세션
 
-저장소를 clone한 뒤 Claude Code를 처음 실행하면 **UserPromptSubmit hook 실행 허용** 다이얼로그가 뜹니다 (`.claude/hooks/inject-domain-references.sh`). **Allow**를 눌러주세요. 이 hook은 워크플로별 레퍼런스 로딩 지시를 LLM 컨텍스트에 전달합니다. review 워크플로에는 blocking digest-load precondition을, draft/ingest 워크플로에는 가벼운 hint를 제공합니다. 거부하면 review-agent 내부의 2차 방어선(Pre-Pipeline 0 loader)은 여전히 작동할 수 있지만 기본 경로가 사라집니다.
+훅은 트래킹되는 `.claude/settings.json`에 등록되어 있습니다. 이 리포에서
+Claude Code를 처음 실행하면 프로젝트 훅 구성(`UserPromptSubmit` 컨텍스트
+주입기 + `PreToolUse` 쓰기 가드)을 검토·승인하라는 안내가 표시됩니다.
+승인해 주세요 — 주입기는 워크플로별 레퍼런스 로딩 지시를 LLM 컨텍스트에
+전달하고, 가드는 `contract-review/library/approved/`로의 실수 직접 쓰기를
+차단합니다. 거부하면 review-agent 내부의 2차 방어선(Pre-Pipeline 0 loader)은
+여전히 동작하지만 기본 방어층은 비활성화됩니다. 개인 설정은 gitignore되는
+`.claude/settings.local.json`에 두세요.
 
 ---
 
@@ -114,7 +122,7 @@ Claude Code는 계약군, 조항 분류 체계, 검토 모드, 검색 규칙 등
 | 구조 | 파일 하나당 계약서 하나 |
 | 프라이버시 | 모든 파일은 로컬 머신에만 보관되며, 외부로 전송되거나 공유되지 않습니다 |
 
-템플릿과 선례는 기본적으로 **자동 승인**됩니다. 플레이북과 코멘트 뱅크는 사람의 확인이 필요합니다. [`approval-rules.yaml`](../../contract-review/library/policies/approval-rules.yaml)을 참고하세요.
+템플릿과 선례는 기본적으로 **자동 승인**됩니다. 플레이북과 코멘트 뱅크는 사람의 확인이 필요합니다. [`approval-rules.yaml`](../../contract-review/library/policies.default/approval-rules.yaml)을 참고하세요.
 
 ### 3. 계약서 검토하기
 

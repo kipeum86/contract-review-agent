@@ -16,7 +16,18 @@ STAGING_DIR = BASE / "contract-review" / "library" / "staging"
 QUARANTINE_DIR = BASE / "contract-review" / "library" / "quarantine"
 INDEXES_DIR = BASE / "contract-review" / "library" / "indexes"
 APPROVAL_RULES_PATH = BASE / "contract-review" / "library" / "policies" / "approval-rules.yaml"
-SUMMARY_FILE = sorted(RUNS_DIR.glob("*_batch-summary.json"))[-1]
+
+
+def latest_summary_file() -> Path:
+    """Return the newest batch summary, failing loudly when none exists."""
+    candidates = sorted(RUNS_DIR.glob("*_batch-summary.json"))
+    if not candidates:
+        raise SystemExit(
+            "ERROR: no *_batch-summary.json under "
+            "contract-review/library/runs/ingestion/ — run scripts/batch_ingest.py "
+            "first to produce a batch summary."
+        )
+    return candidates[-1]
 
 NOW = datetime.now(timezone.utc)
 
@@ -891,7 +902,7 @@ def rebuild_indexes_from_approved() -> dict:
 def main():
     approval_rules = load_approval_rules()
 
-    with open(SUMMARY_FILE, "r", encoding="utf-8") as f:
+    with open(latest_summary_file(), "r", encoding="utf-8") as f:
         summary = json.load(f)
 
     results = [r for r in summary["results"] if r["status"] == "normalized"]

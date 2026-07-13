@@ -68,7 +68,7 @@ Interview-driven contract generation with self-review
 ```bash
 git clone <repository-url> contract-review-agent
 cd contract-review-agent
-npm install
+corepack enable && pnpm install   # or: npm install -g pnpm && pnpm install
 python -m pip install pyyaml
 ```
 
@@ -98,7 +98,7 @@ Drop your house templates and reference contracts into [`contract-review/library
 | Structure | One agreement per file |
 | Privacy | All uploaded files stay on your local PC only — they are never uploaded or shared anywhere |
 
-Templates and precedents are **auto-approved** by default. Playbooks and comment banks still require human confirmation. See [`approval-rules.yaml`](./contract-review/library/policies/approval-rules.yaml).
+Templates and precedents are **auto-approved** by default. Playbooks and comment banks still require human confirmation. See [`approval-rules.yaml`](./contract-review/library/policies.default/approval-rules.yaml).
 
 > [!TIP]
 > **Redlined contracts too.** Drop a DOCX with tracked changes and comments into the same `inbox/raw/` folder. The system auto-detects tracked changes and extracts *what* was changed, *how*, and *why* — building a personalized review pattern index. Over time, this lets the agent reference your past negotiation patterns during future reviews.
@@ -217,7 +217,7 @@ No embeddings or vector databases. Retrieval works in stages:
 
 1. **Deterministic filter** — JSON index filtering by contract family, jurisdiction, governing law, approval state, and status
 2. **Narrowing** — structural clause-type matching when candidates exceed threshold
-3. **Priority ranking** — controlled by [`retrieval-priority.yaml`](./contract-review/library/policies/retrieval-priority.yaml), including authority-level ranking, same-language preference, freshness downranking, and affinity-family fallback
+3. **Priority ranking** — controlled by [`retrieval-priority.yaml`](./contract-review/library/policies.default/retrieval-priority.yaml), including authority-level ranking, same-language preference, freshness downranking, and affinity-family fallback
 4. **LLM judgment** — best-match selection from the filtered set
 
 Fully auditable. Every match is traceable.
@@ -303,6 +303,7 @@ Policies are **read-only for the agent** — only you edit them. The agent manag
 |-------------|---------|---------|
 | Python | 3.10+ | — |
 | Node.js | 18+ | — |
+| pnpm | 9+ | Ships with corepack (Node 18+) — run `corepack enable` |
 | PyYAML | — | `pip install pyyaml` |
 | `jq` | 1.6+ | `brew install jq` (macOS) · `apt-get install jq` (Linux) |
 | `shasum` or `sha256sum` | — | Preinstalled on macOS / most Linux distros |

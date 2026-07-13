@@ -1,10 +1,28 @@
-version: 1
+version: 2
 description: Patterns that must not remain in an external-clean DOCX.
+# NOTE: This is the LAST line of defense before counterparty delivery.
+# False positives fail closed (deliverable deleted, pipeline halts) — that is
+# intentional. Tune patterns per practice, but never remove a category without
+# adding an equivalent.
 blocked_patterns:
+  # --- audience / process markers ---
   - id: internal_marker
     category: audience_marker
     pattern: "\\[INTERNAL\\]"
     reason: "internal audience marker remains"
+  - id: internal_marker_ko
+    category: audience_marker
+    pattern: "\\[내부(?:용|검토)?\\]"
+    reason: "Korean internal audience marker remains"
+  - id: privileged_marker
+    category: audience_marker
+    pattern: "\\[PRIVILEGED\\]"
+    reason: "privileged marker remains"
+  - id: manual_required_marker
+    category: process_marker
+    pattern: "\\[MANUAL_REQUIRED\\]"
+    reason: "firewall failure placeholder remains — must never reach counterparty"
+  # --- English strategy terms (v1) ---
   - id: internal_only
     category: internal_strategy
     pattern: "\\binternal\\s+only\\b"
@@ -29,3 +47,28 @@ blocked_patterns:
     category: negotiation_strategy
     pattern: "\\bnegotiation\\s+strategy\\b"
     reason: "negotiation strategy language remains"
+  # --- Korean strategy terms (v2 — ported from validate-audience-firewall.py) ---
+  - id: bottom_line_ko
+    category: negotiation_strategy
+    pattern: "마지노선|최소\\s*수용\\s*조건"
+    reason: "Korean bottom-line language remains"
+  - id: negotiation_strategy_ko
+    category: negotiation_strategy
+    pattern: "협상\\s*전략|협상\\s*카드"
+    reason: "Korean negotiation strategy language remains"
+  - id: acceptance_threshold_ko
+    category: negotiation_strategy
+    pattern: "수용\\s*가능"
+    reason: "Korean acceptance threshold language remains"
+  - id: concession_ko
+    category: negotiation_strategy
+    pattern: "양보\\s*(?:가능|여지|불가)"
+    reason: "Korean concession language remains"
+  - id: internal_only_ko
+    category: internal_strategy
+    pattern: "내부\\s*(?:검토용|전용|공유용|용도)"
+    reason: "Korean internal-only wording remains"
+  - id: priority_ko
+    category: internal_strategy
+    pattern: "(?:우리|당사)\\s*(?:측|쪽)?\\s*(?:최)?우선\\s*순위|최우선\\s*사항"
+    reason: "Korean internal priority language remains"

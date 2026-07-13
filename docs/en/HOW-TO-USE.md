@@ -37,6 +37,7 @@ Both methods support the same slash commands and natural language — choose whi
 | **Claude Code** | Latest | [Installation guide](https://docs.anthropic.com/en/docs/claude-code) |
 | **Python** | 3.10+ | Required for parsing/generation scripts |
 | **Node.js** | 18+ | Required for project tooling |
+| pnpm | 9+ | Ships with corepack (Node 18+) — run `corepack enable` |
 | **PyYAML** | Latest | `pip install pyyaml` |
 | **jq** | 1.6+ | `brew install jq` (macOS) · `apt-get install jq` (Linux). Required by the domain reference forced-load hook. |
 | **shasum / sha256sum** | — | Preinstalled on macOS and most Linux distros |
@@ -57,7 +58,7 @@ Optional dependencies:
 ```bash
 git clone <repository-url> contract-review-agent
 cd contract-review-agent
-npm install
+corepack enable && pnpm install   # or: npm install -g pnpm && pnpm install
 python -m pip install pyyaml
 
 # Verify jq is available (used by the forced-load hook)
@@ -70,13 +71,15 @@ chmod +x .claude/hooks/*.sh .claude/scripts/*.sh
 
 ### First Claude Code session after install
 
-The first time you launch Claude Code in this repo, you will see a permission
-dialog asking you to **allow the UserPromptSubmit hook**
-(`.claude/hooks/inject-domain-references.sh`). Click **Allow** — this is the
-hook that routes workflow-specific reference loading instructions into the LLM
-context. Review workflows get a blocking digest-load precondition; draft and
-ingest workflows get lighter hints. If you deny it, reviews can still fall back
-to the review-agent Pre-Pipeline 0 loader, but the primary path is gone.
+Hooks are registered in the tracked `.claude/settings.json`. The first time you
+launch Claude Code in this repo, Claude Code will ask you to review and approve
+the project's hook configuration (a `UserPromptSubmit` context injector and a
+`PreToolUse` write guard). Approve it — the injector routes workflow-specific
+reference-loading instructions into the LLM context, and the guard blocks
+accidental direct writes into `contract-review/library/approved/`. If you
+decline, reviews still fall back to the review-agent Pre-Pipeline 0 loader,
+but the primary defense layer is disabled. Your personal overrides belong in
+`.claude/settings.local.json` (gitignored).
 
 ---
 
@@ -121,7 +124,7 @@ Drop your house templates and reference contracts into [`contract-review/library
 | Structure | One agreement per file |
 | Privacy | All files stay on your local machine — never uploaded or shared anywhere |
 
-Templates and precedents are **auto-approved** by default. Playbooks and comment banks require human confirmation. See [`approval-rules.yaml`](../../contract-review/library/policies/approval-rules.yaml).
+Templates and precedents are **auto-approved** by default. Playbooks and comment banks require human confirmation. See [`approval-rules.yaml`](../../contract-review/library/policies.default/approval-rules.yaml).
 
 ### 3. Review a Contract
 

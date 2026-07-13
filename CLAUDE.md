@@ -12,7 +12,7 @@ Use this profile when generating review reports, redline comments, and any deliv
 
 ## Korean Legal Opinion Style
 
-한국어 계약 검토 메모(Memorandum) 생성 시 반드시 `_private/docs/ko-legal-opinion-style-guide.md`를 읽고 따를 것. 문서 구조, 헤더/정보 블록, 법령·판례 인용 형식, 정의 용어 관례, 문체(합니다체·법률 전문 문어체), 확신도 표현 체계, 번호 매김 관례, 종결부(disclaimer·서명), 타이포그래피(DOCX 생성 규칙) 등 전 항목을 준수한다.
+한국어 계약 검토 메모(Memorandum) 생성 시 `_private/docs/ko-legal-opinion-style-guide.md`가 존재하면 반드시 읽고 따를 것 (로컬 전용 파일 — 공개 리포에는 포함되지 않음). 파일이 없으면 `compile-report.js`의 한국어 메모 렌더러 기본 구조를 따르고, 별도 스타일 가이드 없이 진행함을 사용자에게 한 줄로 알린다. 문서 구조, 헤더/정보 블록, 법령·판례 인용 형식, 정의 용어 관례, 문체(합니다체·법률 전문 문어체), 확신도 표현 체계, 번호 매김 관례, 종결부(disclaimer·서명), 타이포그래피(DOCX 생성 규칙) 등 전 항목을 준수한다.
 
 ---
 

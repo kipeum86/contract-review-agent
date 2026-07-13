@@ -20,7 +20,10 @@ ALLOWED_PUBLISHERS = (
     ".claude/skills/index-manager/scripts/build-index.py",
 )
 
-DIRECT_WRITE_RE = re.compile(r"\b(cp|mv|rsync|install|ditto|mkdir|tee)\b|(?:^|\s)(>|>>)(?=\s)")
+DIRECT_WRITE_RE = re.compile(r"\b(cp|mv|rsync|install|ditto|mkdir|tee|dd)\b|>{1,2}")
+
+# Claude Code blocks the tool call only on exit code 2 (exit 1 is advisory).
+BLOCK_EXIT = 2
 
 
 def read_payload() -> dict:
@@ -36,7 +39,15 @@ def read_payload() -> dict:
     except Exception:
         return {}
 
-    return data if isinstance(data, dict) else {}
+    if not isinstance(data, dict):
+        return {}
+
+    # Claude Code PreToolUse hooks deliver {"tool_name": ..., "tool_input": {...}}.
+    # Unwrap tool_input when present; keep flat payloads working for tests/CLI.
+    tool_input = data.get("tool_input")
+    if isinstance(tool_input, dict):
+        return tool_input
+    return data
 
 
 def project_root() -> Path:
@@ -69,17 +80,31 @@ def allowed_write_paths(root: Path) -> tuple[Path, ...]:
     )
 
 
+def protected_write_paths(root: Path) -> tuple[Path, ...]:
+    # CLAUDE.md Safety Rule 3 (No Auto-Promotion): approved/ is publish-only.
+    return (root / "contract-review" / "library" / "approved",)
+
+
 def check_file_path(data: dict, root: Path) -> int:
     file_path = data.get("file_path", "")
     if not isinstance(file_path, str) or not file_path:
         return 0
 
     abs_path = resolve_candidate(file_path, root)
+
+    if any(is_same_or_inside(abs_path, protected) for protected in protected_write_paths(root)):
+        print(
+            f"BLOCKED: Direct writes into {abs_path} are disallowed "
+            "(approved/ is publish-only — use the publish workflow).",
+            file=sys.stderr,
+        )
+        return BLOCK_EXIT
+
     if any(is_same_or_inside(abs_path, allowed) for allowed in allowed_write_paths(root)):
         return 0
 
     print(f"BLOCKED: Write to {abs_path} is outside allowed directories", file=sys.stderr)
-    return 1
+    return BLOCK_EXIT
 
 
 def check_command(data: dict) -> int:
@@ -100,7 +125,7 @@ def check_command(data: dict) -> int:
             "Use the publish workflow or index-manager service.",
             file=sys.stderr,
         )
-        return 1
+        return BLOCK_EXIT
 
     return 0
 

@@ -233,7 +233,7 @@ def parse_threaded_comment_entries(part_path: str) -> tuple[ET.ElementTree | Non
             'thread_id': get_attr_local(element, 'id'),
             'parent_id': get_attr_local(element, 'parentId'),
             'para_id': get_attr_local(element, 'paraId'),
-            'is_internal': extract_text(element).strip().startswith('[INTERNAL]'),
+            'is_internal': extract_text(element).strip().upper().startswith('[INTERNAL]'),
         })
     return tree, root, entries
 
@@ -334,7 +334,7 @@ def collect_internal_comments(comments_xml_path: str) -> dict:
     for comment in root.findall(f'{{{NSMAP["w"]}}}comment'):
         comment_id = get_attr_local(comment, 'id')
         comment_text = extract_text(comment)
-        if not comment_text.strip().startswith('[INTERNAL]'):
+        if not comment_text.strip().upper().startswith('[INTERNAL]'):
             continue
 
         para_id = get_attr_local(comment, 'paraId')
@@ -526,7 +526,21 @@ def strip_internal_comments(input_docx: str, output_docx: str) -> dict:
             os.makedirs(output_dir, exist_ok=True)
         pack_docx(temp_dir, output_docx)
 
-        scan_result = load_external_clean_scanner().scan_docx(output_docx)
+        try:
+            scan_result = load_external_clean_scanner().scan_docx(output_docx)
+        except Exception as exc:
+            # Fail closed: an unscanned "_clean" file must never remain on disk.
+            if os.path.exists(output_docx):
+                os.remove(output_docx)
+            return {
+                'success': False,
+                'input_docx': input_docx,
+                'output_docx': output_docx,
+                'error': 'external_clean_scan_crashed',
+                'detail': f'{type(exc).__name__}: {exc}',
+                'internal_comments_stripped': internal_state['internal_comments_stripped'],
+                'internal_threaded_comments_stripped': threaded_result['removed_entries'],
+            }
         if not scan_result.get('success'):
             if os.path.exists(output_docx):
                 os.remove(output_docx)

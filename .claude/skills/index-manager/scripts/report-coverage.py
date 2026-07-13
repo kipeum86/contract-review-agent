@@ -20,6 +20,23 @@ PROJECT_ROOT = os.path.abspath(os.path.join(SCRIPT_DIR, '..', '..', '..', '..'))
 LIBRARY_DIR = os.path.join(PROJECT_ROOT, 'contract-review', 'library')
 INDEXES_DIR = os.path.join(LIBRARY_DIR, 'indexes')
 POLICIES_DIR = os.path.join(LIBRARY_DIR, 'policies')
+POLICIES_DEFAULT_DIR = os.path.join(LIBRARY_DIR, 'policies.default')
+
+
+def resolve_policy_path(filename: str) -> str:
+    """Prefer user policies/; fall back to shipped policies.default/ with a warning."""
+    primary = os.path.join(POLICIES_DIR, filename)
+    if os.path.exists(primary):
+        return primary
+    fallback = os.path.join(POLICIES_DEFAULT_DIR, filename)
+    if os.path.exists(fallback):
+        print(
+            f"WARN: {filename} missing under policies/ — falling back to policies.default/. "
+            "Initialize policies/ per CLAUDE.md 'Policy Initialization'.",
+            file=sys.stderr,
+        )
+        return fallback
+    return primary
 
 
 def load_json(path: str) -> dict | None:
@@ -158,8 +175,8 @@ def build_coverage_report(family_policy: dict, clause_taxonomy: dict,
 
 
 def generate_report() -> dict:
-    family_policy = load_yaml(os.path.join(POLICIES_DIR, 'contract-families.yaml')) or {}
-    clause_taxonomy = load_yaml(os.path.join(POLICIES_DIR, 'clause-taxonomy.yaml')) or {}
+    family_policy = load_yaml(resolve_policy_path('contract-families.yaml')) or {}
+    clause_taxonomy = load_yaml(resolve_policy_path('clause-taxonomy.yaml')) or {}
     documents_index = load_json(os.path.join(INDEXES_DIR, 'documents.json')) or {}
     clauses_index = load_json(os.path.join(INDEXES_DIR, 'clauses.json')) or {}
     return build_coverage_report(family_policy, clause_taxonomy, documents_index, clauses_index)

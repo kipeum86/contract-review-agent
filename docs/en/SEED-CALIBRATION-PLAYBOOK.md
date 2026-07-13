@@ -30,7 +30,7 @@ In the current system, synthetic seeds are intentionally conservative:
 
 The control layer for that process lives in:
 
-- [`seed-calibration-policy.yaml`](../../contract-review/library/policies/seed-calibration-policy.yaml)
+- [`seed-calibration-policy.yaml`](../../contract-review/library/policies.default/seed-calibration-policy.yaml)
 - [`report_seed_calibration.py`](../../scripts/report_seed_calibration.py)
 - [`build_seed_review_packets.py`](../../scripts/build_seed_review_packets.py)
 - [`update_seed_calibration.py`](../../scripts/update_seed_calibration.py)

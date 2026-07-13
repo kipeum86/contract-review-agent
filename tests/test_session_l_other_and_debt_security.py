@@ -7,6 +7,7 @@ import yaml
 
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
+SSA_ASSET = REPO_ROOT / "contract-review" / "library" / "approved" / "templates" / "ssa"
 
 
 def load_module(module_name: str, relative_path: str):
@@ -53,8 +54,12 @@ class SessionLOtherAndDebtSecurityTests(unittest.TestCase):
         report = coverage_module.generate_report()
 
         self.assertEqual(report["configured_family_count"], 29)
-        self.assertEqual(report["covered_family_count"], 29)
-        self.assertEqual(report["uncovered_families"], [])
+        # Fresh clones cover 26 tracked seed families; local libraries may also
+        # provide the gitignored safe, sha, and ssa families.
+        self.assertGreaterEqual(report["covered_family_count"], 26)
+        self.assertTrue(
+            set(report["uncovered_families"]).issubset({"safe", "sha", "ssa"})
+        )
         self.assertEqual(report["total_unmapped_clause_count"], 0)
         self.assertEqual(report["top_unmapped_headings"], [])
 
@@ -63,6 +68,7 @@ class SessionLOtherAndDebtSecurityTests(unittest.TestCase):
         self.assertEqual(per_family["other"]["document_count"], 1)
         self.assertEqual(per_family["other"]["clause_count"], 9)
 
+    @unittest.skipUnless(SSA_ASSET.exists(), "local-only asset not shipped in public repo")
     def test_ssa_bond_issuance_clauses_use_debt_security_issuance_type(self):
         expected_doc_ids = {
             "1-3-1-early-investment-convertible-bond",
