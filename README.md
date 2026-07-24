@@ -21,8 +21,8 @@ and negotiation recommendations** — all generated directly in DOCX.
 
 > [!IMPORTANT]
 > **Before you start, please read:**
-> - **[Disclaimer](./docs/en/DISCLAIMER.md)** — important limitations and data security considerations
-> - **[How to Use](./docs/en/HOW-TO-USE.md)** — setup, environment, and step-by-step guide
+> - **[Disclaimer](./docs/DISCLAIMER.md)** — important limitations and data security considerations
+> - **[How to Use](./docs/HOW-TO-USE.md)** — setup, environment, and step-by-step guide
 
 ## What It Does
 
@@ -201,7 +201,7 @@ Auto-approval is on by default for templates, precedents, and redline records. N
 Beyond contract templates, you can build a **reference library** of statutes, court decisions, law firm analyses, forms, and more. These are converted to structured Markdown and used as context during reviews.
 
 1. Drop any file (PDF, DOCX, etc.) into `contract-review/library/inbox/raw/`
-2. Tell the agent: `/ingest` or "참조 자료 넣었어"
+2. Tell the agent: `/ingest` or "I dropped some reference material in the inbox"
 3. The agent will automatically:
    - Convert to structured Markdown
    - Generate metadata (frontmatter)
@@ -371,7 +371,7 @@ The agent is composed of three specialized sub-agents coordinated by an orchestr
 
 ## Reference
 
-- [How to Use](./docs/en/HOW-TO-USE.md) — setup guide and step-by-step walkthrough
+- [How to Use](./docs/HOW-TO-USE.md) — setup guide and step-by-step walkthrough
 - [CLAUDE.md](./CLAUDE.md) — orchestrator routing and safety rules
 
 Internal implementation notes are kept in the local-only workspace and are intentionally omitted from the public repository.

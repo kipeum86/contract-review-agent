@@ -333,7 +333,7 @@ class SessionEAudit010AndDocsTests(unittest.TestCase):
         family_count = len(family_policy["families"])
 
         readme = (REPO_ROOT / "README.md").read_text(encoding="utf-8")
-        how_to_use = (REPO_ROOT / "docs/en/HOW-TO-USE.md").read_text(encoding="utf-8")
+        how_to_use = (REPO_ROOT / "docs/HOW-TO-USE.md").read_text(encoding="utf-8")
 
         self.assertIn(f"{family_count} contract families", readme)
         self.assertIn(f"{family_count} contract families", how_to_use)

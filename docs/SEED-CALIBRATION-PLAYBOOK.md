@@ -1,7 +1,5 @@
 # Seed Calibration Playbook
 
-[English](./SEED-CALIBRATION-PLAYBOOK.md)
-
 ## Purpose
 
 This playbook explains how to maintain and upgrade the project's synthetic seed templates over time without confusing:
