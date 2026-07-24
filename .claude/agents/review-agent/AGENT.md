@@ -659,8 +659,14 @@ Same as WF2 Steps 1-4. Outputs to `round_{N+1}/working/`
 4. Each clause gets `delta_summary` and `prior_risk_level`
 
 ### Step 5 — Delta Report Generation
-1. LLM generates narrative for: accepted/partially accepted/rejected requests
-2. Run `compile-delta-report.js` → `{matter_id}_round_{N+1}_delta.docx`
+1. LLM generates the narrative for four sections:
+   1. **Negotiation Progress** — which prior redline requests were accepted, partially accepted, or rejected
+   2. **New Issues** — clauses that worsened or newly appeared
+   3. **Resolved Issues** — clauses that improved or were accepted
+   4. **Remaining Open Items** — unresolved issues carried forward
+2. Run `compile-delta-report.js` → `{matter_id}_round_{N+1}_delta.docx`, writing
+   to `$CRA_OUTPUT_DIR` by default (legacy `output/` when preserving an
+   existing round)
 
 ### Steps 6-7 — DOCX Application & Human Review
 Same as WF2 Steps 9 and 12
