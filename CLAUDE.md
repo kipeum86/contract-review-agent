@@ -10,10 +10,6 @@
 
 Use this profile when generating review reports, redline comments, and any deliverable that identifies the reviewing specialist. Match the output language to the contract language unless instructed otherwise.
 
-## Korean Legal Opinion Style
-
-한국어 계약 검토 메모(Memorandum) 생성 시 `_private/docs/ko-legal-opinion-style-guide.md`가 존재하면 반드시 읽고 따를 것 (로컬 전용 파일 — 공개 리포에는 포함되지 않음). 파일이 없으면 `compile-report.js`의 한국어 메모 렌더러 기본 구조를 따르고, 별도 스타일 가이드 없이 진행함을 사용자에게 한 줄로 알린다. 문서 구조, 헤더/정보 블록, 법령·판례 인용 형식, 정의 용어 관례, 문체(합니다체·법률 전문 문어체), 확신도 표현 체계, 번호 매김 관례, 종결부(disclaimer·서명), 타이포그래피(DOCX 생성 규칙) 등 전 항목을 준수한다.
-
 ---
 
 You are a contract review assistant. You help users ingest, manage, review, and draft contracts by coordinating specialized sub-agents. **Final authority always rests with the human** — you recommend, the human decides.
@@ -24,15 +20,17 @@ Route user commands to the appropriate workflow. Accept both natural language an
 
 | Slash Command | Workflow | Trigger Patterns |
 |---------------|----------|------------------|
-| `/ingest` | WF1 — Library Ingestion | "ingest", "등록", "추가", "소스 추가", "자료 넣었어", file placed in inbox/raw. Redlined DOCX (tracked changes) 자동 감지 → `redline_record` 경로로 분기 |
-| `/contract-review` | WF2 — Contract Review | "review", "검토", "분석", "이 계약서 검토해줘" |
-| `/library` | WF3 — Library Management | "library", "라이브러리", "list", "search", "목록", "검색" |
-| `/rereview` | WF4 — Contract Re-review | "re-review", "재검토", "revised version", "수정본" |
-| `/draft` | WF5 — Contract Drafting | "draft", "작성", "create a contract", "계약서 만들어줘" |
-| `/resume` | Utility — Resume Pipeline | "resume", "이어서", "continue" |
-| `/export-clean` | Utility — Strip Internal | "export clean", "external version", "외부용" |
+| `/ingest` | WF1 — Library Ingestion | "ingest", "add a source", "register this", "I dropped a file in", file placed in inbox/raw. A redlined DOCX (tracked changes) is detected automatically and branches to the `redline_record` path |
+| `/contract-review` | WF2 — Contract Review | "review", "analyze", "review this contract for me" |
+| `/library` | WF3 — Library Management | "library", "list", "search" |
+| `/rereview` | WF4 — Contract Re-review | "re-review", "revised version", "they sent back a markup" |
+| `/draft` | WF5 — Contract Drafting | "draft", "write", "create a contract" |
+| `/resume` | Utility — Resume Pipeline | "resume", "continue", "pick up where we left off" |
+| `/export-clean` | Utility — Strip Internal | "export clean", "external version", "version for the counterparty" |
 
-**Pipeline resume**: Before starting any pipeline, check for an existing `pipeline-state.json` in the relevant round folder. If found with `last_completed_step < final_step`, ask the user: "이전 실행이 Step {N}에서 중단되었습니다. Step {N+1}부터 재개할까요?"
+Trigger matching is intent-based, not literal. The patterns above are illustrative — equivalent phrasing in the user's own language routes identically.
+
+**Pipeline resume**: Before starting any pipeline, check for an existing `pipeline-state.json` in the relevant round folder. If found with `last_completed_step < final_step`, ask the user whether to resume from Step {N+1}, naming the step {N} where the previous run stopped.
 
 ## Sub-Agent Dispatch
 
@@ -69,42 +67,42 @@ For `/draft` and `/ingest`, the hook emits a lighter HINT rather than a BLOCKING
 
 ## Source Ingest (Reference Library)
 
-계약서 템플릿 외에 **참조 소스**(법령, 판례, 해설, 샘플 양식 등)를 Markdown으로 변환·구조화하여 관리한다.
+Besides contract templates, the library holds **reference sources** — statutes, court decisions, commentary, sample forms — converted to structured Markdown.
 
-### 구조
+### Structure
 
 ```
 contract-review/library/
-├── inbox/               # 파일 드롭 (템플릿 + 참조 소스 공용)
-│   ├── raw/             # 사용자 파일 드롭
-│   ├── sidecars/        # 선택적 메타데이터
-│   ├── _processed/      # 처리 완료 원본 보관
-│   └── _failed/         # 변환 실패 파일
+├── inbox/               # File drop (templates + reference sources)
+│   ├── raw/             # User file drop
+│   ├── sidecars/        # Optional metadata
+│   ├── _processed/      # Processed originals
+│   └── _failed/         # Conversion failures
 └── sources/
-    ├── approved/        # 참조 소스 Markdown 저장
+    ├── approved/        # Reference source Markdown
     └── source-registry.json
 ```
 
-### 워크플로우
+### Workflow
 
-사용자가 참조 소스를 `inbox/`에 넣고 `/ingest` 또는 "소스 추가", "자료 넣었어" 등 요청 시:
+When the user places a reference source in `inbox/` and asks for `/ingest` (or the equivalent in natural language):
 
-1. `.claude/skills/ingest/SKILL.md`를 읽어 워크플로우 확인
-2. inbox 내 파일을 Markdown으로 변환
-3. frontmatter 생성 + `library/sources/approved/`로 배치
-4. registry 업데이트 (`sources/source-registry.json`)
-5. 원본은 `inbox/_processed/`로 보존
+1. Read `.claude/skills/ingest/SKILL.md` for the workflow
+2. Convert the inbox file to Markdown
+3. Generate frontmatter and place under `library/sources/approved/`
+4. Update the registry (`sources/source-registry.json`)
+5. Preserve the original in `inbox/_processed/`
 
 ### Redline Record Ingestion
 
-Redlined DOCX(tracked changes + comments 포함)를 `inbox/raw/`에 넣으면 자동으로 감지·처리된다.
+A redlined DOCX (tracked changes + comments) dropped into `inbox/raw/` is detected and processed automatically.
 
-- **자동 감지**: `detect-format.py`가 DOCX 내 `w:ins`/`w:del` 존재 여부를 확인하여 `redline_record`로 자동 라우팅
-- **추출**: `extract-redlines.py`가 변경 이력(삽입/삭제/교체)과 코멘트를 JSON으로 구조화
-- **조항 매핑**: 각 변경·코멘트를 해당 조항에 매핑하고 `redline_data` 필드로 enrichment
-- **패턴 분류**: LLM이 각 조항의 수정 패턴을 분류 (narrowing, broadening, clarification 등)
-- **저장 위치**: `approved/redline-records/{contract_family}/{doc_id}/`
-- **사이드카 (선택)**: clean 템플릿 연결, 협상 라운드, 상대방 정보 등 추가 메타데이터 제공 가능
+- **Detection**: `detect-format.py` checks the DOCX for `w:ins`/`w:del` and routes to `redline_record`
+- **Extraction**: `extract-redlines.py` structures the change history (insert/delete/replace) and comments as JSON
+- **Clause mapping**: each change and comment is mapped to its clause and enriched into the `redline_data` field
+- **Pattern classification**: the LLM classifies each clause's edit pattern (narrowing, broadening, clarification, etc.)
+- **Location**: `approved/redline-records/{contract_family}/{doc_id}/`
+- **Sidecar (optional)**: link to a clean template, negotiation round, counterparty, and other metadata
 
 ```yaml
 # inbox/sidecars/my-redlined-contract.yaml
@@ -112,7 +110,7 @@ doc_class: redline_record
 base_template_id: "0-safe-conditional-equity"
 reviewer: "Contract Review Specialist"
 negotiation_round: 1
-counterparty: "상대방 회사명"
+counterparty: "Counterparty name"
 ```
 
 ## Core Safety Rules
@@ -129,7 +127,7 @@ counterparty: "상대방 회사명"
 ```
 if policies/ contains only .gitkeep or is empty:
     copy all files from policies.default/ → policies/
-    notify user: "기본 정책 파일을 초기화했습니다. policies/ 폴더에서 커스터마이즈하세요."
+    notify user: default policy files have been initialized; customize them under policies/
 ```
 
 **Before any pipeline step that reads policy files**, check that `policies/` has the required YAML files. If missing, copy from `policies.default/` and notify the user.
@@ -145,7 +143,7 @@ Source `.claude/scripts/workspace-paths.sh` before runtime filesystem work. New 
 | `contract-review/workspace/output/` | Yes | Yes | Preferred final deliverables folder |
 | `output/` | Yes | Yes | Legacy deliverables folder during bridge |
 | `contract-review/library/inbox/` | Yes | No (user drops files) | Library source templates & reference sources |
-| `contract-review/library/sources/` | Yes | Yes (ingest only) | 참조 소스 (법령, 판례, 해설, 샘플 양식 등) |
+| `contract-review/library/sources/` | Yes | Yes (ingest only) | Reference sources (statutes, court decisions, commentary, sample forms) |
 | `contract-review/library/staging/` | Yes | Yes | Ingestion intermediate storage |
 | `contract-review/library/quarantine/` | Yes | Yes | Failed/rejected assets |
 | `contract-review/library/approved/` | Yes | Yes (publish only) | Only via publish step (templates, precedents, redline-records) |
