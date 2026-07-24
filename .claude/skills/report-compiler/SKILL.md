@@ -33,6 +33,10 @@ Compile analysis results into professional DOCX report deliverables.
 
 ## Input JSON Format — Analysis Report
 
+`memo_metadata` strings are free text and are rendered verbatim. Write them in
+whatever `report_language` is set to — the values below are illustrative only,
+not literals to copy into a report in another language.
+
 ```json
 {
   "schema_version": 1,
@@ -45,8 +49,8 @@ Compile analysis results into professional DOCX report deliverables.
     "recipient": "Client Name",
     "reference": "GC",
     "sender": "Contract Review Agent",
-    "subject": "계약 검토 분석 메모",
-    "signer": "담당 스페셜리스트"
+    "subject": "Contract Review Analysis Memorandum",
+    "signer": "Reviewing Specialist"
   },
   "background_facts": ["..."],
   "questions_presented": ["..."],

@@ -22,11 +22,11 @@ Before beginning to draft, gather three required items, then infer the rest.
 
 Determines which family checklist to apply, what structure to follow, and which templates to retrieve.
 
-- If the user specifies (e.g., "NDA 작성해줘", "draft an SHA for our Series A"), use that.
+- If the user specifies (e.g., "draft an NDA", "draft an SHA for our Series A"), use that.
 - If unclear, ask:
 
-  > 어떤 유형의 계약서를 작성할까요?
-  > 당사자는 누구인가요? (의뢰인 측 당사자명 / 상대방 당사자명)
+  > What type of contract should I draft?
+  > Who are the parties? (client-side party name / counterparty name)
 
 **2. Core commercial terms**
 
@@ -39,17 +39,17 @@ The deal-specific values that must appear in the contract: price, duration, deli
 
 Determines which clause tiers to use from the library (see `drafting-guide.md`).
 
-- If the user states leverage (e.g., "우리가 우위야", "low leverage"), use it.
+- If the user states leverage (e.g., "we have the upper hand", "low leverage"), use it.
 - If unspecified, **ask:**
 
-  > 협상 포지션이 어떻게 되나요?
-  > 1. 우위 (High) — 유리한 조건 최대한 반영
-  > 2. 대등 (Moderate) — 균형 잡힌 초안
-  > 3. 열위 (Low) — 핵심 보호조항 위주로 실용적 접근
+  > What is our negotiating position?
+  > 1. High — push for favourable terms throughout
+  > 2. Moderate — a balanced draft
+  > 3. Low — pragmatic, focused on the essential protections
 
 ### If insufficient info → Structured Interview
 
-When the user provides only a brief description (e.g., "투자계약 만들어줘"), conduct a structured interview using the 6-priority framework:
+When the user provides only a brief description (e.g., "put together an investment agreement"), conduct a structured interview using the 6-priority framework:
 
 | Priority | Category | Example Questions |
 |----------|----------|-------------------|
@@ -88,15 +88,15 @@ Search the library for matching templates and clause records:
 **Retrieval priority:** preferred template > acceptable template > fallback template > approved precedent > reference only
 
 **If no template found**, declare scratch mode:
-> **[Scratch Mode]** 사내 표준 템플릿이 없어 일반 계약법 원칙에 따라 작성합니다.
+> **[Scratch Mode]** No house template is available, so this draft follows general contract law principles.
 
 ### Leverage-based clause tier selection
 
 | Leverage | Core Clauses | Secondary Clauses | Stance |
 |----------|-------------|-------------------|--------|
-| **High** (우위) | Preferred only | Preferred | Push for ideal terms |
-| **Moderate** (대등) | Preferred | Acceptable | Balanced |
-| **Low** (열위) | Acceptable | Selective fallback | Pragmatic; Critical-only must-haves |
+| **High** | Preferred only | Preferred | Push for ideal terms |
+| **Moderate** | Preferred | Acceptable | Balanced |
+| **Low** | Acceptable | Selective fallback | Pragmatic; Critical-only must-haves |
 
 ## Phase 3: Generation
 
@@ -107,7 +107,7 @@ Generate the contract following these rules. Refer to `drafting-guide.md` for de
 3. **Defined terms**: Bold on first use, define in Definitions section, use consistently
 4. **Cross-references**: All internal references must be correct
 5. **Numbering**: Sequential — Korean: 제1조, 제1항 / English: Article 1, Section 1.1
-6. **No placeholders**: Fill all values. If unavailable, mark `[REVIEW NOTE: 확인 필요]` and flag in self-review
+6. **No placeholders**: Fill all values. If unavailable, mark `[REVIEW NOTE: <what needs confirming>]` and flag in self-review
 7. **Signature blocks**: Include name, title, date, seal/signature for each party
 
 ### Self-review (mandatory before delivery)

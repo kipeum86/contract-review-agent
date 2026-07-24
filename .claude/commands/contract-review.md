@@ -55,4 +55,5 @@ the dispatched agent (see AGENT.md "Safety Envelope").
 
 Before dispatching, check for an existing `pipeline-state.json` in the
 relevant matter round folder. If found with `last_completed_step < final_step`,
-ask the user: "이전 실행이 Step {N}에서 중단되었습니다. Step {N+1}부터 재개할까요?"
+ask the user whether to resume from Step {N+1}, naming the step {N} where
+the previous run stopped.

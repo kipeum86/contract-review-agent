@@ -68,24 +68,26 @@ Required for correct analysis direction. Determines which asymmetries are advers
 - If inferable with **high confidence** from the contract (client named by role, house-drafted template, unambiguous signing block) → infer and **state the inference explicitly** before proceeding, giving the user a chance to correct.
 - **If ambiguous or unspecified: ask before starting Step 1.** Use:
 
-  > 어느 쪽 입장에서 검토할까요?
-  > 1. [Party A name / 갑] 입장
-  > 2. [Party B name / 을] 입장
-  > 3. 중립적 검토
+  > Which side are we reviewing for?
+  > 1. [Party A name]
+  > 2. [Party B name]
+  > 3. Neutral review
 
 Write the confirmed `party_role` to `matter-context.yaml` before proceeding.
 
+> **Prompt wording**: the Pre-Pipeline questions below are written here in English for reference. Ask them in the language the user is writing in, per `terminal_output` in `.claude/policies/language-policy.yaml`.
+
 **2. Output deliverables (`output_selection`)**
 
-If the user specified which outputs to produce (e.g., "보고서만", "내부 레드라인이랑 보고서") → record that selection.
+If the user specified which outputs to produce (e.g., "report only", "the internal redline and the report") → record that selection.
 
 If not specified, **ask before starting Step 1:**
 
-> 어떤 결과물을 받으시겠어요? (하나 또는 복수 선택, 또는 "전체")
+> Which deliverables would you like? (one or more, or "all")
 >
-> 1. **Internal Redline DOCX** — tracked changes + [INTERNAL] & [EXTERNAL] 코멘트 포함
-> 2. **External-Clean DOCX** — [INTERNAL] 코멘트 제거, 상대방 전달용
-> 3. **Review Report DOCX** — Executive Summary + 조항별 분석 보고서
+> 1. **Internal Redline DOCX** — tracked changes + [INTERNAL] and [EXTERNAL] comments
+> 2. **External-Clean DOCX** — [INTERNAL] comments stripped, safe to send to the counterparty
+> 3. **Review Report DOCX** — Executive Summary + clause-by-clause analysis
 
 Write `output_selection: [1, 2, 3]` (with only selected numbers) to `matter-context.yaml`. Steps 8–10 will skip any unselected deliverable.
 
@@ -93,13 +95,12 @@ Write `output_selection: [1, 2, 3]` (with only selected numbers) to `matter-cont
 
 Required for correct Executive Summary and Clause-by-Clause rendering language. The contract's own language is determined separately in Step 2 (`contract_info.language`) and does **not** control the report language — user preference does.
 
-- If the user specified a language in the prompt (Korean prompt → `ko`, English prompt → `en`, or explicit override like "리포트는 영어로", "write the report in Korean") → use that.
+- If the user specified a language in the prompt (Korean prompt → `ko`, English prompt → `en`, or explicit override like "write the report in English", "write the report in Korean") → use that.
 - If inferable from the prompt language used in this session with **high confidence** (user has been writing consistently in one language) → infer and **state the inference explicitly** before proceeding.
 - **If ambiguous: ask before starting Step 1.** Use:
 
-  > 리포트를 어떤 언어로 작성할까요?
   > Which language should the report be in?
-  > 1. 한국어 / Korean
+  > 1. Korean
   > 2. English
 
 Write the confirmed `report_language` to `matter-context.yaml` as one of: `ko` | `en`.
@@ -169,11 +170,11 @@ fi
 - If `SIZE_VERDICT: large`: log the size and inform the user in one line that chunking will be required and processing will take longer. Proceed without blocking.
 - If `SIZE_VERDICT: very_large`: ask the user before proceeding. Present:
 
-  > 이 계약서는 매우 큽니다 (추정 토큰 수 T). 한 세션으로 처리하면 (1) chunking merge 중 일부 조항 누락, (2) LLM의 "중요 조항만 선별" 드리프트, (3) Executive Summary 품질 저하가 발생할 수 있습니다. 어떻게 진행할까요?
+  > This contract is very large (estimated T tokens). Handling it in a single session risks (1) clauses dropped during the chunking merge, (2) the model drifting into "only the important clauses", and (3) a weaker Executive Summary. How would you like to proceed?
   >
-  > A) 그대로 진행 (위험 감수)
-  > B) Article 경계에서 2-3개 파일로 수동 분할 후 각각 별도 `/contract-review` 실행
-  > C) Commercial / Technical / Risk allocation 등 논리 주제로 수동 분할 후 각각 별도 round로 실행
+  > A) Proceed as is (accepting the risk)
+  > B) Split manually into 2–3 files at article boundaries and run `/contract-review` on each
+  > C) Split manually by theme (commercial / technical / risk allocation) and run each as its own round
 
   Do not proceed until the user answers.
 
@@ -316,7 +317,7 @@ Load contract-family-specific sections only when they apply (for example `--sect
 For each clause:
 1. Read target clause + matched library clause + playbook (if available) + fallback ladder
 2. Load review mode from `review-mode.yaml` (or per-review override). Preserve the existing mode keys: `strict` | `moderate` | `loose`.
-3. If redline pattern records exist for this clause type (from Step 5.2), include them as context — reference how the reviewer handled similar clauses in past deals (e.g., "이전 Series A 딜에서 이 indemnity 조항을 계약금액 200% 한도로 narrowing한 바 있음")
+3. If redline pattern records exist for this clause type (from Step 5.2), include them as context — reference how the reviewer handled similar clauses in past deals (e.g., "in a prior Series A deal this indemnity was narrowed to a cap of 200% of the contract value")
 4. Apply the four-lens analysis framework from `review-guide.md` (Asymmetries / Overbroad Qualifiers / Missing Protections / Structural Traps)
 5. Identify divergences from house position
 6. Assign risk grade: Critical | High | Medium | Low | Acceptable

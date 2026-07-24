@@ -1,34 +1,33 @@
 ---
 name: ingest
 description: >
-  library/inbox/에 넣은 외부 참조 소스 파일(PDF, DOCX 등)을 자동으로
-  Markdown 변환, frontmatter 생성, 폴더 배치, 인덱스 업데이트까지
-  원스텝으로 처리한다. /ingest로 트리거.
+  Processes external reference source files (PDF, DOCX, etc.) dropped into
+  library/inbox/ in one step: Markdown conversion, frontmatter generation,
+  folder placement, and index update. Triggered by /ingest.
 ---
 
 # Source Ingest
 
-`contract-review/library/inbox/`에 참조 소스 파일을 넣고 `/ingest`를 실행하면 자동으로 처리한다.
+Drop a reference source file into `contract-review/library/inbox/` and run `/ingest` to process it automatically.
 
-> **참고**: 이 스킬은 **참조 소스**(법령, 판례, 해설, 샘플 양식 등)를 Markdown으로 변환·구조화한다.
-> 계약서 템플릿/선례 ingestion은 기존 10단계 파이프라인(ingestion-agent)을 사용한다.
+> **Note**: this skill converts and structures **reference sources** — statutes, court decisions, commentary, sample forms. Contract templates and precedents go through the existing 10-step pipeline (ingestion-agent) instead.
 
 ## Trigger
 
-- `/ingest` — inbox 전체 처리
-- 사용자가 "소스 추가", "자료 넣었어", "ingest", "inbox" 등 요청 시
+- `/ingest` — process the whole inbox
+- A natural-language request to add a source, ingest material, or process the inbox
 
 ---
 
 ## Workflow
 
 ```
-library/inbox/ 에 파일 드롭
+File dropped into library/inbox/
   │
-  ├─ Step 1: 파일 스캔
-  ├─ Step 2: Markdown 변환
-  ├─ Step 3: Frontmatter 생성 + sources/ 배치
-  └─ Step 4: 인덱스 업데이트
+  ├─ Step 1: Scan files
+  ├─ Step 2: Convert to Markdown
+  ├─ Step 3: Generate frontmatter + place under sources/
+  └─ Step 4: Update indexes
 ```
 
 Executable implementation:
@@ -44,84 +43,84 @@ python3 .claude/skills/ingest/scripts/validate_source_registry.py \
   contract-review/library/sources/source-registry.json
 ```
 
-### Step 1: Inbox 스캔
+### Step 1: Scan the inbox
 
 ```
-inbox/ 내 모든 파일을 Glob으로 탐색 (inbox/raw/ 포함)
-지원 포맷: .pdf, .docx, .pptx, .xlsx, .html, .md, .txt
-비지원: .hwp, .hwpx → 유저에게 "PDF/DOCX 변환 후 다시 넣어주세요" 안내
+Glob every file under inbox/ (including inbox/raw/)
+Supported: .pdf, .docx, .pptx, .xlsx, .html, .md, .txt
+Unsupported: .hwp, .hwpx → tell the user to convert to PDF/DOCX and drop it again
 ```
 
-- 파일이 0개면 "inbox가 비어 있습니다" 안내 후 종료
-- 하위 폴더 안의 파일도 재귀 탐색
-- `.gitkeep`, `_processed/`, `_failed/`, `sidecars/` 내 파일은 제외
+- If there are no files, report that the inbox is empty and stop
+- Recurse into subfolders
+- Skip `.gitkeep` and anything under `_processed/`, `_failed/`, `sidecars/`
 
-**계약서 템플릿 vs 참조 소스 구분:**
-- 사용자가 명시적으로 "소스 추가", "참조 자료" 등 참조 소스임을 언급하면 이 스킬로 처리
-- 사용자가 "템플릿 등록", "계약서 추가" 등 계약서임을 언급하면 기존 ingestion-agent로 라우팅
-- 불분명한 경우 사용자에게 질문:
-  > "이 파일은 참조 소스(법령/판례/해설)인가요, 아니면 계약서 템플릿인가요?"
+**Telling contract templates from reference sources:**
+- If the user explicitly calls it a source or reference material, handle it here
+- If the user calls it a template or a contract to register, route to the ingestion-agent
+- If it is unclear, ask:
+  > Is this a reference source (statute / court decision / commentary), or a contract template?
 
-### Step 2: Markdown 변환
+### Step 2: Convert to Markdown
 
-| 입력 포맷 | 변환 방법 |
-|----------|----------|
-| `.pdf` | `mcp__markitdown__convert_to_markdown` (uri: `file:///절대경로`) |
+| Input format | Conversion |
+|--------------|------------|
+| `.pdf` | `mcp__markitdown__convert_to_markdown` (uri: `file:///absolute/path`) |
 | `.docx` | `mcp__markitdown__convert_to_markdown` |
 | `.pptx`, `.xlsx`, `.html` | `mcp__markitdown__convert_to_markdown` |
-| `.md`, `.txt` | 변환 불필요, 그대로 사용 |
+| `.md`, `.txt` | No conversion needed — use as is |
 
-**변환 실패 시:** 해당 파일을 `library/inbox/_failed/`로 이동 + 유저에게 실패 사유 안내
+**On conversion failure:** move the file to `library/inbox/_failed/` and tell the user why.
 
-### Step 3: Frontmatter 생성 + sources/ 배치
+### Step 3: Generate frontmatter + place under sources/
 
-변환된 .md 파일에 YAML frontmatter를 자동 생성한다.
+Generate YAML frontmatter on the converted `.md` file.
 
 ```yaml
 ---
-# === 식별 정보 ===
-source_id: "{category}-{slug}"        # 예: "statute-commercial-code-capital-increase"
-slug: "{자동 생성}"
-title_kr: "{문서에서 추출한 제목}"
-title_en: "{영문 제목 있으면 추출, 없으면 빈값}"
+# === Identity ===
+source_id: "{category}-{slug}"        # e.g. "statute-commercial-code-capital-increase"
+slug: "{generated}"
+title_kr: "{title extracted from the document}"
+title_en: "{English title if present, otherwise empty}"
 document_type: "{statute | enforcement_decree | regulation | guideline | decision | precedent | newsletter | commentary | article | paper | sample_form | other}"
 
-# === 소스 정보 ===
-publisher: "{발행 기관/로펌/저널명}"
-author: "{저자명 (추출 가능한 경우)}"
-published_date: "{발행일 (추출 가능한 경우)}"
-source_url: "{URL (추출 가능한 경우)}"
+# === Provenance ===
+publisher: "{issuing body / firm / journal}"
+author: "{author, if extractable}"
+published_date: "{publication date, if extractable}"
+source_url: "{URL, if extractable}"
 original_format: "{pdf | docx | ...}"
-ingested_at: "{처리 시각 ISO 8601}"
+ingested_at: "{processing time, ISO 8601}"
 
-# === 검색 메타 ===
-keywords: ["{내용 기반 키워드 5-10개}"]
-topics: ["{주제 분류}"]
-relevant_statutes: ["{인용된 법조문 목록, 예: 상법 제418조, 자본시장법 제9조}"]
-contract_families_relevant: ["{관련 계약 유형: ssa, sha, safe, spa, license 등}"]
-char_count: {글자수}
+# === Search metadata ===
+keywords: ["{5-10 content-derived keywords}"]
+topics: ["{topic classification}"]
+relevant_statutes: ["{cited provisions}"]
+contract_families_relevant: ["{related contract types: ssa, sha, safe, spa, license, ...}"]
+char_count: {character count}
 ---
 ```
 
-**핵심 필드 추출 로직:**
-1. **제목**: 첫 번째 `#` 헤딩 또는 문서 최상단 볼드 텍스트
-2. **키워드**: 계약법 관련 핵심 용어 추출 (투자계약, 주주간계약, 전환권, 우선매수권, 동반매도, 희석방지 등)
-3. **relevant_statutes**: 정규식으로 "제XX조" 패턴 추출 → 법률명 + 조문 번호 매칭
-4. **contract_families_relevant**: 문서 내용에서 관련 계약 유형 판별 (contract-families.yaml 참조)
-5. **publisher**: 로펌명, 기관명, 저널명 등 추출
-6. **published_date**: 날짜 패턴 추출 (YYYY.MM.DD, YYYY년 M월 D일 등)
+**Field extraction logic:**
+1. **Title**: the first `#` heading, or bold text at the very top of the document
+2. **Keywords**: contract-law terms of art appearing in the document
+3. **relevant_statutes**: regex-extract article references and match them to the statute name plus article number
+4. **contract_families_relevant**: infer related contract types from the content (see `contract-families.yaml`)
+5. **publisher**: firm, institution, or journal name
+6. **published_date**: extract date patterns
 
-**저장 위치:** `library/sources/{slug}.md`
-- slug는 제목에서 생성: 한글 유지, 공백→하이픈, 특수문자 제거
-- 중복 시 `-2`, `-3` 접미사
+**Location:** `library/sources/{slug}.md`
+- The slug is derived from the title: keep the original script, spaces become hyphens, special characters are dropped
+- On collision, append `-2`, `-3`
 
-**원본 파일:** `library/inbox/_processed/`로 이동 (삭제하지 않음)
+**Original file:** moved to `library/inbox/_processed/` (never deleted)
 
-### Step 4: 인덱스 업데이트
+### Step 4: Update the indexes
 
-처리 완료 후 `library/sources/source-registry.json`을 업데이트한다.
+After processing, update `library/sources/source-registry.json`.
 
-**source-registry.json 엔트리 구조:**
+**Registry entry structure:**
 
 ```json
 {
@@ -135,7 +134,9 @@ char_count: {글자수}
 }
 ```
 
-기존 `source-registry.json`이 없으면 새로 생성한다.
+`title_kr` and `keywords` hold the source's own wording, so they carry whatever language the source is written in.
+
+If `source-registry.json` does not exist yet, create it.
 
 Validation rules:
 
@@ -146,38 +147,38 @@ Validation rules:
 
 ---
 
-## 처리 결과 리포트
+## Result report
 
-모든 파일 처리 후 요약 리포트를 출력한다:
+After processing every file, print a summary:
 
 ```
-Ingest 완료
+Ingest complete
 
-처리: N개 파일
-  성공: X건 (파일명 → sources/)
-  실패: Y건 (_failed/로 이동)
+Processed: N files
+  Succeeded: X (filename → sources/)
+  Failed: Y (moved to _failed/)
 
-원본: library/inbox/_processed/ 로 이동
+Originals moved to library/inbox/_processed/
 ```
 
 ---
 
-## 에러 처리
+## Error handling
 
-| 상황 | 대응 |
-|------|------|
-| inbox 비어있음 | "inbox가 비어 있습니다" 안내 |
-| 미지원 포맷 (.hwp 등) | 해당 파일 스킵 + "PDF/DOCX로 변환 필요" 안내 |
-| markitdown 변환 실패 | `_failed/`로 이동 + 실패 사유 안내 |
-| 파일명 중복 | slug에 `-2`, `-3` 접미사 |
-| frontmatter 추출 실패 | 빈 값으로 생성 + 유저 검토 권고 |
+| Situation | Response |
+|-----------|----------|
+| Inbox empty | Report that the inbox is empty |
+| Unsupported format (.hwp etc.) | Skip the file and ask for a PDF/DOCX conversion |
+| markitdown conversion failed | Move to `_failed/` and report the reason |
+| Filename collision | Append `-2`, `-3` to the slug |
+| Frontmatter extraction failed | Generate empty values and recommend user review |
 
 ---
 
-## 주의사항
+## Cautions
 
-1. **원본 보존**: inbox 원본은 절대 삭제하지 않음 → `_processed/`로 이동
-2. **대용량 파일**: 50MB 초과 파일은 경고 후 유저 확인 요청
-3. **스캔 PDF**: OCR 품질이 낮으면 유저 검토 권고
-4. **기존 파일 보호**: 이미 `library/sources/`에 있는 동일 slug 파일은 덮어쓰지 않음
-5. **계약서 템플릿 구분**: 참조 소스가 아닌 계약서 템플릿은 기존 10단계 파이프라인으로 라우팅
+1. **Preserve originals**: never delete an inbox original — move it to `_processed/`
+2. **Large files**: warn and ask for confirmation above 50MB
+3. **Scanned PDFs**: recommend user review when OCR quality is poor
+4. **Do not clobber**: never overwrite an existing `library/sources/` file with the same slug
+5. **Templates are different**: contract templates, as opposed to reference sources, route to the 10-step pipeline
