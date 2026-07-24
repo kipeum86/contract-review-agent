@@ -1065,10 +1065,10 @@ function createKoreanMemorandum(data) {
 
   sections.push(createMemoSectionTitle('4. 검토의견'));
 
-  // Optional 협상 우선순위 sub-section — rendered only when
+  // Optional negotiation-priority sub-section — rendered only when
   // executive_summary.negotiation_priority is present (v2 schema). Backward
-  // compat: legacy Korean review.json without this field renders the
-  // clause-by-clause list directly under "4. 검토의견" as before.
+  // compat: a legacy Korean review.json without this field renders the
+  // clause-by-clause list directly under the section 4 heading, as before.
   const negotiationPriority = data.executive_summary && data.executive_summary.negotiation_priority;
   if (negotiationPriority) {
     sections.push(...createKoreanNegotiationPriority(negotiationPriority));

@@ -76,7 +76,8 @@ fi
 # Rationale:
 #   - `review` wins because it carries the highest analysis-quality risk and
 #     has historically been the most sensitive to missing baselines.
-#     A prompt like "/draft 후 검토해" means the user wants review baselines too.
+#     A prompt like "/draft then review it" means the user wants review
+#     baselines too.
 #   - Slash commands always take priority over natural-language matching.
 #   - `none` triggers a silent `{}` (no injection) so non-workflow chatter and
 #     non-baseline commands like /library don't suffer hook overhead.
@@ -164,7 +165,7 @@ This loads drafting-guide.md which contains user-customized checklists and Korea
         ;;
     ingest)
         # Preserve existing ingest hook behavior (SKILL.md instruction) + add loader nudge
-        INSTRUCTION="[Hook] 유저가 문서 인제스트를 요청했습니다. .claude/skills/ingest/SKILL.md를 읽고 /ingest 워크플로우를 실행하세요.
+        INSTRUCTION="[Hook] The user requested a document ingest. Read .claude/skills/ingest/SKILL.md and run the /ingest workflow.
 
 Optional: If domain-policy.md baselines are needed during processing, run:
 bash $LOADER_REL ingest"
