@@ -59,18 +59,17 @@ __pycache__/
 /contract-review/workspace/runs/*
 !/contract-review/workspace/runs/.gitkeep
 
-# Domain-reference loader session traces (per-execution forensic, never committed)
-# See internal domain-reference loader documentation
+# Domain-reference loader session traces (per-execution, never committed)
 /contract-review/library/runs/ingestion/*
 !/contract-review/library/runs/ingestion/.gitkeep
 /contract-review/library/runs/sessions/*
 !/contract-review/library/runs/sessions/.gitkeep
 
-# Local-only working directory (paths deliberately hidden from public .gitignore)
+# Local-only scratch directory
 /_private/*
 !/_private/.gitkeep
 
-# Generic patterns (no file-name leakage)
+# Local build, draft and log artifacts
 release-note-*.md
 package-lock.json
 package-lock.json.backup-*

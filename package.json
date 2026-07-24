@@ -1,7 +1,7 @@
 {
   "name": "contract-review-agent",
   "version": "1.0.0",
-  "description": "",
+  "description": "Agent-driven contract review, drafting and clause library toolkit",
   "main": "index.js",
   "directories": {
     "doc": "docs"

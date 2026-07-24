@@ -372,9 +372,9 @@ The agent is composed of three specialized sub-agents coordinated by an orchestr
 ## Reference
 
 - [How to Use](./docs/HOW-TO-USE.md) — setup guide and step-by-step walkthrough
+- [Disclaimer](./docs/DISCLAIMER.md) — limitations and data security considerations
+- [Seed Calibration Playbook](./docs/SEED-CALIBRATION-PLAYBOOK.md) — tuning the bundled seed templates
 - [CLAUDE.md](./CLAUDE.md) — orchestrator routing and safety rules
-
-Internal implementation notes are kept in the local-only workspace and are intentionally omitted from the public repository.
 
 ## License
 
